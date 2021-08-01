@@ -27,7 +27,7 @@ const fieldLevelPatch = (
       } else {
         valToPatch = reconcileObject(origVal ?? {}, translatedVal)
       }
-      merged[field][localeId.replace('-', '_')] = valToPatch
+      merged[field][localeId] = valToPatch
     }
 
     client
