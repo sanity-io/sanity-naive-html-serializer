@@ -145,7 +145,7 @@ const serializeObject = (
   }
 
   const tempSerializers = { 
-    types: ...serializers.types,
+    types: serializers.types,
     list: serializers.list,
     listItem: serializers.listItem
   }
