@@ -4,7 +4,7 @@ This is the source for tooling for naively turning documents and rich text field
 
 This builds heavily on Sanity's [blocks-to-html](https://github.com/sanity-io/block-content-to-html) and [block-tools](https://github.com/sanity-io/sanity/tree/next/packages/@sanity/block-tools), and it's highly recommended you familiarize yourself with these if you plan on customizing.
 
-If you're using any of our `TranslationTab` plugins, the scenarios below are some you might enocunter in your journey!
+If you're using any of our `TranslationsTab` plugins, the scenarios below are some you might enocunter in your journey!
 
 ### Scenario: Some fields or objects in my document are serializing /deserializing strangely.
 First: this is often caused by not declaring types at the top level of your schema. Serialization introspects your schema files and can get a much better sense of what to do when objects are not "anonymous" (this is similar to how our GraphQL functions work -- more info on "strict" schemas [here](https://www.sanity.io/docs/graphql#33ec7103289a)) You can save yourself some development time by trying this first.
@@ -61,7 +61,7 @@ const myBlockDeserializationRules = [
 Now, to bring it all together:
 
 ```javascript
-import { TranslationTab, defaultDocumentLevelConfig, BaseDocumentSerializer, BaseDocumentDeserializer, BaseDocumentPatcher, defaultStopTypes } from 'whichever-sanity-plugin-translation-service-you-use'
+import { TranslationsTab, defaultDocumentLevelConfig, BaseDocumentSerializer, BaseDocumentDeserializer, BaseDocumentPatcher, defaultStopTypes } from 'whichever-sanity-plugin-translation-service-you-use'
 
 const myCustomConfig = {
   ...defaultDocumentLevelConfig,
@@ -86,10 +86,10 @@ const myCustomConfig = {
 
 ```
 
-Then, in your document structure, just feed the config into your `TranslationTab`.
+Then, in your document structure, just feed the config into your `TranslationsTab`.
 
 ```javascript
-        S.view.component(TranslationTab).title('My Translation Service').options(
+        S.view.component(TranslationsTab).title('My Translation Service').options(
           myCustomConfig
         )
 ```
@@ -102,7 +102,7 @@ Then, in your document structure, just feed the config into your `TranslationTab
 If all the serialization is working to your liking, but you have a different setup for how your document works, you can overwrite that patching logic.
 
 ```javascript
-import { TranslationTab, defaultDocumentLevelConfig, BaseDocumentDeserializer } from 'whichever-sanity-plugin-translation-service-you-use'
+import { TranslationsTab, defaultDocumentLevelConfig, BaseDocumentDeserializer } from 'whichever-sanity-plugin-translation-service-you-use'
 
 const myCustomConfig = {
   ...defaultDocumentLevelConfig,
@@ -137,7 +137,7 @@ The serializer actually introspects your schema files. You can set `localize: fa
 This plugin ships with a specification called `stopTypes`. By default it ignores fields that don't have useful linguistic information -- dates, numbers, etc. You can add to it easily.
 
 ```javascript
-import { TranslationTab, defaultDocumentLevelConfig, defaultStopTypes, BaseDocumentSerializer } from "sanity-plugin-transifex"
+import { TranslationsTab, defaultDocumentLevelConfig, defaultStopTypes, BaseDocumentSerializer } from "sanity-plugin-transifex"
 
 const myCustomStopTypes = [
   ...defaultStopTypes,
@@ -151,11 +151,11 @@ const myCustomConfig = {
 }
 ```
 
-As above, feed the config into your `TranslationTab`.
+As above, feed the config into your `TranslationsTab`.
 
 ```javascript
 
-        S.view.component(TranslationTab).title('My Translation Service').options(
+        S.view.component(TranslationsTab).title('My Translation Service').options(
           myCustomConfig
         )
 
