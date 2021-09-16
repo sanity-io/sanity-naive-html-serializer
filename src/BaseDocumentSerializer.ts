@@ -81,7 +81,6 @@ const languageObjectFieldFilter = (
   return filteredObj
 }
 
-
 /*
  * Helper. Eliminates stop-types and non-localizable fields.
  */
@@ -144,9 +143,8 @@ const serializeArray = (
     serializeObject(obj, null, stopTypes, serializers)
   )
 
-  return `<div class="${fieldName}">${output.join("")}</div>`
+  return `<div class="${fieldName}">${output.join('')}</div>`
 }
-
 
 const serializeObject = (
   obj: Record<string, any>,
