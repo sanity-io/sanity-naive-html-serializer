@@ -4,10 +4,18 @@ import { defaultStopTypes, customSerializers } from './BaseSerializationConfig'
 import { ObjectField } from '@sanity/types'
 import { findLatestDraft } from './helpers'
 import { Serializer } from './types'
+import clone from 'just-clone'
 
+/*
+ * Helper function that allows us to get metadata (like `localize: false`) from schema fields.
+ */
 const getSchema = (name: string) =>
   schemas._original.types.find((s: ObjectField) => s.name === name)
 
+/*
+ * Main parent function: finds fields to translate, and feeds them to appropriate child serialization
+ * methods.
+ */
 const serializeDocument = async (
   documentId: string,
   translationLevel: string = 'document',
@@ -53,6 +61,10 @@ const serializeDocument = async (
   }
 }
 
+/*
+ * Helper. If field-level translation pattern used, only sends over
+ * content from the base language.
+ */
 const languageObjectFieldFilter = (
   obj: Record<string, any>,
   baseLang: string
@@ -69,6 +81,9 @@ const languageObjectFieldFilter = (
   return filteredObj
 }
 
+/*
+ * Helper. Eliminates stop-types and non-localizable fields.
+ */
 const fieldFilter = (
   obj: Record<string, any>,
   objFields: ObjectField[],
@@ -123,9 +138,12 @@ const serializeArray = (
   })
 
   const output = filteredBlocks.map(obj =>
+    //deep copy needed here to avoid serializer rules
+    //serializing objects with content that comes before in the loop
     serializeObject(obj, null, stopTypes, serializers)
   )
-  return `<div class="${fieldName}">${output.join()}</div>`
+
+  return `<div class="${fieldName}">${output.join('')}</div>`
 }
 
 const serializeObject = (
@@ -144,11 +162,7 @@ const serializeObject = (
     return blocksToHtml({ blocks: [obj], serializers: serializers })
   }
 
-  const tempSerializers = { 
-    types: serializers.types,
-    list: serializers.list,
-    listItem: serializers.listItem
-  }
+  const tempSerializers = clone(serializers)
 
   if (obj._type !== 'span' && obj._type !== 'block') {
     let innerHTML = ''
@@ -185,7 +199,6 @@ const serializeObject = (
     if (!innerHTML) {
       return ''
     }
-    //@ts-ignore
     tempSerializers.types[obj._type] = (props: Record<string, any>) => {
       return h('div', {
         className: topFieldName ?? props.node._type,
