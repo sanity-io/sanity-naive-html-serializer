@@ -80,6 +80,7 @@ const deserializeHTML = (
     HTMLnode = HTMLnode.children[0]
   }
 
+  //prioritize custom deserialization
   if (
     target &&
     target.type &&
@@ -88,17 +89,23 @@ const deserializeHTML = (
   ) {
     const deserialize = deserializers.types[target.type.name]
     output = deserialize(HTMLnode)
-  } else {
+  }
+
+  //begin recursively deserializing
+  //every child node is either a field in an object
+  //or a child object in an array
+  else {
     const children = Array.from(HTMLnode.children)
     output = target && target.type && target.type.hasOwnProperty('of') ? [] : {}
 
     children.forEach(child => {
       let deserializedObj
-      //allow for custom deserialization
+      //prioritize custom deserialization
       if (Object.keys(deserializers.types).includes(child.className)) {
         const deserialize = deserializers.types[child.className]
         deserializedObj = deserialize(child)
       }
+
       //flat string, it's an unrich field
       else if (child.tagName.toLowerCase() === 'span') {
         deserializedObj = child.innerHTML
@@ -107,7 +114,7 @@ const deserializeHTML = (
       //has specific class name, so it's either a field or obj
       else if (child.className) {
         let objType
-        if (target.fields) {
+        if (target && target.fields) {
           objType = target.fields.find(field => field.name === child.className)
         }
 
