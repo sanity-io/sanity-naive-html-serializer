@@ -126,7 +126,7 @@ const deserializeHTML = (
         if (!objType && target && target.type && target.type.fields) {
           //@ts-ignore
           objType = target.type.fields.find(
-            field => field.name === child.className
+            (field: ObjectField) => field.name === child.className
           )
         }
 
