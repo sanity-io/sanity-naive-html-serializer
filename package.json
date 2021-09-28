@@ -48,7 +48,7 @@
     "@sanity/client": "^2.0.9",
     "@sanity/schema": "^2.10.0",
     "@sanity/types": "^2.11.0",
-    "@size-limit/preset-small-lib": "^4.7.0",
+    "@size-limit/preset-small-lib": "5.0.5",
     "husky": "^4.3.0",
     "size-limit": "^4.7.0",
     "tsdx": "^0.14.1",
