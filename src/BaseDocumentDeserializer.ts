@@ -122,6 +122,14 @@ const deserializeHTML = (
           objType = schema.get(child.className)
         }
 
+        //@ts-ignore
+        if (!objType && target && target.type && target.type.fields) {
+          //@ts-ignore
+          objType = target.type.fields.find(
+            (field: ObjectField) => field.name === child.className
+          )
+        }
+
         if (!objType) {
           console.debug(noSchemaWarning(child))
           objType = blockContentType

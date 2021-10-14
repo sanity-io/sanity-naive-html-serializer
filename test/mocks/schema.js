@@ -88,7 +88,7 @@ function documentLevelArticle() {
         name: 'meta',
         title: 'Meta',
         type: 'string',
-        socalize: false
+        localize: false
       },
       {
         name: 'snippet',
@@ -143,6 +143,7 @@ function fieldLevelArticle() {
         name: 'meta',
         title: 'Meta',
         type: 'string',
+        localize: false
       },
       {
         name: 'snippet',

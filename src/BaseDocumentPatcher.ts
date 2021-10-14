@@ -63,8 +63,14 @@ const documentLevelPatch = (
 }
 
 const reconcileArray = (origArray: any[], translatedArray: any[]) => {
+  //arrays of strings don't have keys, so just replace the array and return
+  if (translatedArray && translatedArray.some(el => typeof el === 'string')) {
+    return translatedArray
+  }
+
   //deep copy needed for field level patching
   const combined = JSON.parse(JSON.stringify(origArray))
+
   translatedArray.forEach(block => {
     if (!block._key) {
       return
@@ -74,7 +80,7 @@ const reconcileArray = (origArray: any[], translatedArray: any[]) => {
     )
     if (foundBlockIdx < 0) {
       console.log(
-        `This block no longer exists on the original document. Was it removed? ${block._key}`
+        `This block no longer exists on the original document. Was it removed? ${block}`
       )
     } else if (
       origArray[foundBlockIdx]._type === 'block' ||

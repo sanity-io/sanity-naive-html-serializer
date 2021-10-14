@@ -137,11 +137,13 @@ const serializeArray = (
     }
   })
 
-  const output = filteredBlocks.map(obj =>
-    //deep copy needed here to avoid serializer rules
-    //serializing objects with content that comes before in the loop
-    serializeObject(obj, null, stopTypes, serializers)
-  )
+  const output = filteredBlocks.map((obj, i) => {
+    if (typeof obj === 'string') {
+      return `<span>${obj}</span>`
+    } else {
+      return serializeObject(obj, null, stopTypes, serializers)
+    }
+  })
 
   return `<div class="${fieldName}">${output.join('')}</div>`
 }
@@ -190,7 +192,7 @@ const serializeObject = (
             stopTypes,
             serializers
           )
-          htmlField = `<div class=${fieldName}>${objHTML}</div>`
+          htmlField = `<div class="${fieldName}">${objHTML}</div>`
         }
       }
       innerHTML += htmlField
