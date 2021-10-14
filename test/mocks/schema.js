@@ -1,14 +1,15 @@
-const types = {
-  arrayField: arrayField(),
-  objectField: objectField(),
-  childObjectField: childObjectField(),
-  documentLevelArticle: documentLevelArticle(),
-  fieldLevelArticle: fieldLevelArticle(),
-}
+const types =  [
+  arrayField(),
+  objectField(),
+  childObjectField(),
+  documentLevelArticle(),
+  fieldLevelArticle(),
+]
+
 
 module.exports = {
   name: 'blog',
-  get: (typeName) => types[typeName],
+  get: (typeName) => types.find(t => t.name == typeName),
   _original: {
     types: types
   }
@@ -74,8 +75,8 @@ function objectField() {
 
 function documentLevelArticle() {
   return {
-    name: 'article',
-    title: 'Article',
+    name: 'documentLevelArticle',
+    title: 'Document Level Article',
     type: 'document',
     fields: [
       {
@@ -128,17 +129,15 @@ function createLocaleFields(locales, fieldType) {
 
 function fieldLevelArticle() {
   return {
-    name: 'article',
-    title: 'Article',
+    name: 'fieldLevelArticle',
+    title: 'Field Level Article',
     type: 'document',
     fields: [
       {
         name: 'title',
         title: 'Title',
         type: 'object',
-        fields: [
-          createLocaleFields(LANGUAGES, {type: 'string'})
-        ]
+        fields: createLocaleFields(['en', 'fr', 'de'], {type: 'string'})
       },
       {
         name: 'meta',
@@ -149,17 +148,13 @@ function fieldLevelArticle() {
         name: 'snippet',
         title: 'Snippet',
         type: 'object',
-        fields: [
-          createLocaleFields(LANGUAGES, {type: 'text'})
-        ]
+        fields: createLocaleFields(['en', 'fr', 'de'], {type: 'text'})
       },
       {
         name: 'tags',
         title: 'Tags',
         type: 'object',
-        fields: [
-          createLocaleFields(LANGUAGES, {type: 'array', of: [{type: 'string'}]})
-        ]
+        fields: createLocaleFields(['en', 'fr', 'de'], {type: 'array', of: [{type: 'string'}]})
       },
       {
         name: 'hidden',
@@ -169,12 +164,14 @@ function fieldLevelArticle() {
       {
         name: 'config',
         title: 'Config',
-        createLocaleFields(LANGUAGES, {type: 'objectField'})
+        type: 'object',
+        fields: createLocaleFields(['en', 'fr', 'de'], {type: 'objectField'})
       },
       {
         name: 'content',
         title: 'Content',
-        createLocaleFields(LANGUAGES, {type: 'arrayField'})
+        type: 'object',
+        fields: createLocaleFields(['en', 'fr', 'de'], {type: 'arrayField'})
       },
     ],
   }
