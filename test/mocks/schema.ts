@@ -1,31 +1,22 @@
-// import Schema from '@sanity/schema'
-const Schema = require('@sanity/schema')
+import Schema from "@sanity/schema"
 
 const types =  [
-  arrayField(),
+  {
+    name: 'arrayField',
+    title: 'Array Field',
+    type: 'array',
+    of: [{ type: 'block' }, { type: 'objectField' }],
+  },
   objectField(),
   childObjectField(),
   documentLevelArticle(),
   fieldLevelArticle(),
 ]
 
-
-module.exports = {
-  name: 'blog',
-  get: (typename) => types.find(t => t.name == typename),
-  _original: {
-    types: types
-  }
-}
-
-function arrayField() {
-  return {
-    name: 'arrayField',
-    title: 'Array Field',
-    type: 'array',
-    of: [{ type: 'block' }, { type: 'objectField' }],
-  }
-}
+module.exports = Schema.compile({
+  name: 'test',
+  types
+})
 
 function childObjectField() {
   return {
@@ -121,7 +112,9 @@ function documentLevelArticle() {
   }
 }
 
-function createLocaleFields(locales, fieldType) {
+type FieldDefinition = Record<string,any>
+
+function createLocaleFields(locales: string[], fieldType:FieldDefinition) {
   return locales.map(locale => ({
     ...{name: locale},
     ...fieldType
