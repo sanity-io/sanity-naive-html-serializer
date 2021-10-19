@@ -1,0 +1,94 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Global test of working doc-level functionality and snapshot match 1`] = `
+Object {
+  "config": Object {
+    "nestedArrayField": Array [
+      Object {
+        "_key": "4a58adc7c507",
+        "_type": "block",
+        "children": Array [
+          Object {
+            "_key": "19bb3419e1660",
+            "_type": "span",
+            "marks": Array [],
+            "text": "This is block text 1 level deep",
+          },
+        ],
+        "markDefs": Array [],
+        "style": "normal",
+      },
+    ],
+    "objectAsField": Array [
+      Object {
+        "_key": "mrqq84",
+        "_type": "childObjectField",
+        "content": Object {
+          "": Object {
+            "_key": "1aa228ac848b",
+            "_type": "block",
+            "children": Array [
+              Object {
+                "_key": "7a49e74b2a490",
+                "_type": "span",
+                "marks": Array [],
+                "text": "This is a block text 2 levels deep",
+              },
+            ],
+            "markDefs": Array [],
+            "style": "normal",
+          },
+        },
+        "title": "This is one level deeper",
+      },
+    ],
+    "title": "This is an object nested in a document",
+  },
+  "content": Object {
+    "": Object {
+      "_key": "a4d177e92666",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "d11fab010f4d0",
+          "_type": "span",
+          "marks": Array [],
+          "text": "This is block text at the top level.",
+        },
+      ],
+      "markDefs": Array [],
+      "style": "normal",
+    },
+    "objectField": Object {
+      "objectAsField": Object {
+        "childObjectField": Object {
+          "content": Object {
+            "": Object {
+              "_key": "4f24f6fbfae7",
+              "_type": "block",
+              "children": Array [
+                Object {
+                  "_key": "4da3288854960",
+                  "_type": "span",
+                  "marks": Array [],
+                  "text": "This is block text in a nested object in an object in top-level block text.",
+                },
+              ],
+              "markDefs": Array [],
+              "style": "normal",
+            },
+          },
+          "title": "This is a nested object in an object in top-level block text.",
+        },
+      },
+      "title": "This is an object in top-level block text.",
+    },
+  },
+  "hidden": "",
+  "snippet": "This is text in my text field.",
+  "tags": Object {
+    "": "tag 3",
+  },
+  "title": "My Document-Level Article",
+}
+`;

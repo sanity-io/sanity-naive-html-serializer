@@ -1,3 +1,6 @@
+// import Schema from '@sanity/schema'
+const Schema = require('@sanity/schema')
+
 const types =  [
   arrayField(),
   objectField(),
@@ -9,13 +12,11 @@ const types =  [
 
 module.exports = {
   name: 'blog',
-  get: (typeName) => types.find(t => t.name == typeName),
+  get: (typename) => types.find(t => t.name == typename),
   _original: {
     types: types
   }
 }
-
-const LANGUAGES = ['en', 'fr', 'de']
 
 function arrayField() {
   return {

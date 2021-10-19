@@ -3,7 +3,6 @@ import { defaultStopTypes, customSerializers } from '../src/BaseSerializationCon
 const documentLevelArticle = require('./mocks/articles/documentLevelArticle')
 const fieldLevelArticle = require('./mocks/articles/fieldLevelArticle')
 
-
 test('Global test of working doc-level functionality and snapshot match', async () => {
   const serializer = BaseDocumentSerializer
   const serialized = await serializer.serializeDocument(
@@ -15,7 +14,6 @@ test('Global test of working field-level functionality and snapshot match', asyn
   const serializer = BaseDocumentSerializer
   const serialized = await serializer.serializeDocument(
     fieldLevelArticle._id, 'field', 'en', defaultStopTypes, customSerializers)
-  console.log(serialized)
   expect(serialized).toMatchSnapshot()
 })
 
