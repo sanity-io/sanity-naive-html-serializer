@@ -8,17 +8,6 @@ const arrayField = {
     of: [{ type: 'block' }, { type: 'objectField' }],
 }
 
- 
-// module.exports = 
-// {
-//   name: 'blog',
-//   get: (typename) => types.find(t => t.name == typename),
-//   _original: {
-//     types: types
-//   }
-// }
-
-
 const childObjectField = {
   name: 'childObjectField',
   title: 'Child Object Field',
@@ -173,5 +162,8 @@ const types =  [
 ]
 
 module.exports = new Schema(
-  {name: 'test', types}
+  {
+    name: 'test',
+    types
+  }
 )

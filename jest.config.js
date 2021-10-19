@@ -7,6 +7,5 @@ module.exports = {
   moduleNameMapper: {
     '^part:@sanity/base/schema$': '<rootDir>/test/mocks/schema.ts',
     '^part:@sanity/base/client$': '<rootDir>/test/mocks/client.js',
-
   }
 };
