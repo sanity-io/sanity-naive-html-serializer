@@ -50,14 +50,27 @@ const serializeDocument = async (
     }
   }
 
+  const rawHTMLBody = document.createElement('body')
+  rawHTMLBody.innerHTML = serializeObject(
+    serializedFields,
+    doc._type,
+    stopTypes,
+    serializers
+  )
+
+  //include _rev of doc as meta
+  const rawHTMLHead = document.createElement('head')
+  const revMeta = document.createElement('meta')
+  revMeta.setAttribute('_rev', doc._rev)
+  rawHTMLHead.appendChild(revMeta)
+
+  const rawHTML = document.createElement('html')
+  rawHTML.appendChild(rawHTMLHead)
+  rawHTML.appendChild(rawHTMLBody)
+
   return {
     name: documentId,
-    content: serializeObject(
-      serializedFields,
-      doc._type,
-      stopTypes,
-      serializers
-    ),
+    content: rawHTML.outerHTML,
   }
 }
 
@@ -192,7 +205,7 @@ const serializeObject = (
             stopTypes,
             serializers
           )
-          htmlField = `<div class=${fieldName}>${objHTML}</div>`
+          htmlField = `<div class="${fieldName}">${objHTML}</div>`
         }
       }
       innerHTML += htmlField

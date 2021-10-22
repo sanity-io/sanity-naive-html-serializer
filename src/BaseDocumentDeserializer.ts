@@ -45,14 +45,27 @@ export const deserializeDocument = async (
   deserializers: Record<string, any> = customDeserializers,
   blockDeserializers: Array<any> = customBlockDeserializers
 ) => {
-  return findLatestDraft(documentId).then((doc: SanityDocument) =>
-    deserializeHTML(
+  return findLatestDraft(documentId).then((doc: SanityDocument) => {
+    const docContent: Record<string, any> = deserializeHTML(
       serializedDoc,
       schema.get(doc._type),
       deserializers,
       blockDeserializers
     )
-  )
+
+    //find and assign revision from meta tag
+    const head = new DOMParser().parseFromString(serializedDoc, 'text/html')
+      .head
+    if (head) {
+      const revMeta = Array.from(head.children).find(node =>
+        node.hasAttribute('_rev')
+      )
+      if (revMeta) {
+        docContent._rev = revMeta.getAttribute('_rev')
+      }
+    }
+    return docContent
+  })
 }
 
 const deserializeHTML = (

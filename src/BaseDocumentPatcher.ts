@@ -1,9 +1,20 @@
 import { findLatestDraft } from './helpers'
 import sanityClient from 'part:@sanity/base/client'
-import { SanityDocument } from '@sanity/types'
 import { Patcher } from './types'
 
+//TODO: move all logic around fetching the right base document
+//and merging to the right target document outside of this class
+
 const client = sanityClient.withConfig({ apiVersion: '2021-03-25' })
+
+const findDocumentAtRevision = async (documentId: string, rev: string) => {
+  const dataset = client.config().dataset
+  const baseUrl = `/data/history/${dataset}/documents/${documentId}?revision=${rev}`
+  const url = client.getUrl(baseUrl)
+  return fetch(url, { credentials: 'include' })
+    .then(req => req.json())
+    .then(req => req.documents[0])
+}
 
 const fieldLevelPatch = (
   translatedFields: Record<string, any>,
@@ -37,29 +48,40 @@ const fieldLevelPatch = (
   })
 }
 
-const documentLevelPatch = (
+const documentLevelPatch = async (
   translatedFields: Record<string, any>,
   documentId: string,
   localeId: string
 ) => {
-  /* try whatever existing draft of this doc exists first --
-   *  If user has created the i18n version, use that. If not,
-   *  make it from the existing draft
-   */
-  return findLatestDraft(`i18n.${documentId}.${localeId}`)
-    .then((doc: SanityDocument) => {
-      if (!doc) {
-        return findLatestDraft(documentId)
-      } else {
-        return doc
+  let baseDoc: Record<string, any> = await findLatestDraft(documentId)
+  const targetId = `i18n.${documentId}.${localeId}`
+  const i18nDoc = await findLatestDraft(targetId, false)
+
+  if (translatedFields._rev) {
+    baseDoc = await findDocumentAtRevision(documentId, translatedFields._rev)
+  } else if (i18nDoc) {
+    /* check for existing i18n version. and, if there's no rev, use it as base */
+    baseDoc = baseDoc ?? i18nDoc
+  }
+
+  const merged = reconcileObject(baseDoc, translatedFields)
+  if (i18nDoc) {
+    const cleanedMerge: Record<string, any> = {}
+    Object.entries(merged).forEach(([key, value]) => {
+      if (Object.keys(translatedFields).includes(key)) {
+        cleanedMerge[key] = value
       }
     })
-    .then((doc: SanityDocument) => {
-      const merged = reconcileObject(doc, translatedFields)
-      merged._id = `drafts.i18n.${documentId}.${localeId}`
-      merged._lang = localeId
-      client.createOrReplace(merged)
-    })
+    client
+      .transaction()
+      //@ts-ignore
+      .patch(i18nDoc._id, p => p.set(cleanedMerge))
+      .commit()
+  } else {
+    merged._id = `drafts.${targetId}`
+    merged._lang = localeId
+    client.create(merged)
+  }
 }
 
 const reconcileArray = (origArray: any[], translatedArray: any[]) => {
@@ -80,7 +102,9 @@ const reconcileArray = (origArray: any[], translatedArray: any[]) => {
     )
     if (foundBlockIdx < 0) {
       console.log(
-        `This block no longer exists on the original document. Was it removed? ${block}`
+        `This block no longer exists on the original document. Was it removed? ${JSON.stringify(
+          block
+        )}`
       )
     } else if (
       origArray[foundBlockIdx]._type === 'block' ||
