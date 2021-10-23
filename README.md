@@ -4,7 +4,7 @@ This is the source for tooling for naively turning documents and rich text field
 
 This builds heavily on Sanity's [blocks-to-html](https://github.com/sanity-io/block-content-to-html) and [block-tools](https://github.com/sanity-io/sanity/tree/next/packages/@sanity/block-tools), and it's highly recommended you familiarize yourself with these if you plan on customizing.
 
-If you're using any of our `TranslationsTab` plugins, the scenarios below are some you might enocunter in your journey!
+If you're using any of our `TranslationsTab` plugins, the scenarios below are some you might encounter on your journey!
 
 ### Scenario: Some fields or objects in my document are serializing /deserializing strangely.
 First: this is often caused by not declaring types at the top level of your schema. Serialization introspects your schema files and can get a much better sense of what to do when objects are not "anonymous" (this is similar to how our GraphQL functions work -- more info on "strict" schemas [here](https://www.sanity.io/docs/graphql#33ec7103289a)) You can save yourself some development time by trying this first.

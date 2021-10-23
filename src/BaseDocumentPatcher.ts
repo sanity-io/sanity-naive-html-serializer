@@ -9,43 +9,60 @@ const client = sanityClient.withConfig({ apiVersion: '2021-03-25' })
 
 const findDocumentAtRevision = async (documentId: string, rev: string) => {
   const dataset = client.config().dataset
-  const baseUrl = `/data/history/${dataset}/documents/${documentId}?revision=${rev}`
-  const url = client.getUrl(baseUrl)
-  return fetch(url, { credentials: 'include' })
+  let baseUrl = `/data/history/${dataset}/documents/${documentId}?revision=${rev}`
+  let url = client.getUrl(baseUrl)
+  let revisionDoc = await fetch(url, { credentials: 'include' })
     .then(req => req.json())
     .then(req => req.documents[0])
+  /* endpoint will silently give you incorrect doc
+   * if you don't request draft and the rev belongs to a draft, so check
+   */
+  if (revisionDoc._rev !== rev) {
+    baseUrl = `/data/history/${dataset}/documents/drafts.${documentId}?revision=${rev}`
+    url = client.getUrl(baseUrl)
+    revisionDoc = await fetch(url, { credentials: 'include' })
+      .then(req => req.json())
+      .then(req => req.documents[0])
+  }
+  return revisionDoc
 }
 
-const fieldLevelPatch = (
+const fieldLevelPatch = async (
   translatedFields: Record<string, any>,
   documentId: string,
   localeId: string,
   baseLang: string = 'en'
 ) => {
-  return findLatestDraft(documentId).then((doc: Record<string, any>) => {
-    const merged: Record<string, any> = {}
+  let doc: Record<string, any>
+  if (translatedFields._rev) {
+    doc = await findDocumentAtRevision(documentId, translatedFields._rev)
+  } else {
+    doc = await findLatestDraft(documentId)
+  }
+  const merged: Record<string, any> = {}
 
-    for (let field in translatedFields) {
-      const translatedVal = translatedFields[field][baseLang]
-      const origVal = doc[field][baseLang]
-
-      merged[field] = doc[field]
-      let valToPatch
-      if (typeof translatedVal === 'string') {
-        valToPatch = translatedVal
-      } else if (Array.isArray(translatedVal)) {
-        valToPatch = reconcileArray(origVal ?? [], translatedVal)
-      } else {
-        valToPatch = reconcileObject(origVal ?? {}, translatedVal)
-      }
-      merged[field][localeId.replace('-', '_')] = valToPatch
+  for (let field in translatedFields) {
+    if (field === '_rev') {
+      continue
     }
+    const translatedVal = translatedFields[field][baseLang]
+    const origVal = doc[field][baseLang]
 
-    client
-      .patch(doc._id)
-      .set(merged)
-      .commit()
-  })
+    let valToPatch
+    if (typeof translatedVal === 'string') {
+      valToPatch = translatedVal
+    } else if (Array.isArray(translatedVal)) {
+      valToPatch = reconcileArray(origVal ?? [], translatedVal)
+    } else {
+      valToPatch = reconcileObject(origVal ?? {}, translatedVal)
+    }
+    merged[`${field}.${localeId.replace('-', '_')}`] = valToPatch
+  }
+
+  client
+    .patch(doc._id)
+    .set(merged)
+    .commit()
 }
 
 const documentLevelPatch = async (
