@@ -2,10 +2,10 @@ import Schema from '@sanity/schema'
 // const Schema = require('@sanity/schema')
 
 const arrayField = {
-    name: 'arrayField',
-    title: 'Array Field',
-    type: 'array',
-    of: [{ type: 'block' }, { type: 'objectField' }],
+  name: 'arrayField',
+  title: 'Array Field',
+  type: 'array',
+  of: [{ type: 'block' }, { type: 'objectField' }],
 }
 
 const childObjectField = {
@@ -27,7 +27,7 @@ const childObjectField = {
   ],
 }
 
-const objectField =  {
+const objectField = {
   name: 'objectField',
   title: 'Object Field',
   type: 'object',
@@ -51,7 +51,6 @@ const objectField =  {
   ],
 }
 
-
 const documentLevelArticle = {
   name: 'documentLevelArticle',
   title: 'Document Level Article',
@@ -66,7 +65,7 @@ const documentLevelArticle = {
       name: 'meta',
       title: 'Meta',
       type: 'string',
-      localize: false
+      localize: false,
     },
     {
       name: 'snippet',
@@ -99,8 +98,8 @@ const documentLevelArticle = {
 
 function createLocaleFields(locales: string[], fieldType: Record<string, any>) {
   return locales.map(locale => ({
-    ...{name: locale},
-    ...fieldType
+    ...{ name: locale },
+    ...fieldType,
   }))
 }
 
@@ -113,25 +112,28 @@ const fieldLevelArticle = {
       name: 'title',
       title: 'Title',
       type: 'object',
-      fields: createLocaleFields(['en', 'fr', 'de'], {type: 'string'})
+      fields: createLocaleFields(['en', 'fr', 'de'], { type: 'string' }),
     },
     {
       name: 'meta',
       title: 'Meta',
       type: 'string',
-      localize: false
+      localize: false,
     },
     {
       name: 'snippet',
       title: 'Snippet',
       type: 'object',
-      fields: createLocaleFields(['en', 'fr', 'de'], {type: 'text'})
+      fields: createLocaleFields(['en', 'fr', 'de'], { type: 'text' }),
     },
     {
       name: 'tags',
       title: 'Tags',
       type: 'object',
-      fields: createLocaleFields(['en', 'fr', 'de'], {type: 'array', of: [{type: 'string'}]})
+      fields: createLocaleFields(['en', 'fr', 'de'], {
+        type: 'array',
+        of: [{ type: 'string' }],
+      }),
     },
     {
       name: 'hidden',
@@ -142,18 +144,18 @@ const fieldLevelArticle = {
       name: 'config',
       title: 'Config',
       type: 'object',
-      fields: createLocaleFields(['en', 'fr', 'de'], {type: 'objectField'})
+      fields: createLocaleFields(['en', 'fr', 'de'], { type: 'objectField' }),
     },
     {
       name: 'content',
       title: 'Content',
       type: 'object',
-      fields: createLocaleFields(['en', 'fr', 'de'], {type: 'arrayField'})
+      fields: createLocaleFields(['en', 'fr', 'de'], { type: 'arrayField' }),
     },
   ],
 }
 
-const types =  [
+const types = [
   arrayField,
   childObjectField,
   objectField,
@@ -161,9 +163,7 @@ const types =  [
   fieldLevelArticle,
 ]
 
-module.exports = new Schema(
-  {
-    name: 'test',
-    types
-  }
-)
+module.exports = new Schema({
+  name: 'test',
+  types,
+})

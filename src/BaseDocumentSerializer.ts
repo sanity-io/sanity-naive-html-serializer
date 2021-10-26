@@ -18,9 +18,9 @@ const getSchema = (name: string) =>
 const serializeDocument = (
   doc: SanityDocument,
   translationLevel: string = 'document',
-  baseLang: string = 'en',
-  stopTypes: string[] = defaultStopTypes,
-  serializers: Record<string, any> = customSerializers
+  baseLang = 'en',
+  stopTypes = defaultStopTypes,
+  serializers = customSerializers
 ) => {
   let filteredObj: Record<string, any> = {}
 

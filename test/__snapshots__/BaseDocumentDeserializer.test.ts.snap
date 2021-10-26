@@ -2,6 +2,9 @@
 
 exports[`Global test of working doc-level functionality and snapshot match 1`] = `
 Object {
+  "_id": "drafts.d8ffc675-ce86-4f60-9ac8-da164cde3b0a",
+  "_rev": "fxcnqj-uew-gr7-v6r-z965tfm69",
+  "_type": "documentLevelArticle",
   "config": Object {
     "nestedArrayField": Array [
       Object {
@@ -9,7 +12,7 @@ Object {
         "_type": "block",
         "children": Array [
           Object {
-            "_key": "7bea39dc34f90",
+            "_key": "randomKey-10",
             "_type": "span",
             "marks": Array [],
             "text": "This is block text 1 level deep",
@@ -26,7 +29,7 @@ Object {
           "_type": "block",
           "children": Array [
             Object {
-              "_key": "b1643105d5010",
+              "_key": "randomKey-20",
               "_type": "span",
               "marks": Array [],
               "text": "This is a block text 2 levels deep",
@@ -46,7 +49,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "a8f4f748a6c80",
+          "_key": "randomKey-30",
           "_type": "span",
           "marks": Array [],
           "text": "This is block text at the top level.",
@@ -65,7 +68,7 @@ Object {
             "_type": "block",
             "children": Array [
               Object {
-                "_key": "5c222f650ed20",
+                "_key": "randomKey-40",
                 "_type": "span",
                 "marks": Array [],
                 "text": "This is block text in a nested object in an object in top-level block text.",
@@ -88,5 +91,108 @@ Object {
     "tag 3",
   ],
   "title": "My Document-Level Article",
+}
+`;
+
+exports[`Global test of working field-level functionality and snapshot match 1`] = `
+Object {
+  "_id": "drafts.2947533e-1ea5-4116-955b-339608d3445d",
+  "_rev": "l58oha-n06-1s4-f6i-74g6cuakl",
+  "_type": "fieldLevelArticle",
+  "config": Object {
+    "en": Object {
+      "nestedArrayField": Array [
+        Object {
+          "_key": "f49b4d7e3e51",
+          "_type": "block",
+          "children": Array [
+            Object {
+              "_key": "randomKey-20",
+              "_type": "span",
+              "marks": Array [],
+              "text": "This is block text 1 level deep",
+            },
+          ],
+          "markDefs": Array [],
+          "style": "normal",
+        },
+      ],
+      "objectAsField": Object {
+        "content": Array [
+          Object {
+            "_key": "869168fe3a2a",
+            "_type": "block",
+            "children": Array [
+              Object {
+                "_key": "randomKey-10",
+                "_type": "span",
+                "marks": Array [],
+                "text": "This is block text 2 levels deep",
+              },
+            ],
+            "markDefs": Array [],
+            "style": "normal",
+          },
+        ],
+        "title": "This is one level deeper",
+      },
+      "title": "This is an object nested in a document",
+    },
+  },
+  "content": Object {
+    "en": Array [
+      Object {
+        "_key": "e2a39d768ff8",
+        "_type": "block",
+        "children": Array [
+          Object {
+            "_key": "randomKey-30",
+            "_type": "span",
+            "marks": Array [],
+            "text": "This is block text at the top level.",
+          },
+        ],
+        "markDefs": Array [],
+        "style": "normal",
+      },
+      Object {
+        "_key": "271b0c6ee984",
+        "_type": "objectField",
+        "objectAsField": Object {
+          "content": Array [
+            Object {
+              "_key": "4f24f6fbfae7",
+              "_type": "block",
+              "children": Array [
+                Object {
+                  "_key": "randomKey-40",
+                  "_type": "span",
+                  "marks": Array [],
+                  "text": "This is block text in a nested object in an object in top-level block text.",
+                },
+              ],
+              "markDefs": Array [],
+              "style": "normal",
+            },
+          ],
+          "title": "This is a nested object in an object in top-level block text.",
+        },
+        "title": "This is an object in top-level block text.",
+      },
+    ],
+  },
+  "snippet": Object {
+    "en": "This is text in my text field",
+  },
+  "tags": Object {
+    "en": Array [
+      "tag 1",
+      "tag 2",
+      "tag 3",
+    ],
+  },
+  "title": Object {
+    "en": "My Field-Level Article",
+  },
 }
 `;
