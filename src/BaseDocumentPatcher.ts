@@ -7,10 +7,16 @@ import { Patcher } from './types'
 
 const client = sanityClient.withConfig({ apiVersion: '2021-03-25' })
 
+const getUrl = (path: string) => {
+  const { projectId } = client.config()
+  const baseUrl = `https://${projectId}.api.sanity.io`
+  return baseUrl + path
+}
+
 const findDocumentAtRevision = async (documentId: string, rev: string) => {
-  const dataset = client.config().dataset
-  let baseUrl = `/data/history/${dataset}/documents/${documentId}?revision=${rev}`
-  let url = client.getUrl(baseUrl)
+  const { dataset } = client.config()
+  let path = `/data/history/${dataset}/documents/${documentId}?revision=${rev}`
+  let url = getUrl(path)
   let revisionDoc = await fetch(url, { credentials: 'include' })
     .then(req => req.json())
     .then(req => req.documents[0])
@@ -18,8 +24,8 @@ const findDocumentAtRevision = async (documentId: string, rev: string) => {
    * if you don't request draft and the rev belongs to a draft, so check
    */
   if (revisionDoc._rev !== rev) {
-    baseUrl = `/data/history/${dataset}/documents/drafts.${documentId}?revision=${rev}`
-    url = client.getUrl(baseUrl)
+    path = `/data/history/${dataset}/documents/drafts.${documentId}?revision=${rev}`
+    url = getUrl(path)
     revisionDoc = await fetch(url, { credentials: 'include' })
       .then(req => req.json())
       .then(req => req.documents[0])
