@@ -9,7 +9,7 @@ const client = sanityClient.withConfig({ apiVersion: '2021-03-25' })
 
 const getUrl = (path: string) => {
   const { projectId, apiVersion } = client.config()
-  const baseUrl = `https://${projectId}.api.sanity.io/${apiVersion}`
+  const baseUrl = `https://${projectId}.api.sanity.io/v${apiVersion}`
   return baseUrl + path
 }
 
