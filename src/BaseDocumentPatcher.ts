@@ -8,8 +8,8 @@ import { Patcher } from './types'
 const client = sanityClient.withConfig({ apiVersion: '2021-03-25' })
 
 const getUrl = (path: string) => {
-  const { projectId } = client.config()
-  const baseUrl = `https://${projectId}.api.sanity.io`
+  const { projectId, apiVersion } = client.config()
+  const baseUrl = `https://${projectId}.api.sanity.io/${apiVersion}`
   return baseUrl + path
 }
 
