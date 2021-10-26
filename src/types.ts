@@ -1,45 +1,9 @@
-import { ObjectField, ObjectSchemaType, BlockSchemaType } from '@sanity/types'
-
-export type TranslationTask = {
-  taskId: string
-  documentId: string
-  locales: TranslationTaskLocaleStatus[]
-}
-
-export type TranslationLocale = {
-  localeId: string
-  description: string
-  enabled?: boolean
-}
-
-export type TranslationTaskLocaleStatus = {
-  localeId: string
-  progress: number
-}
-
-export type TransifexSecrets = {
-  organization: string
-  project: string
-  token: string
-}
-
-export interface Adapter {
-  getLocales: (secrets: TransifexSecrets) => Promise<TranslationLocale[]>
-  getTranslationTask: (
-    documentId: string,
-    secrets: TransifexSecrets
-  ) => Promise<TranslationTask | null>
-  createTask: (
-    documentId: string,
-    document: Record<string, any>,
-    secrets: TransifexSecrets
-  ) => Promise<TranslationTask>
-  getTranslation: (
-    taskid: string,
-    localeId: string,
-    secrets: TransifexSecrets
-  ) => Promise<any | null>
-}
+import {
+  ObjectField,
+  ObjectSchemaType,
+  BlockSchemaType,
+  SanityDocument,
+} from '@sanity/types'
 
 export type SerializedDocument = {
   name: string
@@ -48,12 +12,12 @@ export type SerializedDocument = {
 
 export interface Serializer {
   serializeDocument: (
-    documentId: string,
+    doc: SanityDocument,
     translationLevel: string,
     baseLang: string,
     stopTypes: string[],
     serializers: Record<string, any>
-  ) => Promise<SerializedDocument>
+  ) => SerializedDocument
   fieldFilter: (
     obj: Record<string, any>,
     objFields: ObjectField[],
@@ -79,8 +43,9 @@ export interface Serializer {
 
 export interface Deserializer {
   deserializeDocument: (
-    documentId: string,
-    serializedDoc: string
+    serializedDoc: string,
+    deserializers: Record<string, any>,
+    blockDeserializers: Array<any>
   ) => Record<string, any>
   deserializeHTML: (
     html: string,
@@ -90,18 +55,20 @@ export interface Deserializer {
   ) => Record<string, any> | any[]
 }
 
-export interface Patcher {
-  fieldLevelPatch: (
+export interface Merger {
+  fieldLevelMerge: (
     translatedFields: Record<string, any>,
+    baseDoc: SanityDocument,
     documentId: string,
     localeId: string,
     baseLang: string
-  ) => Promise<void>
-  documentLevelPatch: (
+  ) => Record<string, any>
+  documentLevelMerge: (
     translatedFields: Record<string, any>,
+    baseDoc: SanityDocument,
     documentId: string,
     localeId: string
-  ) => Promise<void>
+  ) => Record<string, any>
   reconcileArray: (origArray: any[], translatedArray: any[]) => any[]
   reconcileObject: (
     origObject: Record<string, any>,

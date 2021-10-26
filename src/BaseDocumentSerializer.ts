@@ -1,8 +1,7 @@
 import schemas from 'part:@sanity/base/schema'
 import blocksToHtml, { h } from '@sanity/block-content-to-html'
 import { defaultStopTypes, customSerializers } from './BaseSerializationConfig'
-import { ObjectField } from '@sanity/types'
-import { findLatestDraft } from './helpers'
+import { ObjectField, SanityDocument } from '@sanity/types'
 import { Serializer } from './types'
 import clone from 'just-clone'
 
@@ -16,15 +15,13 @@ const getSchema = (name: string) =>
  * Main parent function: finds fields to translate, and feeds them to appropriate child serialization
  * methods.
  */
-const serializeDocument = async (
-  documentId: string,
+const serializeDocument = (
+  doc: SanityDocument,
   translationLevel: string = 'document',
   baseLang: string = 'en',
   stopTypes: string[] = defaultStopTypes,
   serializers: Record<string, any> = customSerializers
 ) => {
-  const doc = await findLatestDraft(documentId)
-
   let filteredObj: Record<string, any> = {}
 
   if (translationLevel === 'field') {
@@ -58,18 +55,21 @@ const serializeDocument = async (
     serializers
   )
 
-  //include _rev of doc as meta
   const rawHTMLHead = document.createElement('head')
-  const revMeta = document.createElement('meta')
-  revMeta.setAttribute('_rev', doc._rev)
-  rawHTMLHead.appendChild(revMeta)
+  const metaFields = ['_id', '_type', '_rev']
+  metaFields.forEach(field => {
+    const metaEl = document.createElement('meta')
+    metaEl.setAttribute('name', field)
+    metaEl.setAttribute('content', doc[field] as string)
+    rawHTMLHead.appendChild(metaEl)
+  })
 
   const rawHTML = document.createElement('html')
   rawHTML.appendChild(rawHTMLHead)
   rawHTML.appendChild(rawHTMLBody)
 
   return {
-    name: documentId,
+    name: doc._id,
     content: rawHTML.outerHTML,
   }
 }

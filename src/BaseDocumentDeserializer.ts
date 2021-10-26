@@ -5,13 +5,7 @@ import {
   customDeserializers,
   customBlockDeserializers,
 } from './BaseSerializationConfig'
-import { findLatestDraft } from './helpers'
-import {
-  ObjectField,
-  SanityDocument,
-  ObjectSchemaType,
-  BlockSchemaType,
-} from '@sanity/types'
+import { ObjectField, ObjectSchemaType, BlockSchemaType } from '@sanity/types'
 import { Deserializer } from './types'
 
 const noSchemaWarning = (obj: Element) =>
@@ -39,33 +33,33 @@ const blockContentType = defaultSchema
   .get('default')
   .fields.find((field: ObjectField) => field.name === 'block').type
 
-export const deserializeDocument = async (
-  documentId: string,
+export const deserializeDocument = (
   serializedDoc: string,
   deserializers: Record<string, any> = customDeserializers,
   blockDeserializers: Array<any> = customBlockDeserializers
 ) => {
-  return findLatestDraft(documentId).then((doc: SanityDocument) => {
-    const docContent: Record<string, any> = deserializeHTML(
-      serializedDoc,
-      schema.get(doc._type),
-      deserializers,
-      blockDeserializers
-    )
+  const metadata: Record<string, any> = {}
+  const head = new DOMParser().parseFromString(serializedDoc, 'text/html').head
 
-    //find and assign revision from meta tag
-    const head = new DOMParser().parseFromString(serializedDoc, 'text/html')
-      .head
-    if (head) {
-      const revMeta = Array.from(head.children).find(node =>
-        node.hasAttribute('_rev')
-      )
-      if (revMeta) {
-        docContent._rev = revMeta.getAttribute('_rev')
-      }
+  Array.from(head.children).forEach(metaTag => {
+    const validTags = ['_id', '_rev', '_type']
+    const metaName = metaTag.getAttribute('name')
+    if (metaName && validTags.includes(metaName)) {
+      metadata[metaName] = metaTag.getAttribute('content')
     }
-    return docContent
   })
+
+  const content: Record<string, any> = deserializeHTML(
+    serializedDoc,
+    schema.get(metadata._type),
+    deserializers,
+    blockDeserializers
+  )
+
+  return {
+    ...metadata,
+    ...content,
+  }
 }
 
 const deserializeHTML = (
