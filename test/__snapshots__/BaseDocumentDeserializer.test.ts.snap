@@ -2,6 +2,9 @@
 
 exports[`Global test of working doc-level functionality and snapshot match 1`] = `
 Object {
+  "_id": "drafts.d8ffc675-ce86-4f60-9ac8-da164cde3b0a",
+  "_rev": "fxcnqj-uew-gr7-v6r-z965tfm69",
+  "_type": "documentLevelArticle",
   "config": Object {
     "nestedArrayField": Array [
       Object {
@@ -9,7 +12,7 @@ Object {
         "_type": "block",
         "children": Array [
           Object {
-            "_key": "7bea39dc34f90",
+            "_key": "dc3f6bb059100",
             "_type": "span",
             "marks": Array [],
             "text": "This is block text 1 level deep",
@@ -26,7 +29,7 @@ Object {
           "_type": "block",
           "children": Array [
             Object {
-              "_key": "b1643105d5010",
+              "_key": "73ed3c47265c0",
               "_type": "span",
               "marks": Array [],
               "text": "This is a block text 2 levels deep",
@@ -46,7 +49,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "a8f4f748a6c80",
+          "_key": "71e4668cdcf80",
           "_type": "span",
           "marks": Array [],
           "text": "This is block text at the top level.",
@@ -65,7 +68,7 @@ Object {
             "_type": "block",
             "children": Array [
               Object {
-                "_key": "5c222f650ed20",
+                "_key": "d052e507205f0",
                 "_type": "span",
                 "marks": Array [],
                 "text": "This is block text in a nested object in an object in top-level block text.",
