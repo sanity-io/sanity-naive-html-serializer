@@ -14,6 +14,7 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "lint": "tsdx lint src",
+    "test": "jest",
     "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why"
@@ -43,19 +44,23 @@
     }
   ],
   "devDependencies": {
+    "@sanity/base": "^2.21.4",
+    "@size-limit/preset-small-lib": "^4.7.0",
+    "husky": "^4.3.0",
+    "jest": "^27.0.0",
+    "jest-environment-jsdom": "^27.3.0",
+    "size-limit": "^4.7.0",
+    "ts-jest": "^27.0.5",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.0.3",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
     "@sanity/block-content-to-html": "^2.0.0",
     "@sanity/block-tools": "^2.11.0",
     "@sanity/client": "^2.0.9",
     "@sanity/schema": "^2.10.0",
     "@sanity/types": "^2.11.0",
-    "@size-limit/preset-small-lib": "^4.7.0",
-    "husky": "^4.3.0",
-    "size-limit": "^4.7.0",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.0.3",
-    "typescript": "^4.0.5"
-  },
-  "dependencies": {
     "just-clone": "^3.2.1"
   }
 }
