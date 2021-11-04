@@ -13,7 +13,7 @@
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
-    "lint": "tsdx lint src",
+    "lint": "tsdx lint src test",
     "test": "jest",
     "prepare": "tsdx build",
     "size": "size-limit",
@@ -21,7 +21,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsdx lint src"
+      "pre-commit": "tsdx lint src test"
     }
   },
   "prettier": {
