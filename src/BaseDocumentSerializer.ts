@@ -106,12 +106,16 @@ const fieldFilter = (
 
   const fieldFilter = (field: Record<string, any>) => {
     if (field.localize === false) {
+      console.log('localize false', field)
       return false
-    } else if (field.type.name === 'string' || field.type.name === 'text') {
+    } else if (field.type === 'string' || field.type === 'text') {
+      console.log('string or test', field)
       return true
     } else if (Array.isArray(obj[field.name])) {
+      console.log('array', field)
       return true
-    } else if (!stopTypes.includes(field.type.name)) {
+    } else if (!stopTypes.includes(field.type)) {
+      console.log('stop types', field)
       return true
     }
     return false

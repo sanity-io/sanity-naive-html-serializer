@@ -83,7 +83,6 @@ Object {
       "title": "This is an object in top-level block text.",
     },
   ],
-  "hidden": "",
   "snippet": "This is text in my text field.",
   "tags": Array [
     "tag 1",
