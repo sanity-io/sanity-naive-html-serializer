@@ -78,6 +78,18 @@ test('Contains metadata field containing document type', () => {
  */
 
 /*
+ * Top-level plain text
+ */
+test('String and text types get serialized correctly at top-level -- document level', () => {
+  const serialized = getSerialized(documentLevelArticle, 'document')
+  const docTree = getHTMLNode(serialized).body.children[0]
+  const HTMLString = findByClass(docTree.children, 'title')
+  const HTMLText = findByClass(docTree.children, 'snippet')
+  expect(HTMLString?.innerHTML).toEqual(documentLevelArticle.title)
+  expect(HTMLText?.innerHTML).toEqual(documentLevelArticle.snippet)
+})
+
+/*
  * Presence and accuracy of fields in "vanilla" deserialization -- objects
  */
 const getDocumentLevelObjectField = () => {
@@ -187,6 +199,17 @@ test('Object in array contains accurate values in nested object -- document leve
 /*
  * FIELD LEVEL
  */
+
+test('String and text types get serialized correctly at top-level -- field level', () => {
+  const serialized = getSerialized(fieldLevelArticle, 'field')
+  const docTree = getHTMLNode(serialized).body.children[0]
+  const titleObj = findByClass(docTree.children, 'title')
+  const HTMLString = findByClass(titleObj!.children, 'en')
+  const snippetObj = findByClass(docTree.children, 'snippet')
+  const HTMLText = findByClass(snippetObj!.children, 'en')
+  expect(HTMLString?.innerHTML).toEqual(fieldLevelArticle.title.en)
+  expect(HTMLText?.innerHTML).toEqual(fieldLevelArticle.snippet.en)
+})
 /*
  * Presence and accuracy of fields in "vanilla" deserialization -- objects
  */
@@ -299,10 +322,19 @@ test('Object in array contains accurate values in nested object -- field level',
 })
 
 //expect values in a list to not be repeated (this was a bug)
-
+test('Values in a field are not repeated', () => {
+  const serialized = getSerialized(documentLevelArticle, 'document')
+  const docTree = getHTMLNode(serialized).body.children[0]
+  const HTMLList = findByClass(docTree.children, 'tags')
+  const tags = documentLevelArticle.tags
+  expect(HTMLList?.innerHTML).toContain(tags[0])
+  expect(HTMLList?.innerHTML).toContain(tags[1])
+  expect(HTMLList?.innerHTML).toContain(tags[2])
+})
 //more integration-y:
 //expect custom serializers to work
 //expect localize false fields to be absent
+//expect default stop types to be absent
 //expect explicitly declared stop types to be absent
 
 //load annotation and inline blocks content
