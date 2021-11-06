@@ -1,6 +1,16 @@
 import { SerializedDocument } from '../src/types'
-import { getSerialized } from './helpers'
+import {
+  getSerialized,
+  addedCustomerSerializers,
+  createCustomInnerHTML,
+} from './helpers'
 import { Block } from '@sanity/types'
+import {
+  BaseDocumentSerializer,
+  defaultStopTypes,
+  customSerializers,
+} from '../src'
+
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 
@@ -94,9 +104,11 @@ test('String and text types get serialized correctly at top-level -- document le
  */
 const getDocumentLevelObjectField = () => {
   const serialized = getSerialized(documentLevelArticle, 'document')
-  //parent node is always div with classname of field -- get its children
   const docTree = getHTMLNode(serialized).body.children[0]
-  return findByClass(docTree.children, 'config')
+  //parent node is always div with classname of field with a nested div
+  //that has classname of obj type
+  const configObj = findByClass(docTree.children, 'config')
+  return configObj!.children[0]
 }
 
 test('Top-level nested objects contain all serializable fields -- document level', () => {
@@ -321,7 +333,6 @@ test('Object in array contains accurate values in nested object -- field level',
   expect(nestedObject?.innerHTML).toContain(blockText)
 })
 
-//expect values in a list to not be repeated (this was a bug)
 test('Values in a field are not repeated', () => {
   const serialized = getSerialized(documentLevelArticle, 'document')
   const docTree = getHTMLNode(serialized).body.children[0]
@@ -331,8 +342,38 @@ test('Values in a field are not repeated', () => {
   expect(HTMLList?.innerHTML).toContain(tags[1])
   expect(HTMLList?.innerHTML).toContain(tags[2])
 })
-//more integration-y:
-//expect custom serializers to work
+
+/*
+ * CUSTOM SETTINGS
+ */
+
+test('Custom serialization should manifest at all levels', () => {
+  const serializer = BaseDocumentSerializer
+  const serialized = serializer.serializeDocument(
+    documentLevelArticle,
+    'document',
+    'en',
+    defaultStopTypes,
+    addedCustomerSerializers
+  )
+  const docTree = getHTMLNode(serialized).body.children[0]
+  const arrayField = findByClass(docTree.children, 'content')
+
+  const topLevelCustomSerialized = findByClass(docTree.children, 'config')
+  const requiredTopLevelTitle = documentLevelArticle.config.title
+  expect(topLevelCustomSerialized?.innerHTML).toContain(
+    createCustomInnerHTML(requiredTopLevelTitle)
+  )
+
+  const nestedSerialized = findByClass(arrayField!.children, 'objectField')
+  const requiredNestedTitle = documentLevelArticle.content.find(
+    (b: Record<string, any>) => b._type === 'objectField'
+  ).title
+  expect(nestedSerialized?.innerHTML).toContain(
+    createCustomInnerHTML(requiredNestedTitle)
+  )
+})
+
 //expect localize false fields to be absent
 //expect default stop types to be absent
 //expect explicitly declared stop types to be absent

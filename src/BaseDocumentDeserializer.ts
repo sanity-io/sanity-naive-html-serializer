@@ -121,6 +121,7 @@ const deserializeHTML = (
       //has specific class name, so it's either a field or obj
       else if (child.className) {
         let objType
+        //wrapper is fieldname
         if (target && target.fields) {
           objType = target.fields.find(field => field.name === child.className)
         }

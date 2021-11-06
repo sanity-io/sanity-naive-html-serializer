@@ -38,12 +38,18 @@ const serializeDocument = (
     } else if (Array.isArray(value)) {
       serializedFields[key] = serializeArray(value, key, stopTypes, serializers)
     } else {
-      serializedFields[key] = serializeObject(
+      const serialized = serializeObject(
         value,
-        key,
+        //top-level objects need an additional layer of nesting for custom serialization etc.
+        translationLevel === 'field' ? key : null,
         stopTypes,
         serializers
       )
+      if (translationLevel === 'document') {
+        serializedFields[key] = `<div class='${key}'>${serialized}</div>`
+      } else {
+        serializedFields[key] = serialized
+      }
     }
   }
 
@@ -106,16 +112,12 @@ const fieldFilter = (
 
   const fieldFilter = (field: Record<string, any>) => {
     if (field.localize === false) {
-      console.log('localize false', field)
       return false
     } else if (field.type === 'string' || field.type === 'text') {
-      console.log('string or test', field)
       return true
     } else if (Array.isArray(obj[field.name])) {
-      console.log('array', field)
       return true
     } else if (!stopTypes.includes(field.type)) {
-      console.log('stop types', field)
       return true
     }
     return false
