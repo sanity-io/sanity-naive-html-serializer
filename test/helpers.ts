@@ -7,6 +7,7 @@ import {
   customBlockDeserializers,
 } from '../src/BaseSerializationConfig'
 import { h } from '@sanity/block-content-to-html'
+import { Block } from '@sanity/types'
 import clone from 'just-clone'
 
 export const getSerialized = (document: SanityDocument, level: string) => {
@@ -27,6 +28,22 @@ export const getDeserialized = (document: SanityDocument, level: string) => {
     customDeserializers,
     customBlockDeserializers
   )
+}
+
+export const getValidFields = (field: Record<string, any>) => {
+  const invalidFields = ['_type', '_key']
+  return Object.keys(field).filter(key => !invalidFields.includes(key))
+}
+
+export const toPlainText = (blocks: Block[]) => {
+  return blocks
+    .map(block => {
+      if (block._type !== 'block' || !block.children) {
+        return ''
+      }
+      return block.children.map(child => child.text).join('')
+    })
+    .join('\n\n')
 }
 
 type SerializerProps = {

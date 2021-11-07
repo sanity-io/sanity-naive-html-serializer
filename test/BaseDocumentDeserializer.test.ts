@@ -1,9 +1,11 @@
-import { getDeserialized } from './helpers'
+import { getDeserialized, toPlainText } from './helpers'
+import { Block } from '@sanity/types'
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 
 let mockTestKey = 0
 
+//needed to make snapshots happy on internal spans (where we don't track keys)
 jest.mock('@sanity/block-tools/lib/util/randomKey.js', () => {
   return jest.fn().mockImplementation(() => {
     return `randomKey-${++mockTestKey}`
@@ -41,3 +43,199 @@ test('Contains type of original document', () => {
   const type = deserialized._type
   expect(type).toEqual(documentLevelArticle._type)
 })
+
+/*
+ * DOCUMENT LEVEL
+ */
+
+/*
+ * Top-level plain text
+ */
+
+test('String and text types get deserialized correctly at top-level -- document level', () => {
+  const deserialized = getDeserialized(documentLevelArticle, 'document')
+  expect(deserialized.title).toEqual(documentLevelArticle.title)
+  expect(deserialized.snippet).toEqual(documentLevelArticle.snippet)
+})
+
+/*
+ * Presence and accuracy of fields in "vanilla" deserialization -- objects
+ */
+test('Nested object contains accurate values -- document level', () => {
+  const deserialized = getDeserialized(documentLevelArticle, 'document')
+  const origTitle = documentLevelArticle.config.title
+  const deserializedTitle = deserialized.config.title
+  expect(origTitle).toEqual(deserializedTitle)
+
+  const origBlockText = documentLevelArticle.config.nestedArrayField
+  const deserializedBlockText = deserialized.config.nestedArrayField
+
+  const origKeys = origBlockText.map((block: Block) => block._key)
+  const deserializedKeys = deserializedBlockText.map(
+    (block: Block) => block._key
+  )
+
+  expect(deserializedKeys.sort()).toEqual(origKeys.sort())
+  expect(toPlainText(deserializedBlockText)).toEqual(toPlainText(origBlockText))
+})
+
+test('Nested object in an object contains accurate values -- document level', () => {
+  const deserialized = getDeserialized(documentLevelArticle, 'document')
+  const origNestedObject = documentLevelArticle.config.objectAsField
+  const deserializedNestedObject = deserialized.config.objectAsField
+
+  expect(origNestedObject.title).toEqual(deserializedNestedObject.title)
+
+  const origKeys = origNestedObject.content.map((block: Block) => block._key)
+  const deserializedKeys = deserializedNestedObject.content.map(
+    (block: Block) => block._key
+  )
+
+  expect(origKeys.sort()).toEqual(deserializedKeys.sort())
+  expect(toPlainText(deserializedNestedObject.content)).toEqual(
+    toPlainText(origNestedObject.content)
+  )
+})
+
+/*
+ * Presence and accuracy of fields in vanilla deserialization -- arrays
+ */
+
+test('Array contains all serializable blocks with keys, in order -- document level', () => {
+  const deserialized = getDeserialized(documentLevelArticle, 'document')
+  const origKeys = documentLevelArticle.content.map(
+    (block: Block) => block._key
+  )
+  const deserializedKeys = deserialized.content.map(
+    (block: Block) => block._key
+  )
+  expect(deserializedKeys.sort()).toEqual(origKeys.sort())
+})
+
+test('Array contains top-level block text -- document level', () => {
+  const deserialized = getDeserialized(documentLevelArticle, 'document')
+  expect(toPlainText(deserialized.content)).toEqual(
+    toPlainText(documentLevelArticle.content)
+  )
+})
+
+test('Object in array contains accurate values in nested object -- document level', () => {
+  const deserialized = getDeserialized(documentLevelArticle, 'document')
+  const origTitle = documentLevelArticle.content.find(
+    (block: Record<string, any>) => block._type === 'objectField'
+  ).objectAsField.title
+  const deserializedTitle = deserialized.content.find(
+    (block: Record<string, any>) => block._type === 'objectField'
+  ).objectAsField.title
+  expect(deserializedTitle).toEqual(origTitle)
+
+  const origBlockText = toPlainText(
+    documentLevelArticle.content.find(
+      (block: Record<string, any>) => block._type === 'objectField'
+    ).objectAsField.content
+  ).trim()
+  const deserializedBlockText = toPlainText(
+    documentLevelArticle.content.find(
+      (block: Record<string, any>) => block._type === 'objectField'
+    ).objectAsField.content
+  ).trim()
+  expect(deserializedBlockText).toEqual(origBlockText)
+})
+/*
+ * FIELD LEVEL
+ */
+
+/*
+ * Top-level plain text
+ */
+
+test('String and text types get deserialized correctly at top-level -- field level', () => {
+  const deserialized = getDeserialized(fieldLevelArticle, 'field')
+  expect(deserialized.title.en).toEqual(fieldLevelArticle.title.en)
+  expect(deserialized.snippet.en).toEqual(fieldLevelArticle.snippet.en)
+})
+
+/*
+ * Presence and accuracy of fields in "vanilla" deserialization -- objects
+ */
+test('Nested object contains accurate values -- field level', () => {
+  const deserialized = getDeserialized(fieldLevelArticle, 'field')
+  const origTitle = fieldLevelArticle.config.en.title
+  const deserializedTitle = deserialized.config.en.title
+  expect(origTitle).toEqual(deserializedTitle)
+
+  const origBlockText = fieldLevelArticle.config.en.nestedArrayField
+  const deserializedBlockText = deserialized.config.en.nestedArrayField
+
+  const origKeys = origBlockText.map((block: Block) => block._key)
+  const deserializedKeys = deserializedBlockText.map(
+    (block: Block) => block._key
+  )
+
+  expect(deserializedKeys.sort()).toEqual(origKeys.sort())
+  expect(toPlainText(deserializedBlockText)).toEqual(toPlainText(origBlockText))
+})
+
+test('Nested object in an object contains accurate values -- field level', () => {
+  const deserialized = getDeserialized(fieldLevelArticle, 'field')
+  const origNestedObject = fieldLevelArticle.config.en.objectAsField
+  const deserializedNestedObject = deserialized.config.en.objectAsField
+
+  expect(origNestedObject.title).toEqual(deserializedNestedObject.title)
+
+  const origKeys = origNestedObject.content.map((block: Block) => block._key)
+  const deserializedKeys = deserializedNestedObject.content.map(
+    (block: Block) => block._key
+  )
+
+  expect(origKeys.sort()).toEqual(deserializedKeys.sort())
+  expect(toPlainText(deserializedNestedObject.content)).toEqual(
+    toPlainText(origNestedObject.content)
+  )
+})
+
+/*
+ * Presence and accuracy of fields in vanilla deserialization -- arrays
+ */
+
+test('Array contains all serializable blocks with keys, in order -- field level', () => {
+  const deserialized = getDeserialized(fieldLevelArticle, 'field')
+  const origKeys = fieldLevelArticle.content.en.map(
+    (block: Block) => block._key
+  )
+  const deserializedKeys = deserialized.content.en.map(
+    (block: Block) => block._key
+  )
+  expect(deserializedKeys.sort()).toEqual(origKeys.sort())
+})
+
+test('Array contains top-level block text -- field level', () => {
+  const deserialized = getDeserialized(fieldLevelArticle, 'field')
+  expect(toPlainText(deserialized.content.en)).toEqual(
+    toPlainText(fieldLevelArticle.content.en)
+  )
+})
+
+test('Object in array contains accurate values in nested object -- document level', () => {
+  const deserialized = getDeserialized(fieldLevelArticle, 'field')
+  const origTitle = fieldLevelArticle.content.en.find(
+    (block: Record<string, any>) => block._type === 'objectField'
+  ).objectAsField.title
+  const deserializedTitle = deserialized.content.en.find(
+    (block: Record<string, any>) => block._type === 'objectField'
+  ).objectAsField.title
+  expect(deserializedTitle).toEqual(origTitle)
+
+  const origBlockText = toPlainText(
+    fieldLevelArticle.content.en.find(
+      (block: Record<string, any>) => block._type === 'objectField'
+    ).objectAsField.content
+  ).trim()
+  const deserializedBlockText = toPlainText(
+    fieldLevelArticle.content.en.find(
+      (block: Record<string, any>) => block._type === 'objectField'
+    ).objectAsField.content
+  ).trim()
+  expect(deserializedBlockText).toEqual(origBlockText)
+})
+//custom deserializers work

@@ -3,6 +3,8 @@ import {
   getSerialized,
   addedCustomSerializers,
   createCustomInnerHTML,
+  getValidFields,
+  toPlainText,
 } from './helpers'
 import { Block } from '@sanity/types'
 import {
@@ -23,22 +25,6 @@ const getHTMLNode = (serialized: SerializedDocument) => {
 
 const findByClass = (children: HTMLCollection, className: string) => {
   return Array.from(children).find(node => node.className === className)
-}
-
-const getValidFields = (field: Record<string, any>) => {
-  const invalidFields = ['_type', '_key']
-  return Object.keys(field).filter(key => !invalidFields.includes(key))
-}
-
-function toPlainText(blocks: Block[]) {
-  return blocks
-    .map(block => {
-      if (block._type !== 'block' || !block.children) {
-        return ''
-      }
-      return block.children.map(child => child.text).join('')
-    })
-    .join('\n\n')
 }
 
 test('Global test of working doc-level functionality and snapshot match', () => {
@@ -119,7 +105,7 @@ test('Top-level nested objects contain all serializable fields -- document level
     child => child.className
   )
 
-  expect(fieldNames.sort()).toEqual(foundFieldNames.sort())
+  expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
 })
 
 test('Nested object in object contains all serializable fields -- document level', () => {
@@ -130,7 +116,7 @@ test('Nested object in object contains all serializable fields -- document level
   const foundFieldNames = Array.from(nestedObject!.children).map(
     child => child.className
   )
-  expect(fieldNames.sort()).toEqual(foundFieldNames.sort())
+  expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
 })
 
 test('Nested object contains accurate values -- document level', () => {
@@ -170,7 +156,7 @@ test('Array contains all serializable blocks with keys, in order -- document lev
     (block: Block) => block._key
   )
   const serializedKeys = Array.from(arrayField!.children).map(block => block.id)
-  expect(origKeys).toEqual(serializedKeys)
+  expect(serializedKeys).toEqual(origKeys)
 })
 
 test('Array contains top-level block text -- document level', () => {
@@ -190,7 +176,7 @@ test('Object in array contains all serializable fields -- document level', () =>
   const foundFieldNames = Array.from(objectInArray!.children).map(
     child => child.className
   )
-  expect(fieldNames.sort()).toEqual(foundFieldNames.sort())
+  expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
 })
 
 test('Object in array contains accurate values in nested object -- document level', () => {
@@ -243,7 +229,7 @@ test('Top-level nested objects contain all serializable fields -- field level', 
     child => child.className
   )
 
-  expect(fieldNames.sort()).toEqual(foundFieldNames.sort())
+  expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
 })
 
 test('Nested object in object contains all serializable fields -- field Level', () => {
@@ -254,7 +240,7 @@ test('Nested object in object contains all serializable fields -- field Level', 
   const foundFieldNames = Array.from(nestedObject!.children).map(
     child => child.className
   )
-  expect(fieldNames.sort()).toEqual(foundFieldNames.sort())
+  expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
 })
 
 test('Nested object contains accurate values -- field level', () => {
@@ -295,7 +281,7 @@ test('Array contains all serializable blocks with keys, in order -- field level'
     (block: Block) => block._key
   )
   const serializedKeys = Array.from(arrayField!.children).map(block => block.id)
-  expect(origKeys).toEqual(serializedKeys)
+  expect(serializedKeys).toEqual(origKeys)
 })
 
 test('Array contains top-level block text -- field level', () => {
@@ -315,7 +301,7 @@ test('Object in array contains all serializable fields -- field level', () => {
   const foundFieldNames = Array.from(objectInArray!.children).map(
     child => child.className
   )
-  expect(fieldNames.sort()).toEqual(foundFieldNames.sort())
+  expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
 })
 
 test('Object in array contains accurate values in nested object -- field level', () => {
@@ -420,10 +406,12 @@ test('Expect custom stop types to be absent at all levels', () => {
 
 /*
  * ANNOTATION AND INLINE BLOCK CONTENT
- *(separate because these throw an annoying warning from block-content-to-html)
  */
 
 test('Unhandled inline objects and annotations should not hinder translation flows', () => {
+  //unhandled will throw a warn -- ignore it in this case
+  jest.spyOn(console, 'warn').mockImplementation(() => {})
+
   const inlineDocument = {
     ...documentLevelArticle,
     ...annotationAndInlineBlocks,
