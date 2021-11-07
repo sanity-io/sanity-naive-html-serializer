@@ -1,7 +1,20 @@
-import { getDeserialized, toPlainText } from './helpers'
+import {
+  addedCustomDeserializers,
+  getDeserialized,
+  toPlainText,
+  addedCustomSerializers,
+  addedBlockDeserializers,
+} from './helpers'
 import { Block } from '@sanity/types'
+import {
+  BaseDocumentDeserializer,
+  BaseDocumentSerializer,
+  defaultStopTypes,
+} from '../src'
+import { customBlockDeserializers } from '../src/BaseSerializationConfig'
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
+const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
 
 let mockTestKey = 0
 
@@ -238,4 +251,129 @@ test('Object in array contains accurate values in nested object -- document leve
   ).trim()
   expect(deserializedBlockText).toEqual(origBlockText)
 })
-//custom deserializers work
+
+/*
+ * CUSTOM SETTINGS
+ */
+
+test('Custom deserialization should manifest at all levels', () => {
+  const serialized = BaseDocumentSerializer.serializeDocument(
+    documentLevelArticle,
+    'document',
+    'en',
+    defaultStopTypes,
+    addedCustomSerializers
+  )
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(
+    serialized.content,
+    addedCustomDeserializers,
+    customBlockDeserializers
+  )
+  expect(deserialized.config.title).toEqual(documentLevelArticle.config.title)
+  expect(deserialized.config._type).toEqual(documentLevelArticle.config._type)
+
+  const origArrayObj = documentLevelArticle.content.find(
+    (b: Record<string, any>) => b._type === 'objectField'
+  )
+  const deserializedArrayObj = deserialized.content.find(
+    (b: Record<string, any>) => b._type === 'objectField'
+  )
+
+  expect(deserializedArrayObj.title).toEqual(origArrayObj.title)
+  expect(deserializedArrayObj._key).toEqual(origArrayObj._key)
+})
+
+//test -- unhandled annotations and inlines don't break when they get deserialized back?
+
+test('Handled inline objects should be accurately deserialized', () => {
+  const inlineDocument = {
+    ...documentLevelArticle,
+    ...annotationAndInlineBlocks,
+  }
+
+  const serialized = BaseDocumentSerializer.serializeDocument(
+    inlineDocument,
+    'document',
+    'en',
+    defaultStopTypes,
+    addedCustomSerializers
+  )
+
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(
+    serialized.content,
+    addedCustomDeserializers,
+    addedBlockDeserializers
+  )
+
+  let origInlineObj: Record<string, any> | null = null
+  let deserializedInlineObj: Record<string, any> | null = null
+
+  inlineDocument.content.forEach((block: Record<string, any>) => {
+    if (block.children) {
+      block.children.forEach((span: Record<string, any>) => {
+        if (span._type === 'childObjectField') {
+          origInlineObj = span
+        }
+      })
+    }
+  })
+
+  deserialized.content.forEach((block: Record<string, any>) => {
+    if (block.children) {
+      block.children.forEach((span: Record<string, any>) => {
+        if (span._type === 'childObjectField') {
+          deserializedInlineObj = span
+        }
+      })
+    }
+  })
+
+  expect(deserializedInlineObj!.title).toEqual(origInlineObj!.title)
+  expect(deserializedInlineObj!._type).toEqual(origInlineObj!._type)
+})
+
+test('Handled annotations should be accurately deserialized', () => {
+  const inlineDocument = {
+    ...documentLevelArticle,
+    ...annotationAndInlineBlocks,
+  }
+
+  const serialized = BaseDocumentSerializer.serializeDocument(
+    inlineDocument,
+    'document',
+    'en',
+    defaultStopTypes,
+    addedCustomSerializers
+  )
+
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(
+    serialized.content,
+    addedCustomDeserializers,
+    addedBlockDeserializers
+  )
+
+  let origAnnotation: Record<string, any> | null = null
+  let deserializedAnnotation: Record<string, any> | null = null
+
+  inlineDocument.content.forEach((block: Block) => {
+    if (block.children) {
+      block.children.forEach((span: Record<string, any>) => {
+        if (span.marks && span.marks.length) {
+          origAnnotation = span
+        }
+      })
+    }
+  })
+
+  deserialized.content.forEach((block: Block) => {
+    if (block.children) {
+      block.children.forEach((span: Record<string, any>) => {
+        if (span.marks && span.marks.length) {
+          deserializedAnnotation = span
+        }
+      })
+    }
+  })
+
+  expect(deserializedAnnotation!.text).toEqual(origAnnotation!.text)
+})

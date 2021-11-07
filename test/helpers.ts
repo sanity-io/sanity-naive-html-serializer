@@ -101,3 +101,62 @@ tempSerializers.marks = {
 }
 
 export const addedCustomSerializers = tempSerializers
+
+export const addedDeserializerTypes = {
+  objectField: (html: HTMLElement) => {
+    const title = html.innerHTML
+      .split(':')[1]
+      .replace(/'/g, '')
+      .trim()
+    const _type = html.className
+    const _key = html.id
+    return { title, _type, _key }
+  },
+}
+
+const tempDeserializers = clone(customDeserializers)
+tempDeserializers.types = {
+  ...tempDeserializers.types,
+  ...addedDeserializerTypes,
+}
+
+export const addedCustomDeserializers = tempDeserializers
+
+export const addedBlockDeserializers = [
+  {
+    //@ts-ignore
+    deserialize(el) {
+      if (!el.className || el.className.toLowerCase() !== 'childobjectfield') {
+        return undefined
+      }
+
+      const title = el.innerHTML
+        .split(':')[1]
+        .replace(/'/g, '')
+        .trim()
+      const _type = el.className
+      const _key = el.id
+
+      return { title, _type, _key }
+    },
+  },
+  {
+    //@ts-ignore
+    deserialize(el, next) {
+      if (!el.className || el.className.toLowerCase() !== 'annotation') {
+        return undefined
+      }
+
+      const markDef = {
+        _key: el.id,
+        _type: 'annotation',
+      }
+
+      return {
+        _type: '__annotation',
+        markDef: markDef,
+        children: next(el.childNodes),
+      }
+    },
+  },
+]

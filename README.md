@@ -31,7 +31,7 @@ myCustomSerializers.types = myCustomSerializerTypes
 
 const myCustomDeserializer = {
   types: {
-    myType: (htmlString) => {
+    myType: (htmlElement) => {
       //parse it back out!
     }
   }
@@ -53,7 +53,7 @@ const myBlockDeserializationRules = [
       return {
         _type: 'myType',
         //all my other fields
-      })
+      }
     }
 ]
 ```

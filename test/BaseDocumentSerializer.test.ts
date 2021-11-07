@@ -335,8 +335,7 @@ test('Values in a field are not repeated, (indicating serializers are stateless)
  */
 
 test('Custom serialization should manifest at all levels', () => {
-  const serializer = BaseDocumentSerializer
-  const serialized = serializer.serializeDocument(
+  const serialized = BaseDocumentSerializer.serializeDocument(
     documentLevelArticle,
     'document',
     'en',
@@ -380,9 +379,8 @@ test('Expect default stop types to be absent', () => {
 })
 
 test('Expect custom stop types to be absent at all levels', () => {
-  const serializer = BaseDocumentSerializer
   const customStopTypes = [...defaultStopTypes, 'objectField']
-  const serialized = serializer.serializeDocument(
+  const serialized = BaseDocumentSerializer.serializeDocument(
     documentLevelArticle,
     'document',
     'en',
@@ -420,7 +418,7 @@ test('Unhandled inline objects and annotations should not hinder translation flo
   //expect annotations to be ignored
   expect(serialized.content).not.toContain('annotation')
 
-  //expect unhandled inline objects to be empty
+  //expect unhandled inline objects to be present but empty
   const docTree = getHTMLNode(serialized).body.children[0]
   const arrayField = findByClass(docTree.children, 'content')
   const inlineObject = findByClass(arrayField!.children, 'childObjectField')
@@ -433,8 +431,7 @@ test('Handled inline objects should be accurately represented per serializer', (
     ...annotationAndInlineBlocks,
   }
 
-  const serializer = BaseDocumentSerializer
-  const serialized = serializer.serializeDocument(
+  const serialized = BaseDocumentSerializer.serializeDocument(
     inlineDocument,
     'document',
     'en',
@@ -474,8 +471,7 @@ test('Handled annotations should be accurately represented per serializer', () =
     ...annotationAndInlineBlocks,
   }
 
-  const serializer = BaseDocumentSerializer
-  const serialized = serializer.serializeDocument(
+  const serialized = BaseDocumentSerializer.serializeDocument(
     inlineDocument,
     'document',
     'en',
