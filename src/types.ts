@@ -59,15 +59,12 @@ export interface Merger {
   fieldLevelMerge: (
     translatedFields: Record<string, any>,
     baseDoc: SanityDocument,
-    documentId: string,
     localeId: string,
     baseLang: string
   ) => Record<string, any>
   documentLevelMerge: (
     translatedFields: Record<string, any>,
-    baseDoc: SanityDocument,
-    documentId: string,
-    localeId: string
+    baseDoc: SanityDocument
   ) => Record<string, any>
   reconcileArray: (origArray: any[], translatedArray: any[]) => any[]
   reconcileObject: (
