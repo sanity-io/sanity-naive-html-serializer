@@ -1,7 +1,7 @@
 import { SerializedDocument } from '../src/types'
 import {
   getSerialized,
-  addedCustomerSerializers,
+  addedCustomSerializers,
   createCustomInnerHTML,
 } from './helpers'
 import { Block } from '@sanity/types'
@@ -13,6 +13,7 @@ import {
 
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
+const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
 
 const getHTMLNode = (serialized: SerializedDocument) => {
   const htmlString = serialized.content
@@ -333,7 +334,7 @@ test('Object in array contains accurate values in nested object -- field level',
   expect(nestedObject?.innerHTML).toContain(blockText)
 })
 
-test('Values in a field are not repeated', () => {
+test('Values in a field are not repeated, (indicating serializers are stateless)', () => {
   const serialized = getSerialized(documentLevelArticle, 'document')
   const docTree = getHTMLNode(serialized).body.children[0]
   const HTMLList = findByClass(docTree.children, 'tags')
@@ -354,10 +355,9 @@ test('Custom serialization should manifest at all levels', () => {
     'document',
     'en',
     defaultStopTypes,
-    addedCustomerSerializers
+    addedCustomSerializers
   )
   const docTree = getHTMLNode(serialized).body.children[0]
-  const arrayField = findByClass(docTree.children, 'content')
 
   const topLevelCustomSerialized = findByClass(docTree.children, 'config')
   const requiredTopLevelTitle = documentLevelArticle.config.title
@@ -365,6 +365,7 @@ test('Custom serialization should manifest at all levels', () => {
     createCustomInnerHTML(requiredTopLevelTitle)
   )
 
+  const arrayField = findByClass(docTree.children, 'content')
   const nestedSerialized = findByClass(arrayField!.children, 'objectField')
   const requiredNestedTitle = documentLevelArticle.content.find(
     (b: Record<string, any>) => b._type === 'objectField'
@@ -374,11 +375,145 @@ test('Custom serialization should manifest at all levels', () => {
   )
 })
 
-//expect localize false fields to be absent
-//expect default stop types to be absent
-//expect explicitly declared stop types to be absent
+test('Fields marked "localize: false" should not be serialized', () => {
+  const serialized = getSerialized(documentLevelArticle, 'document')
+  const docTree = getHTMLNode(serialized).body.children[0]
+  //"meta" is localize: false field
+  const meta = findByClass(docTree.children, 'meta')
+  expect(documentLevelArticle.meta).toBeDefined()
+  expect(meta).toBeUndefined()
+})
 
-//load annotation and inline blocks content
-//(it throws an annoying warning,
-// so see if we can run in silent for console.debug)
-// how those work with and without custom serializers
+test('Expect default stop types to be absent', () => {
+  const serialized = getSerialized(documentLevelArticle, 'document')
+  const docTree = getHTMLNode(serialized).body.children[0]
+  //"hidden" is boolean field
+  const hidden = findByClass(docTree.children, 'hidden')
+  expect(documentLevelArticle.hidden).toBeDefined()
+  expect(hidden).toBeUndefined()
+})
+
+test('Expect custom stop types to be absent at all levels', () => {
+  const serializer = BaseDocumentSerializer
+  const customStopTypes = [...defaultStopTypes, 'objectField']
+  const serialized = serializer.serializeDocument(
+    documentLevelArticle,
+    'document',
+    'en',
+    customStopTypes,
+    customSerializers
+  )
+
+  const docTree = getHTMLNode(serialized).body.children[0]
+  const config = findByClass(docTree.children, 'config')
+  expect(documentLevelArticle.config).toBeDefined()
+  expect(config).toBeUndefined()
+
+  const arrayField = findByClass(docTree.children, 'content')
+  const nestedSerialized = findByClass(arrayField!.children, 'objectField')
+  const nestedObjField = documentLevelArticle.content.find(
+    (b: Record<string, any>) => b._type === 'objectField'
+  )
+  expect(nestedObjField).toBeDefined()
+  expect(nestedSerialized).toBeUndefined()
+})
+
+/*
+ * ANNOTATION AND INLINE BLOCK CONTENT
+ *(separate because these throw an annoying warning from block-content-to-html)
+ */
+
+test('Unhandled inline objects and annotations should not hinder translation flows', () => {
+  const inlineDocument = {
+    ...documentLevelArticle,
+    ...annotationAndInlineBlocks,
+  }
+  const serialized = getSerialized(inlineDocument, 'document')
+  //expect annotations to be ignored
+  expect(serialized.content).not.toContain('annotation')
+
+  //expect unhandled inline objects to be empty
+  const docTree = getHTMLNode(serialized).body.children[0]
+  const arrayField = findByClass(docTree.children, 'content')
+  const inlineObject = findByClass(arrayField!.children, 'childObjectField')
+  expect(inlineObject?.innerHTML.length).toEqual(0)
+})
+
+test('Handled inline objects should be accurately represented per serializer', () => {
+  const inlineDocument = {
+    ...documentLevelArticle,
+    ...annotationAndInlineBlocks,
+  }
+
+  const serializer = BaseDocumentSerializer
+  const serialized = serializer.serializeDocument(
+    inlineDocument,
+    'document',
+    'en',
+    defaultStopTypes,
+    addedCustomSerializers
+  )
+  const docTree = getHTMLNode(serialized).body.children[0]
+  const arrayField = findByClass(docTree.children, 'content')
+  let inlineObject: Element | null = null
+  let inlineObjectBlock: Record<string, any> | null = null
+
+  Array.from(arrayField!.children).forEach((block: any) => {
+    if (!inlineObject) {
+      inlineObject =
+        findByClass(block.children, 'childObjectField') ?? inlineObject
+    }
+  })
+
+  inlineDocument.content.forEach((block: Record<string, any>) => {
+    if (block.children) {
+      block.children.forEach((span: Record<string, any>) => {
+        if (span._type === 'childObjectField') {
+          inlineObjectBlock = span
+        }
+      })
+    }
+  })
+
+  expect(inlineObject!.innerHTML).toContain(
+    createCustomInnerHTML(inlineObjectBlock!.title)
+  )
+})
+
+test('Handled annotations should be accurately represented per serializer', () => {
+  const inlineDocument = {
+    ...documentLevelArticle,
+    ...annotationAndInlineBlocks,
+  }
+
+  const serializer = BaseDocumentSerializer
+  const serialized = serializer.serializeDocument(
+    inlineDocument,
+    'document',
+    'en',
+    defaultStopTypes,
+    addedCustomSerializers
+  )
+  const docTree = getHTMLNode(serialized).body.children[0]
+  const arrayField = findByClass(docTree.children, 'content')
+  let annotation: Element | null = null
+  let annotationBlock: Record<string, any> | null = null
+
+  Array.from(arrayField!.children).forEach((block: any) => {
+    if (!annotation) {
+      annotation = findByClass(block.children, 'annotation') ?? annotation
+    }
+  })
+
+  inlineDocument.content.forEach((block: Block) => {
+    if (block.children) {
+      block.children.forEach((span: Record<string, any>) => {
+        if (span.marks && span.marks.length) {
+          annotationBlock = span
+        }
+      })
+    }
+  })
+
+  expect(annotation!.innerHTML).toEqual(annotationBlock!.text)
+})
