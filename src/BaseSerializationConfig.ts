@@ -39,4 +39,4 @@ export const customSerializers: Record<string, any> = {
 
 export const customDeserializers: Record<string, any> = { types: {} }
 
-export const customBlockDeserializers = []
+export const customBlockDeserializers: Array<any> = []

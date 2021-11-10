@@ -1,10 +1,8 @@
 import { SanityDocument } from '@sanity/types'
 import { BaseDocumentSerializer, BaseDocumentDeserializer } from '../src'
 import {
-  defaultStopTypes,
   customSerializers,
   customDeserializers,
-  customBlockDeserializers,
 } from '../src/BaseSerializationConfig'
 import { h } from '@sanity/block-content-to-html'
 import { Block } from '@sanity/types'
@@ -12,22 +10,12 @@ import clone from 'just-clone'
 
 export const getSerialized = (document: SanityDocument, level: string) => {
   const serializer = BaseDocumentSerializer
-  return serializer.serializeDocument(
-    document,
-    level,
-    'en',
-    defaultStopTypes,
-    customSerializers
-  )
+  return serializer.serializeDocument(document, level)
 }
 
 export const getDeserialized = (document: SanityDocument, level: string) => {
   const serialized = getSerialized(document, level)
-  return BaseDocumentDeserializer.deserializeDocument(
-    serialized.content,
-    customDeserializers,
-    customBlockDeserializers
-  )
+  return BaseDocumentDeserializer.deserializeDocument(serialized.content)
 }
 
 export const getValidFields = (field: Record<string, any>) => {

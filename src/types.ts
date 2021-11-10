@@ -14,9 +14,9 @@ export interface Serializer {
   serializeDocument: (
     doc: SanityDocument,
     translationLevel: string,
-    baseLang: string,
-    stopTypes: string[],
-    serializers: Record<string, any>
+    baseLang?: string,
+    stopTypes?: string[],
+    serializers?: Record<string, any>
   ) => SerializedDocument
   fieldFilter: (
     obj: Record<string, any>,
@@ -44,8 +44,8 @@ export interface Serializer {
 export interface Deserializer {
   deserializeDocument: (
     serializedDoc: string,
-    deserializers: Record<string, any>,
-    blockDeserializers: Array<any>
+    deserializers?: Record<string, any>,
+    blockDeserializers?: Array<any>
   ) => Record<string, any>
   deserializeHTML: (
     html: string,

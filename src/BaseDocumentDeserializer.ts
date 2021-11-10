@@ -36,7 +36,7 @@ const blockContentType = defaultSchema
 export const deserializeDocument = (
   serializedDoc: string,
   deserializers: Record<string, any> = customDeserializers,
-  blockDeserializers: Array<any> = customBlockDeserializers
+  blockDeserializers = customBlockDeserializers
 ) => {
   const metadata: Record<string, any> = {}
   const head = new DOMParser().parseFromString(serializedDoc, 'text/html').head
