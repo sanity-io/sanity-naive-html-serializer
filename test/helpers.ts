@@ -7,13 +7,20 @@ import {
 import { h } from '@sanity/block-content-to-html'
 import { Block } from '@sanity/types'
 import clone from 'just-clone'
+import { TranslationLevel } from '../src/types'
 
-export const getSerialized = (document: SanityDocument, level: string) => {
+export const getSerialized = (
+  document: SanityDocument,
+  level: TranslationLevel
+) => {
   const serializer = BaseDocumentSerializer
   return serializer.serializeDocument(document, level)
 }
 
-export const getDeserialized = (document: SanityDocument, level: string) => {
+export const getDeserialized = (
+  document: SanityDocument,
+  level: TranslationLevel
+) => {
   const serialized = getSerialized(document, level)
   return BaseDocumentDeserializer.deserializeDocument(serialized.content)
 }
