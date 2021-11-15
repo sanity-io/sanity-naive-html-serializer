@@ -44,6 +44,7 @@
     }
   ],
   "devDependencies": {
+    "@sanity/schema": "^2.10.0",
     "@size-limit/preset-small-lib": "^4.7.0",
     "husky": "^4.3.0",
     "jest": "^27.0.0",
@@ -58,7 +59,6 @@
     "@sanity/base": "^2.21.4",
     "@sanity/block-content-to-html": "^2.0.0",
     "@sanity/block-tools": "^2.11.0",
-    "@sanity/schema": "^2.10.0",
     "@sanity/types": "^2.11.0",
     "just-clone": "^3.2.1"
   }
