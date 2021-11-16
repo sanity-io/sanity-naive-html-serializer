@@ -11,8 +11,10 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
   /*
    * Helper function that allows us to get metadata (like `localize: false`) from schema fields.
    */
+  // FIXME: Need to cast this to `any` as the defined type TypeDef does not
+  // match what the existing code is expecting on these objects
   const getSchema = (name: string) =>
-    schemas._original.types.find(s => s.name === name)
+    schemas._original.types.find(s => s.name === name) as any
 
   /*
    * Main parent function: finds fields to translate, and feeds them to appropriate child serialization
