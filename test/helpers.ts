@@ -9,7 +9,7 @@ import { Block } from '@sanity/types'
 import clone from 'just-clone'
 import { TranslationLevel } from '../src/types'
 
-const schema = require('part:@sanity/base/schema')
+const schema = require('./__fixtures__/schema')
 
 export const getSerialized = (
   document: SanityDocument,

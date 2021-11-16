@@ -16,7 +16,7 @@ const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
 
-const schema = require('part:@sanity/base/schema')
+const schema = require('./__fixtures__/schema')
 
 let mockTestKey = 0
 
