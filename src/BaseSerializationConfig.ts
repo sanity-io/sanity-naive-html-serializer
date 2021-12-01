@@ -18,7 +18,16 @@ export const customSerializers: Record<string, any> = {
     h('div', { className: props.node._type }, ''),
   types: {
     block: (props: Record<string, any>) => {
-      return h('p', { id: props.node._key }, props.children)
+      const key = { id: props.node._key }
+      const style = props.node.style || 'normal'
+
+      if (/^h\d/.test(style)) {
+        return h(style, key, props.children)
+      }
+
+      return style === 'blockquote'
+        ? h('blockquote', key, props.children)
+        : h('p', key, props.children)
     },
   },
   list: (props: Record<string, any>) => {

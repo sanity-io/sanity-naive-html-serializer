@@ -87,6 +87,34 @@ Object {
       },
       "title": "This is an object in top-level block text.",
     },
+    Object {
+      "_key": "9e2ab13c6d63",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "17e856dc4766",
+          "_type": "span",
+          "marks": Array [],
+          "text": "This is h1 text",
+        },
+      ],
+      "markDefs": Array [],
+      "style": "h1",
+    },
+    Object {
+      "_key": "297142fbaf21",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "0b2f9e94a161",
+          "_type": "span",
+          "marks": Array [],
+          "text": "This is h2 text",
+        },
+      ],
+      "markDefs": Array [],
+      "style": "h2",
+    },
   ],
   "hidden": true,
   "meta": "Do not translate this",

@@ -83,6 +83,34 @@
         "title": "This is a nested object in an object in top-level block text."
       },
       "title": "This is an object in top-level block text."
+    },
+    {
+      "_key": "9e2ab13c6d63",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "17e856dc4766",
+          "_type": "span",
+          "marks": [],
+          "text": "This is h1 text"
+        }
+      ],
+      "markDefs": [],
+      "style": "h1"
+    },
+    {
+      "_key": "297142fbaf21",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "0b2f9e94a161",
+          "_type": "span",
+          "marks": [],
+          "text": "This is h2 text"
+        }
+      ],
+      "markDefs": [],
+      "style": "h2"
     }
   ],
   "hidden": true,

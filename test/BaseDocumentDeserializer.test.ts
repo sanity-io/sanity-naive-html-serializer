@@ -377,3 +377,28 @@ test('Handled annotations should be accurately deserialized', () => {
 
   expect(deserializedAnnotation!.text).toEqual(origAnnotation!.text)
 })
+
+/*
+ * STYLE TAGS
+ */
+test('Deserialized content should preserve style tags', () => {
+  const deserialized = getDeserialized(documentLevelArticle, 'document')
+  const origH1 = documentLevelArticle.content.find(
+    (block: Block) => block.style === 'h1'
+  )
+  const deserializedH1 = deserialized.content.find(
+    (block: Block) => block.style === 'h1'
+  )
+  const origH2 = documentLevelArticle.content.find(
+    (block: Block) => block.style === 'h2'
+  )
+  const deserializedH2 = deserialized.content.find(
+    (block: Block) => block.style === 'h2'
+  )
+  expect(deserializedH1).toBeDefined()
+  expect(deserializedH2).toBeDefined()
+  expect(deserializedH1._key).toEqual(origH1._key)
+  expect(deserializedH2._key).toEqual(origH2._key)
+  expect(deserializedH1.children[0].text).toEqual(origH1.children[0].text)
+  expect(deserializedH2.children[0].text).toEqual(origH2.children[0].text)
+})
