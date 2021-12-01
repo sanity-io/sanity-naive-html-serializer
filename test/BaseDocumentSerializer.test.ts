@@ -162,7 +162,10 @@ test('Array contains all serializable blocks with keys, in order -- document lev
 test('Array contains top-level block text -- document level', () => {
   const arrayField = getDocumentLevelArrayField()
   const blockText = toPlainText(documentLevelArticle.content).trim()
-  expect(arrayField?.innerHTML).toContain(blockText)
+  const blockStrings = blockText.split('\n\n')
+  blockStrings.forEach((substring: string) =>
+    expect(arrayField?.innerHTML).toContain(substring)
+  )
 })
 
 test('Object in array contains all serializable fields -- document level', () => {
@@ -500,4 +503,24 @@ test('Handled annotations should be accurately represented per serializer', () =
   })
 
   expect(annotation!.innerHTML).toEqual(annotationBlock!.text)
+})
+
+/*
+ * STYLE TAGS
+ */
+test('Serialized content should preserve style tags from Portable Text', () => {
+  const arrayField = getDocumentLevelArrayField()
+  const blockH1 = documentLevelArticle.content.find(
+    (block: Block) => block.style === 'h1'
+  )
+  const serializedH1 = arrayField?.querySelector('h1')
+  const blockH2 = documentLevelArticle.content.find(
+    (block: Block) => block.style === 'h2'
+  )
+  const serializedH2 = arrayField?.querySelector('h2')
+  //TODO: test blockquote
+  expect(serializedH1).toBeDefined()
+  expect(serializedH2).toBeDefined()
+  expect(serializedH1?.innerHTML).toEqual(blockH1.children[0].text)
+  expect(serializedH2?.innerHTML).toEqual(blockH2.children[0].text)
 })

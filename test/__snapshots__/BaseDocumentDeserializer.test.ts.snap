@@ -82,6 +82,34 @@ Object {
       },
       "title": "This is an object in top-level block text.",
     },
+    Object {
+      "_key": "9e2ab13c6d63",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "randomKey-50",
+          "_type": "span",
+          "marks": Array [],
+          "text": "This is h1 text",
+        },
+      ],
+      "markDefs": Array [],
+      "style": "h1",
+    },
+    Object {
+      "_key": "297142fbaf21",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "randomKey-60",
+          "_type": "span",
+          "marks": Array [],
+          "text": "This is h2 text",
+        },
+      ],
+      "markDefs": Array [],
+      "style": "h2",
+    },
   ],
   "snippet": "This is text in my text field.",
   "tags": Array [
