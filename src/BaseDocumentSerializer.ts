@@ -38,14 +38,15 @@ const serializeDocument = (
     } else if (Array.isArray(value)) {
       serializedFields[key] = serializeArray(value, key, stopTypes, serializers)
     } else {
+      const isFieldLevel = value.hasOwnProperty(baseLang)
       const serialized = serializeObject(
         value,
         //top-level objects need an additional layer of nesting for custom serialization etc.
-        translationLevel === 'field' ? key : null,
+        isFieldLevel ? key : null,
         stopTypes,
         serializers
       )
-      if (translationLevel === 'document') {
+      if (!isFieldLevel) {
         serializedFields[key] = `<div class='${key}'>${serialized}</div>`
       } else {
         serializedFields[key] = serialized
