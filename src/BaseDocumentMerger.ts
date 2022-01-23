@@ -15,6 +15,7 @@ const fieldLevelMerge = (
       merged[field] = translatedFields[field]
       continue
     }
+    //go down into the object and mutate all 'en' fields to be in the localeId
 
     const translatedVal = translatedFields[field][baseLang]
     //@ts-ignore

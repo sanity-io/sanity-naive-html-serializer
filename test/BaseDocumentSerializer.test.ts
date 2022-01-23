@@ -16,6 +16,7 @@ import {
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
+const nestedLanguageFields = require('./__fixtures__/nestedLanguageFields')
 
 const getHTMLNode = (serialized: SerializedDocument) => {
   const htmlString = serialized.content
@@ -268,6 +269,14 @@ test('Nested object in an object contains accurate values -- field level', () =>
   expect(nestedObject.innerHTML).toContain(blockText)
 })
 
+test('Nested locale fields make it to serialization', () => {
+  const nestedLocales = { ...fieldLevelArticle, ...nestedLanguageFields }
+  const serialized = getSerialized(nestedLocales, 'field')
+  const docTree = getHTMLNode(serialized).body.children[0]
+  console.log(serialized)
+  // const slices = findByClass(docTree.children, 'slices')
+  const serializedPageFields = findByClass(docTree.children, 'pageFields')
+})
 /*
  * Presence and accuracy of fields in "vanilla" deserialization -- arrays
  */
