@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Global document level snapshot test 1`] = `
+exports[`Document level merging Global document level snapshot test 1`] = `
 Object {
   "_createdAt": "2021-09-01T23:00:13Z",
   "_id": "drafts.d8ffc675-ce86-4f60-9ac8-da164cde3b0a",
@@ -128,7 +128,7 @@ Object {
 }
 `;
 
-exports[`Global field level snapshot test 1`] = `
+exports[`Field level merging Global field level snapshot test 1`] = `
 Object {
   "_id": "drafts.2947533e-1ea5-4116-955b-339608d3445d",
   "_rev": "l58oha-n06-1s4-f6i-74g6cuakl",
@@ -179,7 +179,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-30",
+          "_key": "randomKey-90",
           "_type": "span",
           "marks": Array [],
           "text": "New block text",
