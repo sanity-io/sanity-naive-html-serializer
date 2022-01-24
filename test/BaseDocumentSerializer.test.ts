@@ -197,6 +197,18 @@ describe('Document-level serialization', () => {
  */
 
 describe('Field-level serialization', () => {
+  const serialized = getSerialized(fieldLevelArticle, 'field')
+  const docTree = getHTMLNode(serialized).body.children[0]
+
+  test('String and text types get serialized correctly at top-level -- field level', () => {
+    const titleObj = findByClass(docTree.children, 'title')
+    const HTMLString = findByClass(titleObj!.children, 'en')
+    const snippetObj = findByClass(docTree.children, 'snippet')
+    const HTMLText = findByClass(snippetObj!.children, 'en')
+    expect(HTMLString?.innerHTML).toEqual(fieldLevelArticle.title.en)
+    expect(HTMLText?.innerHTML).toEqual(fieldLevelArticle.snippet.en)
+  })
+
   describe('Presence and accuracy of fields in "vanilla" deserialization -- objects', () => {
     const getFieldLevelObjectField = () => {
       const serialized = getSerialized(fieldLevelArticle, 'field')
