@@ -10,10 +10,8 @@ const fieldLevelMerge = (
   baseLang: string = 'en'
 ) => {
   const merged: Record<string, any> = {}
-  if (translatedFields._rev) {
-    merged._rev = translatedFields._rev
-  }
-  ;['_rev', '_id', '_type'].forEach(metaKey => {
+  const metaKeys = ['_rev', '_id', '_type']
+  metaKeys.forEach(metaKey => {
     if (translatedFields[metaKey]) {
       merged[metaKey] = translatedFields[metaKey]
     }
