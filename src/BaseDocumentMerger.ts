@@ -1,5 +1,6 @@
 import { Merger } from './types'
 import { SanityDocument } from '@sanity/types'
+import { extractWithPath, extract, arrayToJSONMatchPath } from '@sanity/mutator'
 
 const fieldLevelMerge = (
   translatedFields: Record<string, any>,
@@ -9,17 +10,21 @@ const fieldLevelMerge = (
   baseLang: string = 'en'
 ) => {
   const merged: Record<string, any> = {}
-
-  for (let field in translatedFields) {
-    if (['_rev', '_id', '_type'].includes(field)) {
-      merged[field] = translatedFields[field]
-      continue
+  const metaKeys = ['_rev', '_id', '_type']
+  metaKeys.forEach(metaKey => {
+    if (translatedFields[metaKey]) {
+      merged[metaKey] = translatedFields[metaKey]
     }
+  })
 
-    const translatedVal = translatedFields[field][baseLang]
-    //@ts-ignore
-    const origVal = baseDoc[field][baseLang]
-
+  //get any field that matches the base language, because it's been translated
+  const originPaths = extractWithPath(`..${baseLang}`, translatedFields)
+  originPaths.forEach(match => {
+    const origVal = extract(arrayToJSONMatchPath(match.path), baseDoc)[0]
+    const translatedVal = extract(
+      arrayToJSONMatchPath(match.path),
+      translatedFields
+    )[0]
     let valToPatch
     if (typeof translatedVal === 'string') {
       valToPatch = translatedVal
@@ -28,8 +33,13 @@ const fieldLevelMerge = (
     } else {
       valToPatch = reconcileObject(origVal ?? {}, translatedVal)
     }
-    merged[`${field}.${localeId.replace('-', '_')}`] = valToPatch
-  }
+    const destinationPath = [
+      ...match.path.slice(0, match.path.length - 1), //cut off the "en"
+      localeId.replace('-', '_'), // replace it with our locale
+    ]
+
+    merged[arrayToJSONMatchPath(destinationPath)] = valToPatch
+  })
 
   return merged
 }

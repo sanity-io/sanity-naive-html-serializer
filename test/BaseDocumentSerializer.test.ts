@@ -16,6 +16,7 @@ import {
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
+const nestedLanguageFields = require('./__fixtures__/nestedLanguageFields')
 
 const getHTMLNode = (serialized: SerializedDocument) => {
   const htmlString = serialized.content
@@ -319,6 +320,26 @@ describe('Field-level serialization', () => {
       expect(nestedObject?.innerHTML).toContain(title)
       expect(nestedObject?.innerHTML).toContain(blockText)
     })
+  })
+
+  test('Nested locale fields make it to serialization, but only base lang', () => {
+    const nestedLocales = { ...fieldLevelArticle, ...nestedLanguageFields }
+    const serialized = getSerialized(nestedLocales, 'field')
+    const docTree = getHTMLNode(serialized).body.children[0]
+    const slices = findByClass(docTree.children, 'slices')
+    const pageFields = findByClass(docTree.children, 'pageFields')
+    expect(slices?.innerHTML).toContain(
+      nestedLanguageFields.slices[0].en[0].children[0].text
+    )
+    expect(pageFields?.innerHTML).toContain(
+      nestedLanguageFields.pageFields.name.en
+    )
+    expect(slices?.innerHTML).not.toContain(
+      nestedLanguageFields.slices[0].fr_FR[0].children[0].text
+    )
+    expect(pageFields?.innerHTML).not.toContain(
+      nestedLanguageFields.pageFields.name.fr_FR
+    )
   })
 })
 

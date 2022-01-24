@@ -4,6 +4,7 @@ import { Block } from '@sanity/types'
 import { getDeserialized } from './helpers'
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
+const nestedLanguageFields = require('./__fixtures__/nestedLanguageFields')
 
 let mockTestKey = 0
 
@@ -258,6 +259,30 @@ describe('Field level merging', () => {
     expect(
       fieldLevelPatches['content.es_ES'][1].objectAsField.content
     ).toBeDefined()
+  })
+
+  test('nested locale fields will be merged', () => {
+    const newNestedFields = clone(nestedLanguageFields)
+    newNestedFields.pageFields.name.en = 'This is a new page field name'
+    newNestedFields.slices[0].en[0].children[0].text = 'This is new slice text'
+    const baseDocument = { ...fieldLevelArticle, ...nestedLanguageFields }
+    const newDocument = getDeserialized(
+      { ...fieldLevelArticle, ...newNestedFields },
+      'field'
+    )
+    const fieldLevelPatches = BaseDocumentMerger.fieldLevelMerge(
+      newDocument,
+      baseDocument,
+      'es_ES',
+      'en'
+    )
+
+    expect(fieldLevelPatches['slices[0].es_ES'][0].children[0].text).toEqual(
+      newDocument.slices[0].en[0].children[0].text
+    )
+    expect(fieldLevelPatches['pageFields.name.es_ES']).toEqual(
+      newDocument.pageFields.name.en
+    )
   })
 })
 
