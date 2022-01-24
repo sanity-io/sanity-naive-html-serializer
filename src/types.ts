@@ -72,3 +72,8 @@ export interface Merger {
     translatedObject: Record<string, any>
   ) => Record<string, any>
 }
+
+// export type MatchPath = {
+//   path: string[]
+//   value: any
+// }

@@ -49,9 +49,6 @@
       "en": "Hello, this is my page name in my page field.",
       "fr_FR": "C'est une field en frances"
     },
-    "slug": {
-      "_type": "slug",
-      "current": "valid-page-slug"
-    }
+    "slug": "current slug"
   }
 }

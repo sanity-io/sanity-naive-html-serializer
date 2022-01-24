@@ -197,9 +197,6 @@ describe('Document-level serialization', () => {
  */
 
 describe('Field-level serialization', () => {
-  const serialized = getSerialized(fieldLevelArticle, 'field')
-  const docTree = getHTMLNode(serialized).body.children[0]
-
   describe('Presence and accuracy of fields in "vanilla" deserialization -- objects', () => {
     const getFieldLevelObjectField = () => {
       const serialized = getSerialized(fieldLevelArticle, 'field')
@@ -313,13 +310,24 @@ describe('Field-level serialization', () => {
     })
   })
 
-  test('Nested locale fields make it to serialization', () => {
+  test('Nested locale fields make it to serialization, but only base lang', () => {
     const nestedLocales = { ...fieldLevelArticle, ...nestedLanguageFields }
     const serialized = getSerialized(nestedLocales, 'field')
     const docTree = getHTMLNode(serialized).body.children[0]
-    console.log(serialized)
-    // const slices = findByClass(docTree.children, 'slices')
-    const serializedPageFields = findByClass(docTree.children, 'pageFields')
+    const slices = findByClass(docTree.children, 'slices')
+    const pageFields = findByClass(docTree.children, 'pageFields')
+    expect(slices?.innerHTML).toContain(
+      nestedLanguageFields.slices[0].en[0].children[0].text
+    )
+    expect(pageFields?.innerHTML).toContain(
+      nestedLanguageFields.pageFields.name.en
+    )
+    expect(slices?.innerHTML).not.toContain(
+      nestedLanguageFields.slices[0].fr_FR[0].children[0].text
+    )
+    expect(pageFields?.innerHTML).not.toContain(
+      nestedLanguageFields.pageFields.name.fr_FR
+    )
   })
 })
 

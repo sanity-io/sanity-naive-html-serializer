@@ -111,8 +111,7 @@ const fieldLevelArticle = {
     {
       name: 'title',
       title: 'Title',
-      type: 'object',
-      fields: createLocaleFields(['en', 'fr', 'de'], { type: 'string' }),
+      type: 'localeString',
     },
     {
       name: 'meta',
@@ -176,6 +175,13 @@ const localeBlock = {
   fields: createLocaleFields(['en', 'fr_FR', 'de_DE'], { type: 'arrayField' }),
 }
 
+const localeString = {
+  name: 'localeString',
+  title: 'Locale String',
+  type: 'object',
+  fields: createLocaleFields(['en', 'fr_FR', 'de_DE'], { type: 'string' }),
+}
+
 const pageFields = {
   name: 'pageFields',
   title: 'Page Fields',
@@ -184,14 +190,11 @@ const pageFields = {
     {
       title: 'Page Name',
       name: 'name',
-      type: 'object',
-      fields: createLocaleFields(['en', 'fr_FR', 'de_DE'], {
-        type: 'arrayField',
-      }),
+      type: 'localeString',
     },
     {
       name: 'slug',
-      type: 'slug',
+      type: 'string',
     },
   ],
 }
@@ -204,6 +207,7 @@ const types = [
   fieldLevelArticle,
   pageFields,
   localeBlock,
+  localeString,
 ]
 
 module.exports = new Schema({
