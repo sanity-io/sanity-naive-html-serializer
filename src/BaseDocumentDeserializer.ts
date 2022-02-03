@@ -29,15 +29,22 @@ const defaultSchema = Schema.compile({
   ],
 })
 
-//new function to handle messy input
-const preprocess = (html: string) =>
-  html
-    .replace(/\s\s+/g, ' ') // Remove multiple whitespace
-    .replace(/[\r\n]/g, ' ') // Remove newlines / carriage returns
-
 const blockContentType = defaultSchema
   .get('default')
   .fields.find((field: ObjectField) => field.name === 'block').type
+
+//helper to handle messy input -- take advantage
+//of blockTools' sanitizing behavior for single strings
+const preprocess = (html: string) => {
+  const intermediateBlocks = blockTools.htmlToBlocks(
+    `<p>${html}</p>`,
+    blockContentType
+  )
+  if (!intermediateBlocks.length) {
+    throw new Error(`Error parsing string '${html}'`)
+  }
+  return intermediateBlocks[0].children[0].text
+}
 
 export const deserializeDocument = (
   serializedDoc: string,

@@ -31,17 +31,6 @@ beforeEach(() => {
   mockTestKey = 0
 })
 
-test('&nbsp; whitespace should not be escaped', () => {
-  const content = readFileSync('test/__fixtures__/messy-html.html', {
-    encoding: 'utf-8',
-  })
-  const result = BaseDocumentDeserializer.deserializeDocument(content)
-  expect(result.title).toEqual('Här är artikel titeln')
-  expect(result.content[1].nestedArrayField[0].title).toEqual(
-    'Det här är en dragspels titeln'
-  )
-})
-
 test('Global test of working doc-level functionality and snapshot match', () => {
   const deserialized = getDeserialized(documentLevelArticle, 'document')
   expect(deserialized).toMatchSnapshot()
@@ -419,3 +408,16 @@ test('Deserialized content should preserve style tags', () => {
 /*
  * MESSY INPUT
  */
+test('&nbsp; whitespace should not be escaped', () => {
+  //unhandled field throw a warn -- ignore it in this case
+  jest.spyOn(console, 'debug').mockImplementation(() => {})
+
+  const content = readFileSync('test/__fixtures__/messy-html.html', {
+    encoding: 'utf-8',
+  })
+  const result = BaseDocumentDeserializer.deserializeDocument(content)
+  expect(result.title).toEqual('Här är artikel titeln')
+  expect(result.content[1].nestedArrayField[0].title).toEqual(
+    'Det här är en dragspels titeln'
+  )
+})
