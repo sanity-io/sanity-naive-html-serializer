@@ -29,6 +29,12 @@ const defaultSchema = Schema.compile({
   ],
 })
 
+//new function to handle messy input
+const preprocess = (html: string) =>
+  html
+    .replace(/\s\s+/g, ' ') // Remove multiple whitespace
+    .replace(/[\r\n]/g, ' ') // Remove newlines / carriage returns
+
 const blockContentType = defaultSchema
   .get('default')
   .fields.find((field: ObjectField) => field.name === 'block').type
@@ -115,7 +121,7 @@ const deserializeHTML = (
 
       //flat string, it's an unrich field
       else if (child.tagName.toLowerCase() === 'span') {
-        deserializedObj = child.innerHTML
+        deserializedObj = preprocess(child.innerHTML)
       }
 
       //has specific class name, so it's either a field or obj

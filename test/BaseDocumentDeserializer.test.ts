@@ -402,3 +402,7 @@ test('Deserialized content should preserve style tags', () => {
   expect(deserializedH1.children[0].text).toEqual(origH1.children[0].text)
   expect(deserializedH2.children[0].text).toEqual(origH2.children[0].text)
 })
+
+/*
+ * MESSY INPUT
+ */
