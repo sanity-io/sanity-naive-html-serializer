@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs'
+
 import {
   addedCustomDeserializers,
   getDeserialized,
@@ -401,4 +403,21 @@ test('Deserialized content should preserve style tags', () => {
   expect(deserializedH2._key).toEqual(origH2._key)
   expect(deserializedH1.children[0].text).toEqual(origH1.children[0].text)
   expect(deserializedH2.children[0].text).toEqual(origH2.children[0].text)
+})
+
+/*
+ * MESSY INPUT
+ */
+test('&nbsp; whitespace should not be escaped', () => {
+  //unhandled field throw a warn -- ignore it in this case
+  jest.spyOn(console, 'debug').mockImplementation(() => {})
+
+  const content = readFileSync('test/__fixtures__/messy-html.html', {
+    encoding: 'utf-8',
+  })
+  const result = BaseDocumentDeserializer.deserializeDocument(content)
+  expect(result.title).toEqual('Här är artikel titeln')
+  expect(result.content[1].nestedArrayField[0].title).toEqual(
+    'Det här är en dragspels titeln'
+  )
 })

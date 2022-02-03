@@ -28,9 +28,12 @@ const fieldLevelMerge = (
     let valToPatch
     if (typeof translatedVal === 'string') {
       valToPatch = translatedVal
-    } else if (Array.isArray(translatedVal)) {
+    } else if (Array.isArray(translatedVal) && translatedVal.length) {
       valToPatch = reconcileArray(origVal ?? [], translatedVal)
-    } else {
+    } else if (
+      typeof translatedVal === 'object' &&
+      Object.keys(translatedVal).length
+    ) {
       valToPatch = reconcileObject(origVal ?? {}, translatedVal)
     }
     const destinationPath = [
@@ -92,6 +95,13 @@ const reconcileObject = (
   origObject: Record<string, any>,
   translatedObject: Record<string, any>
 ) => {
+  if (
+    typeof translatedObject !== 'object' ||
+    !Object.keys(translatedObject).length
+  ) {
+    return origObject
+  }
+
   const updatedObj = JSON.parse(JSON.stringify(origObject))
   Object.entries(translatedObject).forEach(([key, value]) => {
     if (!value || key[0] === '_') {

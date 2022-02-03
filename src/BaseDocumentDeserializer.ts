@@ -33,6 +33,19 @@ const blockContentType = defaultSchema
   .get('default')
   .fields.find((field: ObjectField) => field.name === 'block').type
 
+//helper to handle messy input -- take advantage
+//of blockTools' sanitizing behavior for single strings
+const preprocess = (html: string) => {
+  const intermediateBlocks = blockTools.htmlToBlocks(
+    `<p>${html}</p>`,
+    blockContentType
+  )
+  if (!intermediateBlocks.length) {
+    throw new Error(`Error parsing string '${html}'`)
+  }
+  return intermediateBlocks[0].children[0].text
+}
+
 export const deserializeDocument = (
   serializedDoc: string,
   deserializers: Record<string, any> = customDeserializers,
@@ -115,7 +128,7 @@ const deserializeHTML = (
 
       //flat string, it's an unrich field
       else if (child.tagName.toLowerCase() === 'span') {
-        deserializedObj = child.innerHTML
+        deserializedObj = preprocess(child.innerHTML)
       }
 
       //has specific class name, so it's either a field or obj
