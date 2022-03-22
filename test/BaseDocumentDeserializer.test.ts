@@ -14,6 +14,7 @@ import {
   defaultStopTypes,
 } from '../src'
 import { customBlockDeserializers } from '../src/BaseSerializationConfig'
+
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
@@ -417,7 +418,7 @@ test('&nbsp; whitespace should not be escaped', () => {
   const content = readFileSync('test/__fixtures__/messy-html.html', {
     encoding: 'utf-8',
   })
-  const result = BaseDocumentDeserializer.deserializeDocument(content)
+  const result = BaseDocumentDeserializer(schema).deserializeDocument(content)
   expect(result.title).toEqual('Här är artikel titeln')
   expect(result.content[1].nestedArrayField[0].title).toEqual(
     'Det här är en dragspels titeln'

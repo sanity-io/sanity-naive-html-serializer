@@ -24,9 +24,8 @@ export const getDeserialized = (
   level: TranslationLevel
 ) => {
   const serialized = getSerialized(document, level)
-  return BaseDocumentDeserializer(schema).deserializeDocument(
-    serialized.content
-  )
+  const deserializer = BaseDocumentDeserializer(schema)
+  return deserializer.deserializeDocument(serialized.content)
 }
 
 export const getValidFields = (field: Record<string, any>) => {
