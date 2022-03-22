@@ -2,7 +2,7 @@ import schemas from 'part:@sanity/base/schema'
 import blocksToHtml, { h } from '@sanity/block-content-to-html'
 import { defaultStopTypes, customSerializers } from './BaseSerializationConfig'
 import { ObjectField, SanityDocument } from '@sanity/types'
-import { Serializer } from './types'
+import { Serializer, TranslationLevel } from './types'
 import clone from 'just-clone'
 
 const META_FIELDS = ['_key', '_type', '_id']
@@ -19,7 +19,7 @@ const getSchema = (name: string) =>
  */
 const serializeDocument = (
   doc: SanityDocument,
-  translationLevel: string = 'document',
+  translationLevel: TranslationLevel = 'document',
   baseLang = 'en',
   stopTypes = defaultStopTypes,
   serializers = customSerializers

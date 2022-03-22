@@ -10,10 +10,11 @@ export type SerializedDocument = {
   content: string
 }
 
+export type TranslationLevel = 'document' | 'field'
 export interface Serializer {
   serializeDocument: (
     doc: SanityDocument,
-    translationLevel: string,
+    translationLevel: TranslationLevel,
     baseLang?: string,
     stopTypes?: string[],
     serializers?: Record<string, any>
