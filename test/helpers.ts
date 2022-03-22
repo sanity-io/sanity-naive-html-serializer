@@ -9,11 +9,13 @@ import { Block } from '@sanity/types'
 import clone from 'just-clone'
 import { TranslationLevel } from '../src/types'
 
+const schema = require('./__fixtures__/schema')
+
 export const getSerialized = (
   document: SanityDocument,
   level: TranslationLevel
 ) => {
-  const serializer = BaseDocumentSerializer
+  const serializer = BaseDocumentSerializer(schema)
   return serializer.serializeDocument(document, level)
 }
 
@@ -22,7 +24,9 @@ export const getDeserialized = (
   level: TranslationLevel
 ) => {
   const serialized = getSerialized(document, level)
-  return BaseDocumentDeserializer.deserializeDocument(serialized.content)
+  return BaseDocumentDeserializer(schema).deserializeDocument(
+    serialized.content
+  )
 }
 
 export const getValidFields = (field: Record<string, any>) => {

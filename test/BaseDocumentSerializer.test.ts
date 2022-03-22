@@ -13,6 +13,7 @@ import {
   customSerializers,
 } from '../src'
 
+const schema = require('./__fixtures__/schema')
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
@@ -358,7 +359,7 @@ test('Values in a field are not repeated, (indicating serializers are stateless)
  */
 
 test('Custom serialization should manifest at all levels', () => {
-  const serialized = BaseDocumentSerializer.serializeDocument(
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
     documentLevelArticle,
     'document',
     'en',
@@ -403,7 +404,7 @@ test('Expect default stop types to be absent', () => {
 
 test('Expect custom stop types to be absent at all levels', () => {
   const customStopTypes = [...defaultStopTypes, 'objectField']
-  const serialized = BaseDocumentSerializer.serializeDocument(
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
     documentLevelArticle,
     'document',
     'en',
@@ -454,7 +455,7 @@ test('Handled inline objects should be accurately represented per serializer', (
     ...annotationAndInlineBlocks,
   }
 
-  const serialized = BaseDocumentSerializer.serializeDocument(
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
     inlineDocument,
     'document',
     'en',
@@ -494,7 +495,7 @@ test('Handled annotations should be accurately represented per serializer', () =
     ...annotationAndInlineBlocks,
   }
 
-  const serialized = BaseDocumentSerializer.serializeDocument(
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
     inlineDocument,
     'document',
     'en',

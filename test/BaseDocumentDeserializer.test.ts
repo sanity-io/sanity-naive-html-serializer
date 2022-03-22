@@ -18,6 +18,8 @@ const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
 
+const schema = require('./__fixtures__/schema')
+
 let mockTestKey = 0
 
 //needed to make snapshots happy on internal spans (where we don't track keys)
@@ -259,14 +261,14 @@ test('Object in array contains accurate values in nested object -- document leve
  */
 
 test('Custom deserialization should manifest at all levels', () => {
-  const serialized = BaseDocumentSerializer.serializeDocument(
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
     documentLevelArticle,
     'document',
     'en',
     defaultStopTypes,
     addedCustomSerializers
   )
-  const deserialized = BaseDocumentDeserializer.deserializeDocument(
+  const deserialized = BaseDocumentDeserializer(schema).deserializeDocument(
     serialized.content,
     addedCustomDeserializers,
     customBlockDeserializers
@@ -293,7 +295,7 @@ test('Handled inline objects should be accurately deserialized', () => {
     ...annotationAndInlineBlocks,
   }
 
-  const serialized = BaseDocumentSerializer.serializeDocument(
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
     inlineDocument,
     'document',
     'en',
@@ -301,7 +303,7 @@ test('Handled inline objects should be accurately deserialized', () => {
     addedCustomSerializers
   )
 
-  const deserialized = BaseDocumentDeserializer.deserializeDocument(
+  const deserialized = BaseDocumentDeserializer(schema).deserializeDocument(
     serialized.content,
     addedCustomDeserializers,
     addedBlockDeserializers
@@ -340,7 +342,7 @@ test('Handled annotations should be accurately deserialized', () => {
     ...annotationAndInlineBlocks,
   }
 
-  const serialized = BaseDocumentSerializer.serializeDocument(
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
     inlineDocument,
     'document',
     'en',
@@ -348,7 +350,7 @@ test('Handled annotations should be accurately deserialized', () => {
     addedCustomSerializers
   )
 
-  const deserialized = BaseDocumentDeserializer.deserializeDocument(
+  const deserialized = BaseDocumentDeserializer(schema).deserializeDocument(
     serialized.content,
     addedCustomDeserializers,
     addedBlockDeserializers
