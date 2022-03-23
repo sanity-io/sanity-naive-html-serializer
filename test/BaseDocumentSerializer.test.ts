@@ -14,11 +14,13 @@ import {
 } from '../src'
 
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
+const inlineDocumentLevelArticle = require('./__fixtures__/inlineDocumentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
 const nestedLanguageFields = require('./__fixtures__/nestedLanguageFields')
 
 const schema = require('./__fixtures__/schema')
+const inlineSchema = require('./__fixtures__/inlineSchema')
 
 const getHTMLNode = (serialized: SerializedDocument) => {
   const htmlString = serialized.content
@@ -345,7 +347,7 @@ describe('Field-level serialization', () => {
   })
 })
 
-test('Values in a field are not repeated, (indicating serializers are stateless)', () => {
+test('Values in a field are not repeated (indicating serializers are stateless)', () => {
   const serialized = getSerialized(documentLevelArticle, 'document')
   const docTree = getHTMLNode(serialized).body.children[0]
   const HTMLList = findByClass(docTree.children, 'tags')
@@ -551,4 +553,16 @@ test('Serialized content should preserve style tags from Portable Text', () => {
   expect(serializedH2).toBeDefined()
   expect(serializedH1?.innerHTML).toEqual(blockH1.children[0].text)
   expect(serializedH2?.innerHTML).toEqual(blockH2.children[0].text)
+})
+
+/*
+ * V2 functionality -- be able to operate without a strict schema
+ */
+
+test('What does serialized content look like in its current state', () => {
+  const serialized = BaseDocumentSerializer(inlineSchema).serializeDocument(
+    inlineDocumentLevelArticle,
+    'document'
+  )
+  console.log('serialized', serialized)
 })

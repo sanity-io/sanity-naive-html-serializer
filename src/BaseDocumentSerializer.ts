@@ -27,6 +27,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     serializers = customSerializers
   ) => {
     //we must take out any fields not relevant to translation
+    //TODO: handle non-schema objects in the filter
     let filteredObj: Record<string, any> = {}
 
     //field level translations explicitly send over the base language
@@ -67,6 +68,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         if (!isFieldLevel) {
           //now we add an additional field wrapper so we know both
           //the field and type of this object after deserialization
+          //TODO: encode this with data-level: fieldname
           serializedFields[key] = `<div class='${key}'>${serialized}</div>`
         } else {
           serializedFields[key] = serialized
@@ -249,6 +251,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       }
     })
 
+    //TODO: encode this with data-level fieldName
     return `<div class="${fieldName}">${output.join('')}</div>`
   }
 
@@ -309,6 +312,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
               stopTypes,
               serializers
             )
+            //TODO: encode this wi
             htmlField = `<div class="${fieldName}">${objHTML}</div>`
           }
 
