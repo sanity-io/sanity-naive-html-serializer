@@ -5,6 +5,7 @@
   "_createdAt": "2021-09-01T23:00:13Z",
   "_updatedAt": "2021-09-01T23:02:05Z",
   "tabs": {
+    "_type": "object",
     "config": {
       "_type": "objectField",
       "nestedArrayField": [
