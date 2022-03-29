@@ -9,10 +9,10 @@ import { fieldFilter, languageObjectFieldFilter } from './fieldFilters'
 type SerializerClosure = (schemes: Schema) => Serializer
 const META_FIELDS = ['_key', '_type', '_id']
 
-/*
- * Helper function that allows us to get metadata (like `localize: false`) from schema fields.
- */
 export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
+  /*
+   * Helper function that allows us to get metadata (like `localize: false`) from schema fields.
+   */
   const getSchema = (name: string) =>
     schemas._original.types.find(s => s.name === name) as any
 
@@ -28,19 +28,19 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     serializers = customSerializers
   ) => {
     //we must take out any fields not relevant to translation
-    //TODO: handle non-schema objects in the filter
     let filteredObj: Record<string, any> = {}
 
     //field level translations explicitly send over the base language
     if (translationLevel === 'field') {
       filteredObj = languageObjectFieldFilter(doc, baseLang)
     }
-    //otherwise, we have a list of types that should not be sent over.
+    //otherwise, we can refer to the schema and a list of stop types
+    //to determine what should not be sent
     else {
       filteredObj = fieldFilter(doc, getSchema(doc._type).fields, stopTypes)
     }
 
-    //ultimately, this should be an object with strings as plain strings but complex objects as HTML divs
+    //ultimately, serializedFIelds should be an object with strings as plain strings but complex objects as HTML divs
     //e.g. {blockText: "<div><p>My text</p></div>"}
     const serializedFields: Record<string, any> = {}
 
@@ -96,6 +96,11 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       metaEl.setAttribute('content', doc[field] as string)
       rawHTMLHead.appendChild(metaEl)
     })
+    //encode version so we know how to deserialize later
+    const versionMeta = document.createElement('meta')
+    versionMeta.setAttribute('name', 'version')
+    versionMeta.setAttribute('content', '2')
+    rawHTMLHead.appendChild(versionMeta)
 
     const rawHTML = document.createElement('html')
     rawHTML.appendChild(rawHTMLHead)
@@ -141,7 +146,9 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     })
 
     //TODO: encode this with data-level fieldName
-    return `<div class="${fieldName}">${output.join('')}</div>`
+    return `<div class="${fieldName}" data-type="array">${output.join(
+      ''
+    )}</div>`
   }
 
   const serializeObject = (
@@ -201,8 +208,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
               stopTypes,
               serializers
             )
-            //TODO: encode this wi
-            htmlField = `<div class="${fieldName}">${objHTML}</div>`
+            htmlField = `<div class="${fieldName}" data-type="object">${objHTML}</div>`
           }
 
           innerHTML += htmlField
@@ -213,9 +219,11 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         return ''
       }
 
+      const className = topFieldName ?? obj._type
+
       tempSerializers.types[obj._type] = (props: Record<string, any>) => {
         return h('div', {
-          className: topFieldName ?? props.node._type,
+          className,
           id: props.node._key ?? props.node._id,
           innerHTML: innerHTML,
         })
@@ -233,8 +241,13 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         `Had issues serializing block of type "${obj._type}". Please specify a serialization method for this block in your serialization config. Received error: ${err}`
       )
     }
-
-    return serializedBlock
+    //this should always be a <div> so this is safe to do. README should warn folks
+    //against tds or anything else invalid
+    const outerNode = document.createElement('div')
+    outerNode.innerHTML = serializedBlock
+    const node = outerNode.firstElementChild
+    node?.setAttribute('data-type', 'object')
+    return node?.outerHTML
   }
 
   return {

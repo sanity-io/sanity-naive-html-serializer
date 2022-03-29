@@ -25,6 +25,7 @@
         }
       ],
       "objectAsField": {
+        "_type": "object",
         "content": [
           {
             "_key": "1aa228ac848b",
