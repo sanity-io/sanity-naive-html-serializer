@@ -4,7 +4,8 @@ const META_FIELDS = ['_key', '_type', '_id']
 
 /*
  * Helper. If field-level translation pattern used, only sends over
- * content from the base language. Now works recursively!
+ * content from the base language. Works recursively, so if users
+ * use this pattern several layers deep, base language fields will still be found.
  */
 export const languageObjectFieldFilter = (
   obj: Record<string, any>,
@@ -77,7 +78,8 @@ export const languageObjectFieldFilter = (
 }
 
 /*
- * Helper. Eliminates stop-types and non-localizable fields.
+ * Eliminates stop-types and non-localizable fields
+ * for document-level translation.
  */
 export const fieldFilter = (
   obj: Record<string, any>,
@@ -100,9 +102,7 @@ export const fieldFilter = (
   }
 
   const validFields = [
-    '_key',
-    '_type',
-    '_id',
+    ...META_FIELDS,
     ...objFields.filter(fieldFilter).map(field => field.name),
   ]
   validFields.forEach(field => {

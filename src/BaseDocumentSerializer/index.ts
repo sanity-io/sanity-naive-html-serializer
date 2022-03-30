@@ -27,10 +27,10 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     stopTypes = defaultStopTypes,
     serializers = customSerializers
   ) => {
-    //we must take out any fields not relevant to translation
     let filteredObj: Record<string, any> = {}
 
-    //field level translations explicitly send over the base language
+    //field level translations explicitly send over any fields that
+    //match the base language, regardless of depth
     if (translationLevel === 'field') {
       filteredObj = languageObjectFieldFilter(doc, baseLang)
     }
@@ -40,8 +40,6 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       filteredObj = fieldFilter(doc, getSchema(doc._type).fields, stopTypes)
     }
 
-    //ultimately, serializedFIelds should be an object with strings as plain strings but complex objects as HTML divs
-    //e.g. {blockText: "<div><p>My text</p></div>"}
     const serializedFields: Record<string, any> = {}
 
     for (let key in filteredObj) {
@@ -57,17 +55,18 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
           serializers
         )
       } else {
-        //top-level objects need an additional layer of nesting for custom serialization etc.
-        //but we still want the object type to be preserved
         const isFieldLevel = value.hasOwnProperty(baseLang)
         const serialized = serializeObject(
           value,
+          //top-level objects need an additional layer of nesting for custom serialization etc.
+          //but we still want the object type to be preserved
+          //this ensures that field level translations retain both field name and object type divs.
           isFieldLevel ? key : null,
           stopTypes,
           serializers
         )
         if (!isFieldLevel) {
-          //now we add an additional field wrapper so we know both
+          //for document-level, we add an additional field wrapper so we know both
           //the field and type of this object after deserialization
           serializedFields[
             key
@@ -96,7 +95,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       metaEl.setAttribute('content', doc[field] as string)
       rawHTMLHead.appendChild(metaEl)
     })
-    //encode version so we know how to deserialize later
+    //encode version so we can use the correct deserialization methods
     const versionMeta = document.createElement('meta')
     versionMeta.setAttribute('name', 'version')
     versionMeta.setAttribute('content', '2')
@@ -176,9 +175,18 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     //if it's a custom object, iterate through its keys to find and serialize translatable content
     if (obj._type !== 'span' && obj._type !== 'block') {
       let innerHTML = ''
+      //if schema is available, encode values in the order they're declared in the schema,
+      //since this will likely be more intuitive for a translator.
+      let fieldNames = Object.keys(obj)
+      if (getSchema(obj._type)) {
+        fieldNames = getSchema(obj._type)
+          .fields.map((field: Record<string, any>) => field.name)
+          .filter((schemaKey: string) => Object.keys(obj).includes(schemaKey))
+      }
 
-      Object.entries(obj).forEach(([fieldName, value]) => {
+      fieldNames.forEach(fieldName => {
         let htmlField = ''
+        const value = obj[fieldName]
 
         if (!META_FIELDS.includes(fieldName)) {
           //strings are either string fields or have recursively been turned
@@ -208,7 +216,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
               stopTypes,
               serializers
             )
-            htmlField = `<div class="${fieldName}" data-type="object">${objHTML}</div>`
+            htmlField = `<div class="${fieldName}" data-level="field">${objHTML}</div>`
           }
 
           innerHTML += htmlField
@@ -242,7 +250,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       )
     }
     //this should always be a <div> so this is safe to do. README should warn folks
-    //against tds or anything else invalid
+    //against tds or anything else invalid in custom serialization methods
     const outerNode = document.createElement('div')
     outerNode.innerHTML = serializedBlock
     const node = outerNode.firstElementChild
