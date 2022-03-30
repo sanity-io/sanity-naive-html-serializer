@@ -4,7 +4,7 @@ import {
   customBlockDeserializers,
 } from '../BaseSerializationConfig'
 import { Deserializer } from '../types'
-import { blockContentType, preprocess, noSchemaWarning } from './helpers'
+import { blockContentType, preprocess } from './helpers'
 
 const deserializeDocument = (
   serializedDoc: string,
