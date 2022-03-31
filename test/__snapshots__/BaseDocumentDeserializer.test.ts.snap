@@ -6,6 +6,7 @@ Object {
   "_rev": "fxcnqj-uew-gr7-v6r-z965tfm69",
   "_type": "documentLevelArticle",
   "config": Object {
+    "_type": "objectField",
     "nestedArrayField": Array [
       Object {
         "_key": "4a58adc7c507",
@@ -23,6 +24,7 @@ Object {
       },
     ],
     "objectAsField": Object {
+      "_type": "childObjectField",
       "content": Array [
         Object {
           "_key": "1aa228ac848b",
@@ -62,6 +64,7 @@ Object {
       "_key": "c0313627775e",
       "_type": "objectField",
       "objectAsField": Object {
+        "_type": "childObjectField",
         "content": Array [
           Object {
             "_key": "4f24f6fbfae7",
@@ -128,6 +131,7 @@ Object {
   "_type": "fieldLevelArticle",
   "config": Object {
     "en": Object {
+      "_type": "objectField",
       "nestedArrayField": Array [
         Object {
           "_key": "f49b4d7e3e51",
@@ -145,6 +149,7 @@ Object {
         },
       ],
       "objectAsField": Object {
+        "_type": "childObjectField",
         "content": Array [
           Object {
             "_key": "869168fe3a2a",
@@ -186,6 +191,7 @@ Object {
         "_key": "271b0c6ee984",
         "_type": "objectField",
         "objectAsField": Object {
+          "_type": "childObjectField",
           "content": Array [
             Object {
               "_key": "4f24f6fbfae7",

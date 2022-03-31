@@ -55,25 +55,10 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
           serializers
         )
       } else {
-        const isFieldLevel = value.hasOwnProperty(baseLang)
-        const serialized = serializeObject(
-          value,
-          //top-level objects need an additional layer of nesting for custom serialization etc.
-          //but we still want the object type to be preserved
-          //this ensures that field level translations retain both field name and object type divs.
-          isFieldLevel ? key : null,
-          stopTypes,
-          serializers
-        )
-        if (!isFieldLevel) {
-          //for document-level, we add an additional field wrapper so we know both
-          //the field and type of this object after deserialization
-          serializedFields[
-            key
-          ] = `<div class='${key}' data-level='field'>${serialized}</div>`
-        } else {
-          serializedFields[key] = serialized
-        }
+        const serialized = serializeObject(value, stopTypes, serializers)
+        serializedFields[
+          key
+        ] = `<div class='${key}' data-level='field'>${serialized}</div>`
       }
     }
 
@@ -81,7 +66,6 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     const rawHTMLBody = document.createElement('body')
     rawHTMLBody.innerHTML = serializeObject(
       serializedFields,
-      doc._type,
       stopTypes,
       serializers
     )
@@ -140,7 +124,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         return `<span>${obj}</span>`
       } else {
         //send to serialization method
-        return serializeObject(obj, null, stopTypes, serializers)
+        return serializeObject(obj, stopTypes, serializers)
       }
     })
 
@@ -152,7 +136,6 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
 
   const serializeObject = (
     obj: Record<string, any>,
-    topFieldName: string | null = null,
     stopTypes: string[],
     serializers: Record<string, any>
   ) => {
@@ -184,6 +167,11 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
           .filter((schemaKey: string) => Object.keys(obj).includes(schemaKey))
       }
 
+      //account for anonymous inline objects
+      if (typeof obj === 'object' && !obj._type) {
+        obj._type = ''
+      }
+
       fieldNames.forEach(fieldName => {
         let htmlField = ''
         const value = obj[fieldName]
@@ -210,12 +198,8 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
             if (schema) {
               toTranslate = fieldFilter(value, schema.fields, stopTypes)
             }
-            const objHTML = serializeObject(
-              toTranslate,
-              null,
-              stopTypes,
-              serializers
-            )
+            //anonymous inline objects may not declare type.
+            const objHTML = serializeObject(toTranslate, stopTypes, serializers)
             htmlField = `<div class="${fieldName}" data-level="field">${objHTML}</div>`
           }
 
@@ -227,11 +211,9 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         return ''
       }
 
-      const className = topFieldName ?? obj._type
-
       tempSerializers.types[obj._type] = (props: Record<string, any>) => {
         return h('div', {
-          className,
+          className: props.node._type,
           id: props.node._key ?? props.node._id,
           innerHTML: innerHTML,
         })

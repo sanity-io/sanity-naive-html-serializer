@@ -159,6 +159,7 @@ test('Object in array contains accurate values in nested object -- document leve
   ).trim()
   expect(deserializedBlockText).toEqual(origBlockText)
 })
+
 /*
  * FIELD LEVEL
  */
@@ -269,7 +270,8 @@ test('Custom deserialization should manifest at all levels', () => {
     defaultStopTypes,
     addedCustomSerializers
   )
-  const deserialized = BaseDocumentDeserializer(schema).deserializeDocument(
+
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(
     serialized.content,
     addedCustomDeserializers,
     customBlockDeserializers
@@ -304,7 +306,7 @@ test('Handled inline objects should be accurately deserialized', () => {
     addedCustomSerializers
   )
 
-  const deserialized = BaseDocumentDeserializer(schema).deserializeDocument(
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(
     serialized.content,
     addedCustomDeserializers,
     addedBlockDeserializers
@@ -351,7 +353,7 @@ test('Handled annotations should be accurately deserialized', () => {
     addedCustomSerializers
   )
 
-  const deserialized = BaseDocumentDeserializer(schema).deserializeDocument(
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(
     serialized.content,
     addedCustomDeserializers,
     addedBlockDeserializers
@@ -418,7 +420,7 @@ test('&nbsp; whitespace should not be escaped', () => {
   const content = readFileSync('test/__fixtures__/messy-html.html', {
     encoding: 'utf-8',
   })
-  const result = BaseDocumentDeserializer(schema).deserializeDocument(content)
+  const result = BaseDocumentDeserializer.deserializeDocument(content)
   expect(result.title).toEqual('Här är artikel titeln')
   expect(result.content[1].nestedArrayField[0].title).toEqual(
     'Det här är en dragspels titeln'

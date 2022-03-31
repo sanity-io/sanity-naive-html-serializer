@@ -75,6 +75,8 @@ test('Contains metadata field containing document type', () => {
   expect(type).toEqual(documentLevelArticle._type)
 })
 
+//TODO: version meta
+
 /*
  * DOCUMENT LEVEL
  */
@@ -205,9 +207,9 @@ describe('Field-level serialization', () => {
   const docTree = getHTMLNode(serialized).body.children[0]
 
   test('String and text types get serialized correctly at top-level -- field level', () => {
-    const titleObj = findByClass(docTree.children, 'title')
+    const titleObj = findByClass(docTree.children, 'title')?.children[0]
     const HTMLString = findByClass(titleObj!.children, 'en')
-    const snippetObj = findByClass(docTree.children, 'snippet')
+    const snippetObj = findByClass(docTree.children, 'snippet')?.children[0]
     const HTMLText = findByClass(snippetObj!.children, 'en')
     expect(HTMLString?.innerHTML).toEqual(fieldLevelArticle.title.en)
     expect(HTMLText?.innerHTML).toEqual(fieldLevelArticle.snippet.en)
@@ -218,7 +220,7 @@ describe('Field-level serialization', () => {
       const serialized = getSerialized(fieldLevelArticle, 'field')
       //parent node is always div with classname of field -- get its children
       const docTree = getHTMLNode(serialized).body.children[0]
-      const config = findByClass(docTree.children, 'config')
+      const config = findByClass(docTree.children, 'config')?.children[0]
       //return english field
       const englishConfig = findByClass(config!.children, 'en')
       return findByClass(englishConfig!.children, 'objectField')
@@ -277,7 +279,7 @@ describe('Field-level serialization', () => {
     const getFieldLevelArrayField = () => {
       const serialized = getSerialized(fieldLevelArticle, 'field')
       const docTree = getHTMLNode(serialized).body.children[0]
-      const content = findByClass(docTree.children, 'content')
+      const content = findByClass(docTree.children, 'content')?.children[0]
       return findByClass(content!.children, 'en')
     }
     const arrayField = getFieldLevelArrayField()
@@ -564,5 +566,4 @@ test('What does serialized content look like in its current state', () => {
     inlineDocumentLevelArticle,
     'document'
   )
-  console.log('serialized', serialized)
 })

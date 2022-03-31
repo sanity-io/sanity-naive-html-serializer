@@ -38,7 +38,6 @@ export interface Serializer {
   ) => string
   serializeObject: (
     obj: Record<string, any>,
-    topFieldName: string | null,
     stopTypes: string[],
     serializers: Record<string, any>
   ) => string

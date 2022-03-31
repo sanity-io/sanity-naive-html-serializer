@@ -55,18 +55,17 @@ const deserializeHTML = (
   let output: Record<string, any> | any[]
 
   //prioritize custom deserialization
-  const isObject = HTMLnode.getAttribute('data-type') === 'object'
   const deserialize = deserializers.types[HTMLnode.className]
-  if (isObject && !!deserialize) {
+  if (deserialize) {
     output = deserialize(HTMLnode)
-  } else if (isObject) {
+  } else if (HTMLnode.getAttribute('data-type') === 'object') {
     output = deserializeObject(HTMLnode, deserializers, blockDeserializers)
   } else if (HTMLnode.getAttribute('data-type') === 'array') {
     output = deserializeArray(HTMLnode, deserializers, blockDeserializers)
   } else {
     output = {}
     console.debug(
-      `Tried to deserialize block of type ${HTMLnode.className} but failed to identify it!`
+      `Tried to deserialize block ${HTMLnode.outerHTML} but failed to identify it!`
     )
   }
 
@@ -78,9 +77,18 @@ const deserializeObject = (
   deserializers: Record<string, any> = customDeserializers,
   blockDeserializers = customBlockDeserializers
 ) => {
+  const deserialize = deserializers.types[objectHTML.className]
+  if (deserialize) {
+    return deserialize(objectHTML)
+  }
+
   const output: Record<string, any> = {}
-  output._type = objectHTML.className
+  //account for anonymous inline objects
+  if (objectHTML.className) {
+    output._type = objectHTML.className
+  }
   const children = Array.from(objectHTML.children)
+
   children.forEach(child => {
     if (child.tagName.toLowerCase() === 'span') {
       output[child.className] = preprocess(child.innerHTML)
@@ -112,26 +120,29 @@ const deserializeArray = (
     let deserializedObject: any
     if (child.tagName.toLowerCase() === 'span') {
       deserializedObject = preprocess(child.innerHTML)
-    } else if (child.getAttribute('data-type') === 'object') {
+    }
+    //has specific class name, so it's either a field or obj
+    else if (child.className) {
       deserializedObject = deserializeObject(
         child,
         deserializers,
         blockDeserializers
       )
       deserializedObject._key = child.id
-    } else if (child.tagName.toLowerCase() === 'p') {
+    } else {
       deserializedObject = blockTools.htmlToBlocks(
         child.outerHTML,
         blockContentType,
         { rules: blockDeserializers }
       )[0]
       deserializedObject._key = child.id
-    } else {
-      console.debug(
-        `Tried to deserialize block of type ${child.className} but failed to identify it!`
-      )
     }
-    if (deserializedObject) {
+
+    if (!deserializedObject) {
+      console.debug(
+        `Tried to deserialize block: ${child.outerHTML} in an array but failed to identify it!`
+      )
+    } else {
       output.push(deserializedObject)
     }
   })

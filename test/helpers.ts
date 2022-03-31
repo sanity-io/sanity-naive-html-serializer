@@ -24,7 +24,7 @@ export const getDeserialized = (
   level: TranslationLevel
 ) => {
   const serialized = getSerialized(document, level)
-  const deserializer = BaseDocumentDeserializer(schema)
+  const deserializer = BaseDocumentDeserializer
   return deserializer.deserializeDocument(serialized.content)
 }
 
