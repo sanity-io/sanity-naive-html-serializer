@@ -561,9 +561,42 @@ test('Serialized content should preserve style tags from Portable Text', () => {
  * V2 functionality -- be able to operate without a strict schema
  */
 
-test('What does serialized content look like in its current state', () => {
+test('Content with anonymous inline objects serializes all fields, at any depth', () => {
   const serialized = BaseDocumentSerializer(inlineSchema).serializeDocument(
     inlineDocumentLevelArticle,
     'document'
+  )
+  const docTree = getHTMLNode(serialized).body.children[0]
+  const tabs = findByClass(docTree.children, 'tabs')!.children[0]
+  const config = findByClass(tabs!.children, 'config')!.children[0]
+  const fieldNames = getValidFields(inlineDocumentLevelArticle.tabs.config)
+  const foundFieldNames = Array.from(config!.children).map(
+    child => child.className
+  )
+  expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
+  const nestedObjHTML = findByClass(config!.children, 'objectAsField')!
+    .children[0]
+  const nestedObj = inlineDocumentLevelArticle.tabs.config.objectAsField
+  const nestedFieldNames = Array.from(nestedObjHTML!.children).map(
+    child => child.className
+  )
+  expect(nestedFieldNames.sort()).toEqual(getValidFields(nestedObj).sort())
+
+  const content = findByClass(tabs!.children, 'content')!
+  const keysHTML = Array.from(content.children).map(child => child.id)
+  const keysJSON = inlineDocumentLevelArticle.tabs.content.map(
+    (child: any) => child._key
+  )
+  expect(keysHTML.sort()).toEqual(keysJSON.sort())
+
+  const objectInArrayHTML = findByClass(content.children, 'objectField')
+  const objectInArrayHTMLFieldNames = Array.from(
+    objectInArrayHTML!.children
+  ).map(child => child.className)
+  const objectInArray = inlineDocumentLevelArticle.tabs.content.find(
+    (obj: any) => obj._type === 'objectField'
+  )
+  expect(objectInArrayHTMLFieldNames.sort()).toEqual(
+    getValidFields(objectInArray).sort()
   )
 })

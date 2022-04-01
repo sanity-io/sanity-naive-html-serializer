@@ -93,11 +93,18 @@ const deserializeObject = (
     if (child.tagName.toLowerCase() === 'span') {
       output[child.className] = preprocess(child.innerHTML)
     } else if (child.getAttribute('data-level') === 'field') {
-      output[child.className] = deserializeHTML(
+      const deserialized = deserializeHTML(
         child.outerHTML,
         deserializers,
         blockDeserializers
       )
+      if (deserialized && Object.keys(deserialized).length) {
+        output[child.className] = deserialized
+      } else {
+        console.debug(
+          `Tried to deserialize block: ${child.outerHTML} in an array but failed to identify it!`
+        )
+      }
     } else if (child.getAttribute('data-type') === 'array') {
       output[child.className] = deserializeArray(
         child,
