@@ -1,6 +1,10 @@
-# Naive HTML serialization from Sanity documents
+## ⚠️ Deprecation Warning ⚠️
+This is the README for v1 of this package. v2 offers less dependency on declaring ["strict" schemas](https://www.sanity.io/docs/graphql#33ec7103289a) and updates a dependency on Sanity's [blocks-to-html](https://github.com/sanity-io/block-content-to-html) to [@portabletext/to-html](https://github.com/portabletext/to-html), since the former has been deprecated.
 
-This is the source for tooling for naively turning documents and rich text fields into HTML, deserializing them, combining them with source documents, and patching them back. Ideally, this should take in objects that are in portable text, text arrays, or objects with text fields without knowing their specific names or types, and be able to patch them back without additional work on the part of the developer.
+This branch is still the source of truth for v1 versions, but is now in maintenance mode. Guidance on migrating to v2 is coming soon.
+
+# Naive HTML serialization from Sanity documents
+This package provides tooling for naively turning documents and rich text fields into HTML, deserializing them, combining them with source documents, and patching them back. Ideally, this should take in objects that are in Portable Text, text arrays, or objects with text fields without knowing their specific names or types, and be able to patch them back without additional work on the part of the developer.
 
 This builds heavily on Sanity's [blocks-to-html](https://github.com/sanity-io/block-content-to-html) and [block-tools](https://github.com/sanity-io/sanity/tree/next/packages/@sanity/block-tools), and it's highly recommended you familiarize yourself with these if you plan on customizing.
 
