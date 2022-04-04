@@ -1,4 +1,4 @@
-import { ObjectField } from '@sanity/types'
+import { ObjectField, TypedObject } from '@sanity/types'
 
 const META_FIELDS = ['_key', '_type', '_id']
 
@@ -86,7 +86,7 @@ export const fieldFilter = (
   objFields: ObjectField[],
   stopTypes: string[]
 ) => {
-  const filteredObj: Record<string, any> = {}
+  const filteredObj: TypedObject = { _type: obj._type }
 
   const fieldFilter = (field: Record<string, any>) => {
     if (field.localize === false) {

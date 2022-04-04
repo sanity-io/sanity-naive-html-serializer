@@ -3,6 +3,7 @@ import {
   ObjectSchemaType,
   BlockSchemaType,
   SanityDocument,
+  TypedObject,
 } from '@sanity/types'
 
 import Schema from '@sanity/schema'
@@ -25,7 +26,7 @@ export interface Serializer {
     obj: Record<string, any>,
     objFields: ObjectField[],
     stopTypes: string[]
-  ) => Record<string, any>
+  ) => TypedObject
   languageObjectFieldFilter: (
     obj: Record<string, any>,
     baseLang: string
@@ -37,7 +38,7 @@ export interface Serializer {
     serializers: Record<string, any>
   ) => string
   serializeObject: (
-    obj: Record<string, any>,
+    obj: TypedObject,
     stopTypes: string[],
     serializers: Record<string, any>
   ) => string

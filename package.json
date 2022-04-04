@@ -44,9 +44,12 @@
     }
   ],
   "devDependencies": {
+    "@portabletext/types": "^1.0.3",
     "@sanity/schema": "^2.10.0",
     "@size-limit/preset-small-lib": "4.12.0",
     "@types/jest": "^27.4.1",
+    "@types/vhtml": "^2.2.4",
+    "@typescript-eslint/parser": "^2.34.0",
     "husky": "4.3.8",
     "jest": "27.3.1",
     "jest-environment-jsdom": "27.3.1",
@@ -62,6 +65,8 @@
     "@sanity/block-content-to-html": "^2.0.0",
     "@sanity/block-tools": "^2.11.0",
     "@sanity/types": "^2.11.0",
-    "just-clone": "^3.2.1"
+    "htm": "^3.1.0",
+    "just-clone": "^3.2.1",
+    "vhtml": "^2.2.0"
   }
 }

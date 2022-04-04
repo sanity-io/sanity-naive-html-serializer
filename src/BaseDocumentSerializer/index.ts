@@ -1,10 +1,10 @@
-import blocksToHtml, { h } from '@sanity/block-content-to-html'
 import { defaultStopTypes, customSerializers } from '../BaseSerializationConfig'
-import { SanityDocument } from '@sanity/types'
+import { SanityDocument, TypedObject } from '@sanity/types'
 import { Serializer, TranslationLevel } from '../types'
 import Schema from '@sanity/schema'
 import clone from 'just-clone'
 import { fieldFilter, languageObjectFieldFilter } from './fieldFilters'
+import { toHTML } from '@portabletext/to-html'
 
 type SerializerClosure = (schemes: Schema) => Serializer
 const META_FIELDS = ['_key', '_type', '_id']
@@ -55,17 +55,21 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
           serializers
         )
       } else {
-        const serialized = serializeObject(value, stopTypes, serializers)
+        const serialized = serializeObject(
+          value as TypedObject,
+          stopTypes,
+          serializers
+        )
         serializedFields[
           key
-        ] = `<div class='${key}' data-level='field'>${serialized}</div>`
+        ] = `<div class="${key}" data-level='field'>${serialized}</div>`
       }
     }
 
     //create a valid HTML file
     const rawHTMLBody = document.createElement('body')
     rawHTMLBody.innerHTML = serializeObject(
-      serializedFields,
+      serializedFields as TypedObject,
       stopTypes,
       serializers
     )
@@ -124,7 +128,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         return `<span>${obj}</span>`
       } else {
         //send to serialization method
-        return serializeObject(obj, stopTypes, serializers)
+        return serializeObject(obj as TypedObject, stopTypes, serializers)
       }
     })
 
@@ -135,7 +139,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
   }
 
   const serializeObject = (
-    obj: Record<string, any>,
+    obj: TypedObject,
     stopTypes: string[],
     serializers: Record<string, any>
   ) => {
@@ -148,7 +152,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     const hasSerializer =
       serializers.types && Object.keys(serializers.types).includes(obj._type)
     if (hasSerializer) {
-      return blocksToHtml({ blocks: [obj], serializers: serializers })
+      return toHTML([obj], { components: serializers })
     }
 
     //we modify the serializers to send it to blocksToHTML
@@ -193,12 +197,16 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
 
           //this is an object in an object, serialize it first
           else {
-            const schema = getSchema(value._type)
-            let toTranslate = value
+            const embeddedObject = value as TypedObject
+            const schema = getSchema(embeddedObject._type)
+            let toTranslate = embeddedObject
             if (schema) {
-              toTranslate = fieldFilter(value, schema.fields, stopTypes)
+              toTranslate = fieldFilter(
+                embeddedObject,
+                schema.fields,
+                stopTypes
+              )
             }
-            //anonymous inline objects may not declare type.
             const objHTML = serializeObject(toTranslate, stopTypes, serializers)
             htmlField = `<div class="${fieldName}" data-level="field">${objHTML}</div>`
           }
@@ -211,33 +219,29 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         return ''
       }
 
-      tempSerializers.types[obj._type] = (props: Record<string, any>) => {
-        return h('div', {
-          className: props.node._type,
-          id: props.node._key ?? props.node._id,
-          innerHTML: innerHTML,
-        })
+      tempSerializers.types[obj._type] = ({
+        value,
+      }: {
+        value: TypedObject
+      }) => {
+        let div = `<div class="${value._type}"`
+        if (value._key || value._id) {
+          div += `id="${value._key ?? value._id}"`
+        }
+
+        return [div, `data-type="object">${innerHTML}</div>`].join('')
       }
     }
 
     let serializedBlock = ''
     try {
-      serializedBlock = blocksToHtml({
-        blocks: [obj],
-        serializers: tempSerializers,
-      })
+      serializedBlock = toHTML([obj], { components: tempSerializers })
     } catch (err) {
       console.debug(
         `Had issues serializing block of type "${obj._type}". Please specify a serialization method for this block in your serialization config. Received error: ${err}`
       )
     }
-    //this should always be a <div> so this is safe to do. README should warn folks
-    //against tds or anything else invalid in custom serialization methods
-    const outerNode = document.createElement('div')
-    outerNode.innerHTML = serializedBlock
-    const node = outerNode.firstElementChild
-    node?.setAttribute('data-type', 'object')
-    return node?.outerHTML
+    return serializedBlock
   }
 
   return {
