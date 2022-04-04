@@ -3,56 +3,14 @@ import blockTools from '@sanity/block-tools'
 import {
   customDeserializers,
   customBlockDeserializers,
-} from './BaseSerializationConfig'
+} from '../BaseSerializationConfig'
 import { ObjectField, ObjectSchemaType, BlockSchemaType } from '@sanity/types'
-import { Deserializer } from './types'
+import { DeserializerClosure } from '../types'
+import { blockContentType, preprocess, noSchemaWarning } from './helpers'
 
-const defaultSchema = Schema.compile({
-  name: 'default',
-  types: [
-    {
-      type: 'object',
-      name: 'default',
-      fields: [
-        {
-          name: 'block',
-          type: 'array',
-          of: [{ type: 'block' }],
-        },
-      ],
-    },
-  ],
-})
-
-const blockContentType = defaultSchema
-  .get('default')
-  .fields.find((field: ObjectField) => field.name === 'block').type
-
-//helper to handle messy input -- take advantage
-//of blockTools' sanitizing behavior for single strings
-const preprocess = (html: string) => {
-  const intermediateBlocks = blockTools.htmlToBlocks(
-    `<p>${html}</p>`,
-    blockContentType
-  )
-  if (!intermediateBlocks.length) {
-    throw new Error(`Error parsing string '${html}'`)
-  }
-  return intermediateBlocks[0].children[0].text
-}
-const noSchemaWarning = (obj: Element) =>
-  `WARNING: Unfortunately the deserializer may have issues with this field or object: ${obj.className}.
-  If it's a specific type, you may need to declare  at the top level, or write a custom deserializer.`
-
-export type DeserializerClosure = (schema: Schema) => Deserializer
-
-export const BaseDocumentDeserializer: DeserializerClosure = (
+export const LegacyBaseDocumentDeserializer: DeserializerClosure = (
   schema: Schema
 ) => {
-  const blockContentType = defaultSchema
-    .get('default')
-    .fields.find((field: ObjectField) => field.name === 'block').type
-
   const deserializeDocument = (
     serializedDoc: string,
     deserializers: Record<string, any> = customDeserializers,
@@ -222,3 +180,5 @@ export const BaseDocumentDeserializer: DeserializerClosure = (
     deserializeHTML,
   }
 }
+
+export default LegacyBaseDocumentDeserializer

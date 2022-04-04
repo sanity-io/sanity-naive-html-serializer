@@ -1,17 +1,18 @@
 import blocksToHtml, { h } from '@sanity/block-content-to-html'
-import { defaultStopTypes, customSerializers } from './BaseSerializationConfig'
-import { ObjectField, SanityDocument } from '@sanity/types'
-import { Serializer, TranslationLevel } from './types'
+import { defaultStopTypes, customSerializers } from '../BaseSerializationConfig'
+import { SanityDocument } from '@sanity/types'
+import { Serializer, TranslationLevel } from '../types'
 import Schema from '@sanity/schema'
 import clone from 'just-clone'
+import { fieldFilter, languageObjectFieldFilter } from './fieldFilters'
 
 type SerializerClosure = (schemes: Schema) => Serializer
 const META_FIELDS = ['_key', '_type', '_id']
 
-/*
- * Helper function that allows us to get metadata (like `localize: false`) from schema fields.
- */
 export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
+  /*
+   * Helper function that allows us to get metadata (like `localize: false`) from schema fields.
+   */
   const getSchema = (name: string) =>
     schemas._original.types.find(s => s.name === name) as any
 
@@ -26,20 +27,19 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     stopTypes = defaultStopTypes,
     serializers = customSerializers
   ) => {
-    //we must take out any fields not relevant to translation
     let filteredObj: Record<string, any> = {}
 
-    //field level translations explicitly send over the base language
+    //field level translations explicitly send over any fields that
+    //match the base language, regardless of depth
     if (translationLevel === 'field') {
       filteredObj = languageObjectFieldFilter(doc, baseLang)
     }
-    //otherwise, we have a list of types that should not be sent over.
+    //otherwise, we can refer to the schema and a list of stop types
+    //to determine what should not be sent
     else {
       filteredObj = fieldFilter(doc, getSchema(doc._type).fields, stopTypes)
     }
 
-    //ultimately, this should be an object with strings as plain strings but complex objects as HTML divs
-    //e.g. {blockText: "<div><p>My text</p></div>"}
     const serializedFields: Record<string, any> = {}
 
     for (let key in filteredObj) {
@@ -55,22 +55,10 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
           serializers
         )
       } else {
-        //top-level objects need an additional layer of nesting for custom serialization etc.
-        //but we still want the object type to be preserved
-        const isFieldLevel = value.hasOwnProperty(baseLang)
-        const serialized = serializeObject(
-          value,
-          isFieldLevel ? key : null,
-          stopTypes,
-          serializers
-        )
-        if (!isFieldLevel) {
-          //now we add an additional field wrapper so we know both
-          //the field and type of this object after deserialization
-          serializedFields[key] = `<div class='${key}'>${serialized}</div>`
-        } else {
-          serializedFields[key] = serialized
-        }
+        const serialized = serializeObject(value, stopTypes, serializers)
+        serializedFields[
+          key
+        ] = `<div class='${key}' data-level='field'>${serialized}</div>`
       }
     }
 
@@ -78,7 +66,6 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     const rawHTMLBody = document.createElement('body')
     rawHTMLBody.innerHTML = serializeObject(
       serializedFields,
-      doc._type,
       stopTypes,
       serializers
     )
@@ -92,6 +79,11 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       metaEl.setAttribute('content', doc[field] as string)
       rawHTMLHead.appendChild(metaEl)
     })
+    //encode version so we can use the correct deserialization methods
+    const versionMeta = document.createElement('meta')
+    versionMeta.setAttribute('name', 'version')
+    versionMeta.setAttribute('content', '2')
+    rawHTMLHead.appendChild(versionMeta)
 
     const rawHTML = document.createElement('html')
     rawHTML.appendChild(rawHTMLHead)
@@ -101,119 +93,6 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       name: doc._id,
       content: rawHTML.outerHTML,
     }
-  }
-
-  /*
-   * Helper. If field-level translation pattern used, only sends over
-   * content from the base language. Now works recursively!
-   */
-  const languageObjectFieldFilter = (
-    obj: Record<string, any>,
-    baseLang: string
-  ) => {
-    const filterToLangField = (obj: Record<string, any>) => {
-      const filteredObj: Record<string, any> = {}
-      filteredObj[baseLang] = obj[baseLang]
-      META_FIELDS.forEach(field => {
-        if (obj[field]) {
-          filteredObj[field] = obj[field]
-        }
-      })
-      return filteredObj
-    }
-
-    const findBaseLang = (
-      childObj: Record<string, any>
-    ): Record<string, any> => {
-      const filteredObj: Record<string, any> = {}
-      META_FIELDS.forEach(field => {
-        if (childObj[field]) {
-          filteredObj[field] = childObj[field]
-        }
-      })
-
-      for (let key in childObj) {
-        const value: any = childObj[key]
-        //we've reached a base language field, add it to
-        //what we want to send to translation
-        if (value.hasOwnProperty(baseLang)) {
-          filteredObj[key] = filterToLangField(value)
-        }
-        //we have an array that may have language fields in its objects
-        else if (
-          Array.isArray(value) &&
-          value.length &&
-          typeof value[0] === 'object'
-        ) {
-          //recursively find and filter for any objects that have the base language
-          const validLangObjects = value.reduce((validArr, objInArray) => {
-            if (objInArray._type === 'block') {
-              validArr.push(objInArray)
-            } else if (objInArray.hasOwnProperty(baseLang)) {
-              validArr.push(filterToLangField(objInArray))
-            } else {
-              const filtered = findBaseLang(objInArray)
-              if (Object.keys(filtered).length) {
-                validArr.push(filtered)
-              }
-            }
-            return validArr
-          }, [])
-          if (validLangObjects.length) {
-            filteredObj[key] = validLangObjects
-          }
-        }
-        //we have an object nested in an object
-        //recurse down the tree
-        else if (typeof value === 'object') {
-          const nestedLangObj = findBaseLang(value)
-          if (Object.keys(nestedLangObj).length) {
-            filteredObj[key] = nestedLangObj
-          }
-        }
-      }
-      return filteredObj
-    }
-
-    //send top level object into recursive function
-    return findBaseLang(obj)
-  }
-
-  /*
-   * Helper. Eliminates stop-types and non-localizable fields.
-   */
-  const fieldFilter = (
-    obj: Record<string, any>,
-    objFields: ObjectField[],
-    stopTypes: string[]
-  ) => {
-    const filteredObj: Record<string, any> = {}
-
-    const fieldFilter = (field: Record<string, any>) => {
-      if (field.localize === false) {
-        return false
-      } else if (field.type === 'string' || field.type === 'text') {
-        return true
-      } else if (Array.isArray(obj[field.name])) {
-        return true
-      } else if (!stopTypes.includes(field.type)) {
-        return true
-      }
-      return false
-    }
-
-    const validFields = [
-      '_key',
-      '_type',
-      '_id',
-      ...objFields.filter(fieldFilter).map(field => field.name),
-    ]
-    validFields.forEach(field => {
-      if (obj[field]) {
-        filteredObj[field] = obj[field]
-      }
-    })
-    return filteredObj
   }
 
   const serializeArray = (
@@ -245,16 +124,18 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         return `<span>${obj}</span>`
       } else {
         //send to serialization method
-        return serializeObject(obj, null, stopTypes, serializers)
+        return serializeObject(obj, stopTypes, serializers)
       }
     })
 
-    return `<div class="${fieldName}">${output.join('')}</div>`
+    //TODO: encode this with data-level fieldName
+    return `<div class="${fieldName}" data-type="array">${output.join(
+      ''
+    )}</div>`
   }
 
   const serializeObject = (
     obj: Record<string, any>,
-    topFieldName: string | null = null,
     stopTypes: string[],
     serializers: Record<string, any>
   ) => {
@@ -277,9 +158,23 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     //if it's a custom object, iterate through its keys to find and serialize translatable content
     if (obj._type !== 'span' && obj._type !== 'block') {
       let innerHTML = ''
+      //if schema is available, encode values in the order they're declared in the schema,
+      //since this will likely be more intuitive for a translator.
+      let fieldNames = Object.keys(obj)
+      if (getSchema(obj._type)) {
+        fieldNames = getSchema(obj._type)
+          .fields.map((field: Record<string, any>) => field.name)
+          .filter((schemaKey: string) => Object.keys(obj).includes(schemaKey))
+      }
 
-      Object.entries(obj).forEach(([fieldName, value]) => {
+      //account for anonymous inline objects
+      if (typeof obj === 'object' && !obj._type) {
+        obj._type = ''
+      }
+
+      fieldNames.forEach(fieldName => {
         let htmlField = ''
+        const value = obj[fieldName]
 
         if (!META_FIELDS.includes(fieldName)) {
           //strings are either string fields or have recursively been turned
@@ -303,13 +198,9 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
             if (schema) {
               toTranslate = fieldFilter(value, schema.fields, stopTypes)
             }
-            const objHTML = serializeObject(
-              toTranslate,
-              null,
-              stopTypes,
-              serializers
-            )
-            htmlField = `<div class="${fieldName}">${objHTML}</div>`
+            //anonymous inline objects may not declare type.
+            const objHTML = serializeObject(toTranslate, stopTypes, serializers)
+            htmlField = `<div class="${fieldName}" data-level="field">${objHTML}</div>`
           }
 
           innerHTML += htmlField
@@ -322,7 +213,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
 
       tempSerializers.types[obj._type] = (props: Record<string, any>) => {
         return h('div', {
-          className: topFieldName ?? props.node._type,
+          className: props.node._type,
           id: props.node._key ?? props.node._id,
           innerHTML: innerHTML,
         })
@@ -340,8 +231,13 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         `Had issues serializing block of type "${obj._type}". Please specify a serialization method for this block in your serialization config. Received error: ${err}`
       )
     }
-
-    return serializedBlock
+    //this should always be a <div> so this is safe to do. README should warn folks
+    //against tds or anything else invalid in custom serialization methods
+    const outerNode = document.createElement('div')
+    outerNode.innerHTML = serializedBlock
+    const node = outerNode.firstElementChild
+    node?.setAttribute('data-type', 'object')
+    return node?.outerHTML
   }
 
   return {

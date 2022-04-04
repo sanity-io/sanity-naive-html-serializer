@@ -5,6 +5,8 @@ import {
   SanityDocument,
 } from '@sanity/types'
 
+import Schema from '@sanity/schema'
+
 export type SerializedDocument = {
   name: string
   content: string
@@ -36,7 +38,6 @@ export interface Serializer {
   ) => string
   serializeObject: (
     obj: Record<string, any>,
-    topFieldName: string | null,
     stopTypes: string[],
     serializers: Record<string, any>
   ) => string
@@ -50,11 +51,26 @@ export interface Deserializer {
   ) => Record<string, any>
   deserializeHTML: (
     html: string,
+    deserializers: Record<string, any>,
+    blockDeserializers: Array<any>
+  ) => Record<string, any> | any[]
+}
+
+export interface LegacyDeserializer {
+  deserializeDocument: (
+    serializedDoc: string,
+    deserializers?: Record<string, any>,
+    blockDeserializers?: Array<any>
+  ) => Record<string, any>
+  deserializeHTML: (
+    html: string,
     target: ObjectSchemaType | BlockSchemaType,
     deserializers: Record<string, any>,
     blockDeserializers: Array<any>
   ) => Record<string, any> | any[]
 }
+
+export type DeserializerClosure = (schema: Schema) => LegacyDeserializer
 
 export interface Merger {
   fieldLevelMerge: (

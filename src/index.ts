@@ -1,5 +1,8 @@
 import { BaseDocumentSerializer } from './BaseDocumentSerializer'
-import { BaseDocumentDeserializer } from './BaseDocumentDeserializer'
+import {
+  BaseDocumentDeserializer,
+  LegacyBaseDocumentDeserializer,
+} from './BaseDocumentDeserializer'
 import { BaseDocumentMerger } from './BaseDocumentMerger'
 import { defaultStopTypes, customSerializers } from './BaseSerializationConfig'
 
@@ -9,4 +12,5 @@ export {
   BaseDocumentMerger,
   defaultStopTypes,
   customSerializers,
+  LegacyBaseDocumentDeserializer,
 }
