@@ -446,12 +446,21 @@ test('Unhandled inline objects and annotations should not hinder translation flo
     ...annotationAndInlineBlocks,
   }
   const serialized = getSerialized(inlineDocument, 'document')
-  //expect annotations to be ignored
-  expect(serialized.content).not.toContain('annotation')
-
-  //expect unhandled inline objects to be present but empty
   const docTree = getHTMLNode(serialized).body.children[0]
   const arrayField = findByClass(docTree.children, 'content')
+
+  //expect annotated object to have underlying text
+  const blockWithAnnotation = Array.from(arrayField!.children).find(
+    node => node.id === '0e55995095df'
+  )
+  const unhandledAnnotation = findByClass(
+    blockWithAnnotation!.children,
+    'unknown__pt__mark__annotation'
+  )
+  expect(unhandledAnnotation?.innerHTML).toContain('text')
+
+  //expect unknown inline object to be present but empty
+  //(this allows it to be merged back safely, but not sent to translation)
   const inlineObject = findByClass(arrayField!.children, 'childObjectField')
   expect(inlineObject?.innerHTML.length).toEqual(0)
 })
