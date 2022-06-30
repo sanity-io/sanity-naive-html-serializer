@@ -6,6 +6,9 @@ import {
   PortableTextListItemComponent,
 } from '@portabletext/to-html'
 
+import blockTools from '@sanity/block-tools'
+import { blockContentType } from './BaseDocumentDeserializer/helpers'
+
 export const defaultStopTypes = [
   'reference',
   'date',
@@ -17,7 +20,8 @@ export const defaultStopTypes = [
   'crop',
   'hotspot',
   'boolean',
-  'URL',
+  'url',
+  'color',
 ]
 
 export const defaultPortableTextBlockStyles: Record<
@@ -45,6 +49,9 @@ const defaultLists: Record<'number' | 'bullet', PortableTextListComponent> = {
 const defaultListItem: PortableTextListItemComponent = ({ value, children }) =>
   `<li id="${(value._key || '').replace('-parent', '')}">${children}</li>`
 
+const unknownBlockFunc: PortableTextBlockComponent = ({ value, children }) =>
+  `<p id="${value._key}" data-type="unknown-block-style" data-style="${value.style}">${children}</p>`
+
 export const customSerializers: Record<string, any> = {
   unknownType: ({ value }: { value: Record<string, any> }) =>
     `<div class="${value._type}"></div>`,
@@ -52,8 +59,33 @@ export const customSerializers: Record<string, any> = {
   block: defaultPortableTextBlockStyles,
   list: defaultLists,
   listItem: defaultListItem,
+  unknownBlockStyle: unknownBlockFunc,
 }
 
 export const customDeserializers: Record<string, any> = { types: {} }
 
-export const customBlockDeserializers: Array<any> = []
+export const customBlockDeserializers: Array<any> = [
+  //handle undeclared styles
+  {
+    deserialize(el: HTMLParagraphElement) {
+      if (!el.hasChildNodes()) {
+        return undefined
+      }
+
+      if (
+        !el.hasAttribute('data-type') ||
+        el.getAttribute('data-type') !== 'unknown-block-style'
+      ) {
+        return undefined
+      }
+
+      const style = el.getAttribute('data-style')
+      const block = blockTools.htmlToBlocks(el.outerHTML, blockContentType)[0]
+
+      return {
+        ...block,
+        style,
+      }
+    },
+  },
+]

@@ -19,6 +19,7 @@ const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const inlineDocumentLevelArticle = require('./__fixtures__/inlineDocumentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
+const customStyles = require('./__fixtures__/customStyles')
 
 const schema = require('./__fixtures__/schema')
 const inlineSchema = require('./__fixtures__/inlineSchema')
@@ -474,5 +475,32 @@ test('Content with anonymous inline objects deserializes all fields, at any dept
   expect(deserializedObj.title).toEqual(origObj.title)
   expect(deserializedObj.objectAsField.content[0].children[0].text).toEqual(
     origObj.objectAsField.content[0].children[0].text
+  )
+})
+
+test('Content with custom styles deserializes correctly and maintains style', () => {
+  //unhandled style will throw a warn -- ignore it in this case
+  jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+  const customStyledDocument = {
+    ...documentLevelArticle,
+    ...customStyles,
+  }
+
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
+    customStyledDocument,
+    'document'
+  )
+
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(
+    serialized.content
+  )
+
+  expect(deserialized.content[0].children[0].text).toEqual(
+    customStyledDocument.content[0].children[0].text
+  )
+
+  expect(deserialized.content[0].style).toEqual(
+    customStyledDocument.content[0].style
   )
 })
