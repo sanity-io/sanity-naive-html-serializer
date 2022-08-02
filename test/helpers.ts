@@ -1,21 +1,30 @@
-import { SanityDocument } from '@sanity/types'
+import { SanityDocument, TypedObject } from '@sanity/types'
 import { BaseDocumentSerializer, BaseDocumentDeserializer } from '../src'
 import {
   customSerializers,
   customDeserializers,
 } from '../src/BaseSerializationConfig'
-import { h } from '@sanity/block-content-to-html'
 import { Block } from '@sanity/types'
 import clone from 'just-clone'
+import { TranslationLevel } from '../src/types'
 
-export const getSerialized = (document: SanityDocument, level: string) => {
-  const serializer = BaseDocumentSerializer
+const schema = require('./__fixtures__/schema')
+
+export const getSerialized = (
+  document: SanityDocument,
+  level: TranslationLevel
+) => {
+  const serializer = BaseDocumentSerializer(schema)
   return serializer.serializeDocument(document, level)
 }
 
-export const getDeserialized = (document: SanityDocument, level: string) => {
+export const getDeserialized = (
+  document: SanityDocument,
+  level: TranslationLevel
+) => {
   const serialized = getSerialized(document, level)
-  return BaseDocumentDeserializer.deserializeDocument(serialized.content)
+  const deserializer = BaseDocumentDeserializer
+  return deserializer.deserializeDocument(serialized.content)
 }
 
 export const getValidFields = (field: Record<string, any>) => {
@@ -50,22 +59,18 @@ export const createCustomInnerHTML = (title: string) =>
 
 const additionalSerializerTypes = {
   //block and top-level tests
-  objectField: (props: SerializerProps) => {
-    const innerText = createCustomInnerHTML(props.node.title)
-    return h(
-      'div',
-      { className: props.node._type, id: props.node._key },
-      innerText
-    )
+  objectField: ({ value }: { value: TypedObject }) => {
+    const innerText = createCustomInnerHTML(value.title as string)
+    const html = `<div class="${value._type}" id="${value._key ??
+      value._id}">${innerText}</div>`
+    return html
   },
   //inline-level tests
-  childObjectField: (props: SerializerProps) => {
-    const innerText = createCustomInnerHTML(props.node.title)
-    return h(
-      'span',
-      { className: props.node._type, id: props.node._key },
-      innerText
-    )
+  childObjectField: ({ value }: { value: TypedObject }) => {
+    const innerText = createCustomInnerHTML(value.title as string)
+    const html = `<span class="${value._type}" id="${value._key ??
+      value._id}">${innerText}</span>`
+    return html
   },
 }
 
@@ -75,16 +80,16 @@ tempSerializers.types = {
   ...additionalSerializerTypes,
 }
 tempSerializers.marks = {
-  annotation: (props: AnnotationProps) => {
-    return h(
-      'span',
-      {
-        className: props.mark._type,
-        id: props._key,
-        'mark-key': props.mark._key,
-      },
-      props.children
-    )
+  annotation: ({
+    value,
+    markType,
+    children,
+  }: {
+    value: TypedObject
+    markType: string
+    children: any[]
+  }) => {
+    return `<span class="${markType}" id="${value._key}">${children}</span>`
   },
 }
 

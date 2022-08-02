@@ -14,9 +14,15 @@ import {
   defaultStopTypes,
 } from '../src'
 import { customBlockDeserializers } from '../src/BaseSerializationConfig'
+
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
+const inlineDocumentLevelArticle = require('./__fixtures__/inlineDocumentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 const annotationAndInlineBlocks = require('./__fixtures__/annotationAndInlineBlocks')
+const customStyles = require('./__fixtures__/customStyles')
+
+const schema = require('./__fixtures__/schema')
+const inlineSchema = require('./__fixtures__/inlineSchema')
 
 let mockTestKey = 0
 
@@ -156,6 +162,7 @@ test('Object in array contains accurate values in nested object -- document leve
   ).trim()
   expect(deserializedBlockText).toEqual(origBlockText)
 })
+
 /*
  * FIELD LEVEL
  */
@@ -259,13 +266,14 @@ test('Object in array contains accurate values in nested object -- document leve
  */
 
 test('Custom deserialization should manifest at all levels', () => {
-  const serialized = BaseDocumentSerializer.serializeDocument(
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
     documentLevelArticle,
     'document',
     'en',
     defaultStopTypes,
     addedCustomSerializers
   )
+
   const deserialized = BaseDocumentDeserializer.deserializeDocument(
     serialized.content,
     addedCustomDeserializers,
@@ -293,7 +301,7 @@ test('Handled inline objects should be accurately deserialized', () => {
     ...annotationAndInlineBlocks,
   }
 
-  const serialized = BaseDocumentSerializer.serializeDocument(
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
     inlineDocument,
     'document',
     'en',
@@ -340,7 +348,7 @@ test('Handled annotations should be accurately deserialized', () => {
     ...annotationAndInlineBlocks,
   }
 
-  const serialized = BaseDocumentSerializer.serializeDocument(
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
     inlineDocument,
     'document',
     'en',
@@ -409,7 +417,7 @@ test('Deserialized content should preserve style tags', () => {
  * MESSY INPUT
  */
 test('&nbsp; whitespace should not be escaped', () => {
-  //unhandled field throw a warn -- ignore it in this case
+  //unhandled field will throw a warn -- ignore it in this case
   jest.spyOn(console, 'debug').mockImplementation(() => {})
 
   const content = readFileSync('test/__fixtures__/messy-html.html', {
@@ -419,5 +427,80 @@ test('&nbsp; whitespace should not be escaped', () => {
   expect(result.title).toEqual('Här är artikel titeln')
   expect(result.content[1].nestedArrayField[0].title).toEqual(
     'Det här är en dragspels titeln'
+  )
+})
+
+/*
+ * V2 functionality -- be able to operate without a strict schema
+ */
+test('Content with anonymous inline objects deserializes all fields, at any depth', () => {
+  //unhandled field will throw a warn -- ignore it in this case
+  jest.spyOn(console, 'debug').mockImplementation(() => {})
+
+  const serialized = BaseDocumentSerializer(inlineSchema).serializeDocument(
+    inlineDocumentLevelArticle,
+    'document'
+  )
+
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(
+    serialized.content
+  )
+  //object in field
+  expect(deserialized.tabs.config.title).toEqual(
+    inlineDocumentLevelArticle.tabs.config.title
+  )
+
+  //array in object in object
+  expect(
+    deserialized.tabs.config.objectAsField.content[0].children[0].text
+  ).toEqual(
+    inlineDocumentLevelArticle.tabs.config.objectAsField.content[0].children[0]
+      .text
+  )
+
+  //arrays
+  expect(deserialized.tabs.content).toBeInstanceOf(Array)
+  expect(deserialized.tabs.content.map((block: any) => block._key)).toEqual(
+    inlineDocumentLevelArticle.tabs.content.map((block: any) => block._key)
+  )
+
+  //object in array
+  const origObj = inlineDocumentLevelArticle.tabs.content.find(
+    (block: any) => block._type === 'objectField'
+  )
+  const deserializedObj = deserialized.tabs.content.find(
+    (block: any) => block._type === 'objectField'
+  )
+
+  expect(deserializedObj.title).toEqual(origObj.title)
+  expect(deserializedObj.objectAsField.content[0].children[0].text).toEqual(
+    origObj.objectAsField.content[0].children[0].text
+  )
+})
+
+test('Content with custom styles deserializes correctly and maintains style', () => {
+  //unhandled style will throw a warn -- ignore it in this case
+  jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+  const customStyledDocument = {
+    ...documentLevelArticle,
+    ...customStyles,
+  }
+
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
+    customStyledDocument,
+    'document'
+  )
+
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(
+    serialized.content
+  )
+
+  expect(deserialized.content[0].children[0].text).toEqual(
+    customStyledDocument.content[0].children[0].text
+  )
+
+  expect(deserialized.content[0].style).toEqual(
+    customStyledDocument.content[0].style
   )
 })
