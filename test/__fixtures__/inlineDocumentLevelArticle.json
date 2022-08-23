@@ -123,6 +123,24 @@
       "tag 2",
       "tag 3"
     ],
-    "title": "My Document-Level Article"
+    "title": "My Document-Level Article",
+    "arrayWithAnonymousObjects": [
+      {
+        "_key": "4c146e0ab346",
+        "cells": [
+          "Standard",
+          "Americas",
+          "EMEA"
+        ]
+      },
+      {
+        "_key": "038f8c197939",
+        "cells": [
+          "Friends",
+          "Family",
+          "Other"
+        ]
+      }
+    ]
   }
 }
