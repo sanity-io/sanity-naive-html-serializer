@@ -128,8 +128,8 @@ const deserializeArray = (
     if (child.tagName.toLowerCase() === 'span') {
       deserializedObject = preprocess(child.innerHTML)
     }
-    //has specific class name, so it's either a field or obj
-    else if (child.className) {
+    //has specific class name or data type, so it's an obj
+    else if (child.className || child.getAttribute('data-type') === 'object') {
       deserializedObject = deserializeObject(
         child,
         deserializers,

@@ -293,8 +293,7 @@ test('Custom deserialization should manifest at all levels', () => {
   expect(deserializedArrayObj._key).toEqual(origArrayObj._key)
 })
 
-//test -- unhandled annotations and inlines don't break when they get deserialized back?
-
+//test -- unhandled annotations and inlines don't break when they get deserialized back
 test('Handled inline objects should be accurately deserialized', () => {
   const inlineDocument = {
     ...documentLevelArticle,
@@ -413,6 +412,33 @@ test('Deserialized content should preserve style tags', () => {
   expect(deserializedH2.children[0].text).toEqual(origH2.children[0].text)
 })
 
+test('Content with custom styles deserializes correctly and maintains style', () => {
+  //unhandled style will throw a warn -- ignore it in this case
+  jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+  const customStyledDocument = {
+    ...documentLevelArticle,
+    ...customStyles,
+  }
+
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
+    customStyledDocument,
+    'document'
+  )
+
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(
+    serialized.content
+  )
+
+  expect(deserialized.content[0].children[0].text).toEqual(
+    customStyledDocument.content[0].children[0].text
+  )
+
+  expect(deserialized.content[0].style).toEqual(
+    customStyledDocument.content[0].style
+  )
+})
+
 /*
  * MESSY INPUT
  */
@@ -475,32 +501,5 @@ test('Content with anonymous inline objects deserializes all fields, at any dept
   expect(deserializedObj.title).toEqual(origObj.title)
   expect(deserializedObj.objectAsField.content[0].children[0].text).toEqual(
     origObj.objectAsField.content[0].children[0].text
-  )
-})
-
-test('Content with custom styles deserializes correctly and maintains style', () => {
-  //unhandled style will throw a warn -- ignore it in this case
-  jest.spyOn(console, 'warn').mockImplementation(() => {})
-
-  const customStyledDocument = {
-    ...documentLevelArticle,
-    ...customStyles,
-  }
-
-  const serialized = BaseDocumentSerializer(schema).serializeDocument(
-    customStyledDocument,
-    'document'
-  )
-
-  const deserialized = BaseDocumentDeserializer.deserializeDocument(
-    serialized.content
-  )
-
-  expect(deserialized.content[0].children[0].text).toEqual(
-    customStyledDocument.content[0].children[0].text
-  )
-
-  expect(deserialized.content[0].style).toEqual(
-    customStyledDocument.content[0].style
   )
 })
