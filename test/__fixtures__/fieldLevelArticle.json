@@ -4,6 +4,10 @@
   "_rev": "l58oha-n06-1s4-f6i-74g6cuakl",
   "_type": "fieldLevelArticle",
   "_updatedAt": "2021-10-10T23:02:05Z",
+  "slug": {
+    "_type": "slug",
+    "current": "happy-kitchen-hamburger"
+  },
   "config": {
     "en": {
       "_type": "objectField",

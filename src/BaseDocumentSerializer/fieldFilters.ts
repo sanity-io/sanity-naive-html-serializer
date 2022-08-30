@@ -51,7 +51,10 @@ export const languageObjectFieldFilter = (
             validArr.push(filterToLangField(objInArray))
           } else {
             const filtered = findBaseLang(objInArray)
-            if (Object.keys(filtered).length) {
+            const nonMetaFields = Object.keys(filtered).filter(
+              key => META_FIELDS.indexOf(key) === -1
+            )
+            if (nonMetaFields.length) {
               validArr.push(filtered)
             }
           }
@@ -65,7 +68,10 @@ export const languageObjectFieldFilter = (
       //recurse down the tree
       else if (typeof value === 'object') {
         const nestedLangObj = findBaseLang(value)
-        if (Object.keys(nestedLangObj).length) {
+        const nonMetaFields = Object.keys(nestedLangObj).filter(
+          key => META_FIELDS.indexOf(key) === -1
+        )
+        if (nonMetaFields.length) {
           filteredObj[key] = nestedLangObj
         }
       }
