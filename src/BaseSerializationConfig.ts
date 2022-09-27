@@ -22,6 +22,7 @@ export const defaultStopTypes = [
   'boolean',
   'url',
   'color',
+  'code',
 ]
 
 export const defaultPortableTextBlockStyles: Record<
