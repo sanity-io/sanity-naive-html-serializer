@@ -62,6 +62,6 @@
     "@sanity/mutator": "^2.29.3",
     "@sanity/schema": "^2.10.0",
     "@sanity/types": "^2.11.0",
-    "just-clone": "^3.2.1"
+    "just-clone": "^6.0.0"
   }
 }
