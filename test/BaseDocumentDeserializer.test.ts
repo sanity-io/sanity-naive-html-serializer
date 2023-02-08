@@ -23,7 +23,7 @@ const inlineSchema = require('./__fixtures__/inlineSchema')
 let mockTestKey = 0
 
 //needed to make snapshots happy on internal spans (where we don't track keys)
-jest.mock('@sanity/block-tools/src/util/randomKey.ts', () => {
+jest.mock('@sanity/block-tools/src/util/randomKey', () => {
   return jest.fn().mockImplementation(() => {
     return `randomKey-${++mockTestKey}`
   })

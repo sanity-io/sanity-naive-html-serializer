@@ -8,11 +8,16 @@ const nestedLanguageFields = require('./__fixtures__/nestedLanguageFields')
 
 let mockTestKey = 0
 
-//needed to make snapshots happy on internal spans (where we don't track keys)
-jest.mock('@sanity/block-tools/src/util/randomKey.ts', () => {
-  return jest.fn().mockImplementation(() => {
-    return `-${++mockTestKey}`
-  })
+//replace the randomKey function from block-tools with a mock that returns a predictable value
+jest.mock('@sanity/block-tools', () => {
+  const originalModule = jest.requireActual('@sanity/block-tools')
+  return {
+    ...originalModule,
+    randomKey: () => {
+      mockTestKey++
+      return `randomKey-${mockTestKey}`
+    },
+  }
 })
 
 beforeEach(() => {
