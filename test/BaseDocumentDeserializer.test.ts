@@ -7,7 +7,7 @@ import {
   addedCustomSerializers,
   addedBlockDeserializers,
 } from './helpers'
-import {PortableTextBlock} from 'sanity'
+import {PortableTextBlock, PortableTextChild} from 'sanity'
 import {BaseDocumentDeserializer, BaseDocumentSerializer, defaultStopTypes} from '../src'
 import {customBlockDeserializers} from '../src/BaseSerializationConfig'
 
@@ -23,10 +23,24 @@ const inlineSchema = require('./__fixtures__/inlineSchema')
 let mockTestKey = 0
 
 //needed to make snapshots happy on internal spans (where we don't track keys)
-jest.mock('@sanity/block-tools/src/util/randomKey', () => {
-  return jest.fn().mockImplementation(() => {
-    return `randomKey-${++mockTestKey}`
-  })
+// const originalModule = jest.requireActual('@sanity/block-tools')
+
+jest.mock('@sanity/block-tools', () => {
+  const originalModule = jest.requireActual('@sanity/block-tools')
+  return {
+    ...originalModule,
+    //not ideal but jest.mock('@sanity/block-tools/src/util/randomKey.ts' is not working
+    htmlToBlocks: (html: string, blockContentType: any, options: any) => {
+      const blocks = originalModule.htmlToBlocks(html, blockContentType, options)
+      const newBlocks = blocks.map((block: PortableTextBlock) => {
+        const newChildren = (block.children as PortableTextChild[]).map((child) => {
+          return {...child, _key: `randomKey-${mockTestKey++}`}
+        })
+        return {...block, children: newChildren}
+      })
+      return newBlocks
+    },
+  }
 })
 
 beforeEach(() => {

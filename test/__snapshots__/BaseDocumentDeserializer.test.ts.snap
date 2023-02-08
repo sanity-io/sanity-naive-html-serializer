@@ -13,7 +13,7 @@ Object {
         "_type": "block",
         "children": Array [
           Object {
-            "_key": "randomKey-90",
+            "_key": "randomKey-16",
             "_type": "span",
             "marks": Array [],
             "text": "This is block text 1 level deep",
@@ -31,7 +31,7 @@ Object {
           "_type": "block",
           "children": Array [
             Object {
-              "_key": "randomKey-80",
+              "_key": "randomKey-14",
               "_type": "span",
               "marks": Array [],
               "text": "This is a block text 2 levels deep",
@@ -51,7 +51,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-100",
+          "_key": "randomKey-18",
           "_type": "span",
           "marks": Array [],
           "text": "This is block text at the top level.",
@@ -71,7 +71,7 @@ Object {
             "_type": "block",
             "children": Array [
               Object {
-                "_key": "randomKey-130",
+                "_key": "randomKey-24",
                 "_type": "span",
                 "marks": Array [],
                 "text": "This is block text in a nested object in an object in top-level block text.",
@@ -90,7 +90,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-140",
+          "_key": "randomKey-26",
           "_type": "span",
           "marks": Array [],
           "text": "This is h1 text",
@@ -104,7 +104,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-150",
+          "_key": "randomKey-28",
           "_type": "span",
           "marks": Array [],
           "text": "This is h2 text",
@@ -138,7 +138,7 @@ Object {
           "_type": "block",
           "children": Array [
             Object {
-              "_key": "randomKey-90",
+              "_key": "randomKey-16",
               "_type": "span",
               "marks": Array [],
               "text": "This is block text 1 level deep",
@@ -156,7 +156,7 @@ Object {
             "_type": "block",
             "children": Array [
               Object {
-                "_key": "randomKey-80",
+                "_key": "randomKey-14",
                 "_type": "span",
                 "marks": Array [],
                 "text": "This is block text 2 levels deep",
@@ -178,7 +178,7 @@ Object {
         "_type": "block",
         "children": Array [
           Object {
-            "_key": "randomKey-100",
+            "_key": "randomKey-18",
             "_type": "span",
             "marks": Array [],
             "text": "This is block text at the top level.",
@@ -198,7 +198,7 @@ Object {
               "_type": "block",
               "children": Array [
                 Object {
-                  "_key": "randomKey-130",
+                  "_key": "randomKey-24",
                   "_type": "span",
                   "marks": Array [],
                   "text": "This is block text in a nested object in an object in top-level block text.",
