@@ -1,4 +1,4 @@
-import { SerializedDocument } from '../src/types'
+import {SerializedDocument} from '../src/types'
 import {
   getSerialized,
   addedCustomSerializers,
@@ -6,12 +6,8 @@ import {
   getValidFields,
   toPlainText,
 } from './helpers'
-import { Block } from '@sanity/types'
-import {
-  BaseDocumentSerializer,
-  defaultStopTypes,
-  customSerializers,
-} from '../src'
+import {PortableTextBlock} from 'sanity'
+import {BaseDocumentSerializer, defaultStopTypes, customSerializers} from '../src'
 
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const inlineDocumentLevelArticle = require('./__fixtures__/inlineDocumentLevelArticle')
@@ -29,7 +25,7 @@ const getHTMLNode = (serialized: SerializedDocument) => {
 }
 
 const findByClass = (children: HTMLCollection, className: string) => {
-  return Array.from(children).find(node => node.className === className)
+  return Array.from(children).find((node) => node.className === className)
 }
 
 test('Global test of working doc-level functionality and snapshot match', () => {
@@ -49,7 +45,7 @@ test('Contains metadata field containing document id', () => {
   const serialized = getSerialized(documentLevelArticle, 'document')
   const docTree = getHTMLNode(serialized)
   const idMetaTag = Array.from(docTree.head.children).find(
-    metaTag => metaTag.getAttribute('name') === '_id'
+    (metaTag) => metaTag.getAttribute('name') === '_id'
   )
   const id = idMetaTag?.getAttribute('content')
   expect(id).toEqual(documentLevelArticle._id)
@@ -59,7 +55,7 @@ test('Contains metadata field containing document revision', () => {
   const serialized = getSerialized(documentLevelArticle, 'document')
   const docTree = getHTMLNode(serialized)
   const revMetaTag = Array.from(docTree.head.children).find(
-    metaTag => metaTag.getAttribute('name') === '_rev'
+    (metaTag) => metaTag.getAttribute('name') === '_rev'
   )
   const rev = revMetaTag?.getAttribute('content')
   expect(rev).toEqual(documentLevelArticle._rev)
@@ -69,7 +65,7 @@ test('Contains metadata field containing document type', () => {
   const serialized = getSerialized(documentLevelArticle, 'document')
   const docTree = getHTMLNode(serialized)
   const typeMetaTag = Array.from(docTree.head.children).find(
-    metaTag => metaTag.getAttribute('name') === '_type'
+    (metaTag) => metaTag.getAttribute('name') === '_type'
   )
   const type = typeMetaTag?.getAttribute('content')
   expect(type).toEqual(documentLevelArticle._type)
@@ -106,41 +102,29 @@ describe('Document-level serialization', () => {
 
     test('Top-level nested objects contain all serializable fields -- document level', () => {
       const fieldNames = getValidFields(documentLevelArticle.config)
-      const foundFieldNames = Array.from(objectField!.children).map(
-        child => child.className
-      )
+      const foundFieldNames = Array.from(objectField!.children).map((child) => child.className)
       expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
     })
 
     test('Nested object in object contains all serializable fields -- document level', () => {
-      const nestedObject = findByClass(objectField!.children, 'objectAsField')!
-        .children[0]
-      const fieldNames = getValidFields(
-        documentLevelArticle.config.objectAsField
-      )
-      const foundFieldNames = Array.from(nestedObject!.children).map(
-        child => child.className
-      )
+      const nestedObject = findByClass(objectField!.children, 'objectAsField')!.children[0]
+      const fieldNames = getValidFields(documentLevelArticle.config.objectAsField)
+      const foundFieldNames = Array.from(nestedObject!.children).map((child) => child.className)
       expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
     })
 
     test('Nested object contains accurate values -- document level', () => {
       const title = documentLevelArticle.config.title
-      const blockText = toPlainText(
-        documentLevelArticle.config.nestedArrayField
-      )
+      const blockText = toPlainText(documentLevelArticle.config.nestedArrayField)
 
       expect(objectField?.innerHTML).toContain(title)
       expect(objectField?.innerHTML).toContain(blockText)
     })
 
     test('Nested object in an object contains accurate values -- document level', () => {
-      const nestedObject = findByClass(objectField!.children, 'objectAsField')!
-        .children[0]
+      const nestedObject = findByClass(objectField!.children, 'objectAsField')!.children[0]
       const title = documentLevelArticle.config.objectAsField.title
-      const blockText = toPlainText(
-        documentLevelArticle.config.objectAsField.content
-      )
+      const blockText = toPlainText(documentLevelArticle.config.objectAsField.content)
 
       expect(nestedObject.innerHTML).toContain(title)
       expect(nestedObject.innerHTML).toContain(blockText)
@@ -151,12 +135,8 @@ describe('Document-level serialization', () => {
     const arrayField = findByClass(docTree.children, 'content')
 
     test('Array contains all serializable blocks with keys, in order -- document level', () => {
-      const origKeys = documentLevelArticle.content.map(
-        (block: Block) => block._key
-      )
-      const serializedKeys = Array.from(arrayField!.children).map(
-        block => block.id
-      )
+      const origKeys = documentLevelArticle.content.map((block: PortableTextBlock) => block._key)
+      const serializedKeys = Array.from(arrayField!.children).map((block) => block.id)
       expect(serializedKeys).toEqual(origKeys)
     })
 
@@ -175,9 +155,7 @@ describe('Document-level serialization', () => {
           (block: Record<string, any>) => block._type === 'objectField'
         )
       )
-      const foundFieldNames = Array.from(objectInArray!.children).map(
-        child => child.className
-      )
+      const foundFieldNames = Array.from(objectInArray!.children).map((child) => child.className)
       expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
     })
 
@@ -230,42 +208,30 @@ describe('Field-level serialization', () => {
 
     test('Top-level nested objects contain all serializable fields -- field level', () => {
       const fieldNames = getValidFields(fieldLevelArticle.config.en)
-      const foundFieldNames = Array.from(objectField!.children).map(
-        child => child.className
-      )
+      const foundFieldNames = Array.from(objectField!.children).map((child) => child.className)
 
       expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
     })
 
     test('Nested object in object contains all serializable fields -- field Level', () => {
-      const nestedObject = findByClass(objectField!.children, 'objectAsField')!
-        .children[0]
-      const fieldNames = getValidFields(
-        fieldLevelArticle.config.en.objectAsField
-      )
-      const foundFieldNames = Array.from(nestedObject!.children).map(
-        child => child.className
-      )
+      const nestedObject = findByClass(objectField!.children, 'objectAsField')!.children[0]
+      const fieldNames = getValidFields(fieldLevelArticle.config.en.objectAsField)
+      const foundFieldNames = Array.from(nestedObject!.children).map((child) => child.className)
       expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
     })
 
     test('Nested object contains accurate values -- field level', () => {
       const title = fieldLevelArticle.config.en.title
-      const blockText = toPlainText(
-        fieldLevelArticle.config.en.nestedArrayField
-      )
+      const blockText = toPlainText(fieldLevelArticle.config.en.nestedArrayField)
 
       expect(objectField?.innerHTML).toContain(title)
       expect(objectField?.innerHTML).toContain(blockText)
     })
 
     test('Nested object in an object contains accurate values -- field level', () => {
-      const nestedObject = findByClass(objectField!.children, 'objectAsField')!
-        .children[0]
+      const nestedObject = findByClass(objectField!.children, 'objectAsField')!.children[0]
       const title = fieldLevelArticle.config.en.objectAsField.title
-      const blockText = toPlainText(
-        fieldLevelArticle.config.en.objectAsField.content
-      )
+      const blockText = toPlainText(fieldLevelArticle.config.en.objectAsField.content)
 
       expect(nestedObject.innerHTML).toContain(title)
       expect(nestedObject.innerHTML).toContain(blockText)
@@ -285,12 +251,8 @@ describe('Field-level serialization', () => {
     const arrayField = getFieldLevelArrayField()
 
     test('Array contains all serializable blocks with keys, in order -- field level', () => {
-      const origKeys = fieldLevelArticle.content.en.map(
-        (block: Block) => block._key
-      )
-      const serializedKeys = Array.from(arrayField!.children).map(
-        block => block.id
-      )
+      const origKeys = fieldLevelArticle.content.en.map((block: PortableTextBlock) => block._key)
+      const serializedKeys = Array.from(arrayField!.children).map((block) => block.id)
       expect(serializedKeys).toEqual(origKeys)
     })
 
@@ -306,9 +268,7 @@ describe('Field-level serialization', () => {
           (block: Record<string, any>) => block._type === 'objectField'
         )
       )
-      const foundFieldNames = Array.from(objectInArray!.children).map(
-        child => child.className
-      )
+      const foundFieldNames = Array.from(objectInArray!.children).map((child) => child.className)
       expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
     })
 
@@ -329,23 +289,17 @@ describe('Field-level serialization', () => {
   })
 
   test('Nested locale fields make it to serialization, but only base lang', () => {
-    const nestedLocales = { ...fieldLevelArticle, ...nestedLanguageFields }
+    const nestedLocales = {...fieldLevelArticle, ...nestedLanguageFields}
     const serialized = getSerialized(nestedLocales, 'field')
     const docTree = getHTMLNode(serialized).body.children[0]
     const slices = findByClass(docTree.children, 'slices')
     const pageFields = findByClass(docTree.children, 'pageFields')
-    expect(slices?.innerHTML).toContain(
-      nestedLanguageFields.slices[0].en[0].children[0].text
-    )
-    expect(pageFields?.innerHTML).toContain(
-      nestedLanguageFields.pageFields.name.en
-    )
+    expect(slices?.innerHTML).toContain(nestedLanguageFields.slices[0].en[0].children[0].text)
+    expect(pageFields?.innerHTML).toContain(nestedLanguageFields.pageFields.name.en)
     expect(slices?.innerHTML).not.toContain(
       nestedLanguageFields.slices[0].fr_FR[0].children[0].text
     )
-    expect(pageFields?.innerHTML).not.toContain(
-      nestedLanguageFields.pageFields.name.fr_FR
-    )
+    expect(pageFields?.innerHTML).not.toContain(nestedLanguageFields.pageFields.name.fr_FR)
   })
 })
 
@@ -385,9 +339,7 @@ test('Custom serialization should manifest at all levels', () => {
   const requiredNestedTitle = documentLevelArticle.content.find(
     (b: Record<string, any>) => b._type === 'objectField'
   ).title
-  expect(nestedSerialized?.innerHTML).toContain(
-    createCustomInnerHTML(requiredNestedTitle)
-  )
+  expect(nestedSerialized?.innerHTML).toContain(createCustomInnerHTML(requiredNestedTitle))
 })
 
 test('Fields marked "localize: false" should not be serialized', () => {
@@ -451,7 +403,7 @@ test('Unhandled inline objects and annotations should not hinder translation flo
 
   //expect annotated object to have underlying text
   const blockWithAnnotation = Array.from(arrayField!.children).find(
-    node => node.id === '0e55995095df'
+    (node) => node.id === '0e55995095df'
   )
   const unhandledAnnotation = findByClass(
     blockWithAnnotation!.children,
@@ -486,8 +438,7 @@ test('Handled inline objects should be accurately represented per serializer', (
 
   Array.from(arrayField!.children).forEach((block: any) => {
     if (!inlineObject) {
-      inlineObject =
-        findByClass(block.children, 'childObjectField') ?? inlineObject
+      inlineObject = findByClass(block.children, 'childObjectField') ?? inlineObject
     }
   })
 
@@ -501,9 +452,7 @@ test('Handled inline objects should be accurately represented per serializer', (
     }
   })
 
-  expect(inlineObject!.innerHTML).toContain(
-    createCustomInnerHTML(inlineObjectBlock!.title)
-  )
+  expect(inlineObject!.innerHTML).toContain(createCustomInnerHTML(inlineObjectBlock!.title))
 })
 
 test('Handled annotations should be accurately represented per serializer', () => {
@@ -531,8 +480,8 @@ test('Handled annotations should be accurately represented per serializer', () =
     }
   })
 
-  inlineDocument.content.forEach((block: Block) => {
-    if (block.children) {
+  inlineDocument.content.forEach((block: PortableTextBlock) => {
+    if (block.children && Array.isArray(block.children)) {
       block.children.forEach((span: Record<string, any>) => {
         if (span.marks && span.marks.length) {
           annotationBlock = span
@@ -552,11 +501,11 @@ test('Serialized content should preserve style tags from Portable Text', () => {
   const docTree = getHTMLNode(serialized).body.children[0]
   const arrayField = findByClass(docTree.children, 'content')
   const blockH1 = documentLevelArticle.content.find(
-    (block: Block) => block.style === 'h1'
+    (block: PortableTextBlock) => block.style === 'h1'
   )
   const serializedH1 = arrayField?.querySelector('h1')
   const blockH2 = documentLevelArticle.content.find(
-    (block: Block) => block.style === 'h2'
+    (block: PortableTextBlock) => block.style === 'h2'
   )
   const serializedH2 = arrayField?.querySelector('h2')
   //TODO: test blockquote
@@ -579,33 +528,24 @@ test('Content with anonymous inline objects serializes all fields, at any depth'
   const tabs = findByClass(docTree.children, 'tabs')!.children[0]
   const config = findByClass(tabs!.children, 'config')!.children[0]
   const fieldNames = getValidFields(inlineDocumentLevelArticle.tabs.config)
-  const foundFieldNames = Array.from(config!.children).map(
-    child => child.className
-  )
+  const foundFieldNames = Array.from(config!.children).map((child) => child.className)
   expect(foundFieldNames.sort()).toEqual(fieldNames.sort())
-  const nestedObjHTML = findByClass(config!.children, 'objectAsField')!
-    .children[0]
+  const nestedObjHTML = findByClass(config!.children, 'objectAsField')!.children[0]
   const nestedObj = inlineDocumentLevelArticle.tabs.config.objectAsField
-  const nestedFieldNames = Array.from(nestedObjHTML!.children).map(
-    child => child.className
-  )
+  const nestedFieldNames = Array.from(nestedObjHTML!.children).map((child) => child.className)
   expect(nestedFieldNames.sort()).toEqual(getValidFields(nestedObj).sort())
 
   const content = findByClass(tabs!.children, 'content')!
-  const keysHTML = Array.from(content.children).map(child => child.id)
-  const keysJSON = inlineDocumentLevelArticle.tabs.content.map(
-    (child: any) => child._key
-  )
+  const keysHTML = Array.from(content.children).map((child) => child.id)
+  const keysJSON = inlineDocumentLevelArticle.tabs.content.map((child: any) => child._key)
   expect(keysHTML.sort()).toEqual(keysJSON.sort())
 
   const objectInArrayHTML = findByClass(content.children, 'objectField')
-  const objectInArrayHTMLFieldNames = Array.from(
-    objectInArrayHTML!.children
-  ).map(child => child.className)
+  const objectInArrayHTMLFieldNames = Array.from(objectInArrayHTML!.children).map(
+    (child) => child.className
+  )
   const objectInArray = inlineDocumentLevelArticle.tabs.content.find(
     (obj: any) => obj._type === 'objectField'
   )
-  expect(objectInArrayHTMLFieldNames.sort()).toEqual(
-    getValidFields(objectInArray).sort()
-  )
+  expect(objectInArrayHTMLFieldNames.sort()).toEqual(getValidFields(objectInArray).sort())
 })

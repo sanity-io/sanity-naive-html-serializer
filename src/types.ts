@@ -1,10 +1,4 @@
-import {
-  ObjectField,
-  ObjectSchemaType,
-  BlockSchemaType,
-  SanityDocument,
-  TypedObject,
-} from '@sanity/types'
+import {ObjectField, ObjectSchemaType, BlockSchemaType, SanityDocument, TypedObject} from 'sanity'
 
 import Schema from '@sanity/schema'
 
@@ -27,10 +21,7 @@ export interface Serializer {
     objFields: ObjectField[],
     stopTypes: string[]
   ) => TypedObject
-  languageObjectFieldFilter: (
-    obj: Record<string, any>,
-    baseLang: string
-  ) => Record<string, any>
+  languageObjectFieldFilter: (obj: Record<string, any>, baseLang: string) => Record<string, any>
   serializeArray: (
     fieldContent: Record<string, any>[],
     fieldName: string,

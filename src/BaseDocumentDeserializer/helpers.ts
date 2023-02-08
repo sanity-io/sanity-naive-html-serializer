@@ -1,6 +1,6 @@
-import blockTools from '@sanity/block-tools'
+import {htmlToBlocks} from '@sanity/block-tools'
 import Schema from '@sanity/schema'
-import { ObjectField } from '@sanity/types'
+import {ObjectField, PortableTextSpan, PortableTextTextBlock} from 'sanity'
 
 const defaultSchema = Schema.compile({
   name: 'default',
@@ -12,7 +12,7 @@ const defaultSchema = Schema.compile({
         {
           name: 'block',
           type: 'array',
-          of: [{ type: 'block' }],
+          of: [{type: 'block'}],
         },
       ],
     },
@@ -30,10 +30,10 @@ export const noSchemaWarning = (obj: Element) =>
 //helper to handle messy input -- take advantage
 //of blockTools' sanitizing behavior for single strings
 export const preprocess = (html: string) => {
-  const intermediateBlocks = blockTools.htmlToBlocks(
+  const intermediateBlocks = htmlToBlocks(
     `<p>${html}</p>`,
     blockContentType
-  )
+  ) as PortableTextTextBlock<PortableTextSpan>[]
   if (!intermediateBlocks.length) {
     throw new Error(`Error parsing string '${html}'`)
   }

@@ -1,27 +1,17 @@
-import { SanityDocument, TypedObject } from '@sanity/types'
-import { BaseDocumentSerializer, BaseDocumentDeserializer } from '../src'
-import {
-  customSerializers,
-  customDeserializers,
-} from '../src/BaseSerializationConfig'
-import { Block } from '@sanity/types'
+import {BaseDocumentSerializer, BaseDocumentDeserializer} from '../src'
+import {customSerializers, customDeserializers} from '../src/BaseSerializationConfig'
+import {PortableTextBlock, SanityDocument, TypedObject} from 'sanity'
 import clone from 'just-clone'
-import { TranslationLevel } from '../src/types'
+import {TranslationLevel} from '../src/types'
 
 const schema = require('./__fixtures__/schema')
 
-export const getSerialized = (
-  document: SanityDocument,
-  level: TranslationLevel
-) => {
+export const getSerialized = (document: SanityDocument, level: TranslationLevel) => {
   const serializer = BaseDocumentSerializer(schema)
   return serializer.serializeDocument(document, level)
 }
 
-export const getDeserialized = (
-  document: SanityDocument,
-  level: TranslationLevel
-) => {
+export const getDeserialized = (document: SanityDocument, level: TranslationLevel) => {
   const serialized = getSerialized(document, level)
   const deserializer = BaseDocumentDeserializer
   return deserializer.deserializeDocument(serialized.content)
@@ -29,16 +19,16 @@ export const getDeserialized = (
 
 export const getValidFields = (field: Record<string, any>) => {
   const invalidFields = ['_type', '_key']
-  return Object.keys(field).filter(key => !invalidFields.includes(key))
+  return Object.keys(field).filter((key) => !invalidFields.includes(key))
 }
 
-export const toPlainText = (blocks: Block[]) => {
+export const toPlainText = (blocks: PortableTextBlock[]) => {
   return blocks
-    .map(block => {
+    .map((block) => {
       if (block._type !== 'block' || !block.children) {
         return ''
       }
-      return block.children.map(child => child.text).join('')
+      return (block.children as Array<any>).map((child) => child.text).join('')
     })
     .join('\n\n')
 }
@@ -59,17 +49,15 @@ export const createCustomInnerHTML = (title: string) =>
 
 const additionalSerializerTypes = {
   //block and top-level tests
-  objectField: ({ value }: { value: TypedObject }) => {
+  objectField: ({value}: {value: TypedObject}) => {
     const innerText = createCustomInnerHTML(value.title as string)
-    const html = `<div class="${value._type}" id="${value._key ??
-      value._id}">${innerText}</div>`
+    const html = `<div class="${value._type}" id="${value._key ?? value._id}">${innerText}</div>`
     return html
   },
   //inline-level tests
-  childObjectField: ({ value }: { value: TypedObject }) => {
+  childObjectField: ({value}: {value: TypedObject}) => {
     const innerText = createCustomInnerHTML(value.title as string)
-    const html = `<span class="${value._type}" id="${value._key ??
-      value._id}">${innerText}</span>`
+    const html = `<span class="${value._type}" id="${value._key ?? value._id}">${innerText}</span>`
     return html
   },
 }
@@ -97,13 +85,10 @@ export const addedCustomSerializers = tempSerializers
 
 export const addedDeserializerTypes = {
   objectField: (html: HTMLElement) => {
-    const title = html.innerHTML
-      .split(':')[1]
-      .replace(/'/g, '')
-      .trim()
+    const title = html.innerHTML.split(':')[1].replace(/'/g, '').trim()
     const _type = html.className
     const _key = html.id
-    return { title, _type, _key }
+    return {title, _type, _key}
   },
 }
 
@@ -123,14 +108,11 @@ export const addedBlockDeserializers = [
         return undefined
       }
 
-      const title = el.innerHTML
-        .split(':')[1]
-        .replace(/'/g, '')
-        .trim()
+      const title = el.innerHTML.split(':')[1].replace(/'/g, '').trim()
       const _type = el.className
       const _key = el.id
 
-      return { title, _type, _key }
+      return {title, _type, _key}
     },
   },
   {

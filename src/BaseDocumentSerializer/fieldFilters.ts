@@ -1,4 +1,4 @@
-import { ObjectField, TypedObject } from '@sanity/types'
+import {ObjectField, TypedObject} from 'sanity'
 
 const META_FIELDS = ['_key', '_type', '_id']
 
@@ -7,14 +7,11 @@ const META_FIELDS = ['_key', '_type', '_id']
  * content from the base language. Works recursively, so if users
  * use this pattern several layers deep, base language fields will still be found.
  */
-export const languageObjectFieldFilter = (
-  obj: Record<string, any>,
-  baseLang: string
-) => {
+export const languageObjectFieldFilter = (obj: Record<string, any>, baseLang: string) => {
   const filterToLangField = (obj: Record<string, any>) => {
     const filteredObj: Record<string, any> = {}
     filteredObj[baseLang] = obj[baseLang]
-    META_FIELDS.forEach(field => {
+    META_FIELDS.forEach((field) => {
       if (obj[field]) {
         filteredObj[field] = obj[field]
       }
@@ -24,13 +21,13 @@ export const languageObjectFieldFilter = (
 
   const findBaseLang = (childObj: Record<string, any>): Record<string, any> => {
     const filteredObj: Record<string, any> = {}
-    META_FIELDS.forEach(field => {
+    META_FIELDS.forEach((field) => {
       if (childObj[field]) {
         filteredObj[field] = childObj[field]
       }
     })
 
-    for (let key in childObj) {
+    for (const key in childObj) {
       const value: any = childObj[key]
       //we've reached a base language field, add it to
       //what we want to send to translation
@@ -38,11 +35,7 @@ export const languageObjectFieldFilter = (
         filteredObj[key] = filterToLangField(value)
       }
       //we have an array that may have language fields in its objects
-      else if (
-        Array.isArray(value) &&
-        value.length &&
-        typeof value[0] === 'object'
-      ) {
+      else if (Array.isArray(value) && value.length && typeof value[0] === 'object') {
         //recursively find and filter for any objects that have the base language
         const validLangObjects = value.reduce((validArr, objInArray) => {
           if (objInArray._type === 'block') {
@@ -52,7 +45,7 @@ export const languageObjectFieldFilter = (
           } else {
             const filtered = findBaseLang(objInArray)
             const nonMetaFields = Object.keys(filtered).filter(
-              key => META_FIELDS.indexOf(key) === -1
+              (key) => META_FIELDS.indexOf(key) === -1
             )
             if (nonMetaFields.length) {
               validArr.push(filtered)
@@ -69,7 +62,7 @@ export const languageObjectFieldFilter = (
       else if (typeof value === 'object') {
         const nestedLangObj = findBaseLang(value)
         const nonMetaFields = Object.keys(nestedLangObj).filter(
-          key => META_FIELDS.indexOf(key) === -1
+          (key) => META_FIELDS.indexOf(key) === -1
         )
         if (nonMetaFields.length) {
           filteredObj[key] = nestedLangObj
@@ -92,7 +85,7 @@ export const fieldFilter = (
   objFields: ObjectField[],
   stopTypes: string[]
 ) => {
-  const filteredObj: TypedObject = { _type: obj._type }
+  const filteredObj: TypedObject = {_type: obj._type}
 
   const fieldFilter = (field: Record<string, any>) => {
     if (field.localize === false) {
@@ -107,11 +100,8 @@ export const fieldFilter = (
     return false
   }
 
-  const validFields = [
-    ...META_FIELDS,
-    ...objFields.filter(fieldFilter).map(field => field.name),
-  ]
-  validFields.forEach(field => {
+  const validFields = [...META_FIELDS, ...objFields.filter(fieldFilter).map((field) => field.name)]
+  validFields.forEach((field) => {
     if (obj[field]) {
       filteredObj[field] = obj[field]
     }

@@ -1,6 +1,6 @@
-import { Merger } from './types'
-import { SanityDocument } from '@sanity/types'
-import { extractWithPath, extract, arrayToJSONMatchPath } from '@sanity/mutator'
+import {Merger} from './types'
+import {SanityDocument} from 'sanity'
+import {extractWithPath, arrayToJSONMatchPath} from '@sanity/mutator'
 
 const fieldLevelMerge = (
   translatedFields: Record<string, any>,
@@ -11,7 +11,7 @@ const fieldLevelMerge = (
 ) => {
   const merged: Record<string, any> = {}
   const metaKeys = ['_rev', '_id', '_type']
-  metaKeys.forEach(metaKey => {
+  metaKeys.forEach((metaKey) => {
     if (translatedFields[metaKey]) {
       merged[metaKey] = translatedFields[metaKey]
     }
@@ -19,22 +19,20 @@ const fieldLevelMerge = (
 
   //get any field that matches the base language, because it's been translated
   const originPaths = extractWithPath(`..${baseLang}`, translatedFields)
-  originPaths.forEach(match => {
-    const origVal = extract(arrayToJSONMatchPath(match.path), baseDoc)[0]
-    const translatedVal = extract(
-      arrayToJSONMatchPath(match.path),
-      translatedFields
-    )[0]
+  originPaths.forEach((match) => {
+    const origVal = extractWithPath(arrayToJSONMatchPath(match.path), baseDoc)[0].value
+    const translatedVal = extractWithPath(arrayToJSONMatchPath(match.path), translatedFields)[0]
+      .value
     let valToPatch
     if (typeof translatedVal === 'string') {
       valToPatch = translatedVal
     } else if (Array.isArray(translatedVal) && translatedVal.length) {
-      valToPatch = reconcileArray(origVal ?? [], translatedVal)
+      valToPatch = reconcileArray((origVal as Array<any>) ?? [], translatedVal)
     } else if (
       typeof translatedVal === 'object' &&
-      Object.keys(translatedVal).length
+      Object.keys(translatedVal as Record<string, any>).length
     ) {
-      valToPatch = reconcileObject(origVal ?? {}, translatedVal)
+      valToPatch = reconcileObject(origVal ?? {}, translatedVal as Record<string, any>)
     }
     const destinationPath = [
       ...match.path.slice(0, match.path.length - 1), //cut off the "en"
@@ -57,20 +55,18 @@ const documentLevelMerge = (
 
 const reconcileArray = (origArray: any[], translatedArray: any[]) => {
   //arrays of strings don't have keys, so just replace the array and return
-  if (translatedArray && translatedArray.some(el => typeof el === 'string')) {
+  if (translatedArray && translatedArray.some((el) => typeof el === 'string')) {
     return translatedArray
   }
 
   //deep copy needed for field level patching
   const combined = JSON.parse(JSON.stringify(origArray))
 
-  translatedArray.forEach(block => {
+  translatedArray.forEach((block) => {
     if (!block._key) {
       return
     }
-    const foundBlockIdx = origArray.findIndex(
-      origBlock => origBlock._key === block._key
-    )
+    const foundBlockIdx = origArray.findIndex((origBlock) => origBlock._key === block._key)
     if (foundBlockIdx < 0) {
       console.log(
         `This block no longer exists on the original document. Was it removed? ${JSON.stringify(
@@ -95,10 +91,7 @@ const reconcileObject = (
   origObject: Record<string, any>,
   translatedObject: Record<string, any>
 ) => {
-  if (
-    typeof translatedObject !== 'object' ||
-    !Object.keys(translatedObject).length
-  ) {
+  if (typeof translatedObject !== 'object' || !Object.keys(translatedObject).length) {
     return origObject
   }
 
