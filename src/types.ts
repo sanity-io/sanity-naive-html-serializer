@@ -1,6 +1,6 @@
 import {ObjectField, ObjectSchemaType, BlockSchemaType, SanityDocument, TypedObject} from 'sanity'
 
-import Schema from '@sanity/schema'
+import {Schema} from '@sanity/schema'
 
 export type SerializedDocument = {
   name: string
@@ -62,7 +62,7 @@ export interface LegacyDeserializer {
   ) => Record<string, any> | any[]
 }
 
-export type DeserializerClosure = (schema: Schema) => LegacyDeserializer
+export type DeserializerClosure = (schema: typeof Schema) => LegacyDeserializer
 
 export interface Merger {
   fieldLevelMerge: (

@@ -1,5 +1,4 @@
-import Schema from '@sanity/schema'
-// const Schema = require('@sanity/schema')
+import {Schema} from '@sanity/schema'
 
 const arrayField = {
   name: 'arrayField',

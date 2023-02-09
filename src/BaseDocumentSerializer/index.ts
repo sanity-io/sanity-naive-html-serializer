@@ -1,19 +1,18 @@
 import {defaultStopTypes, customSerializers} from '../BaseSerializationConfig'
-import {SanityDocument, TypedObject} from 'sanity'
+import {SanityDocument, TypedObject, Schema} from 'sanity'
 import {Serializer, TranslationLevel} from '../types'
-import Schema from '@sanity/schema'
 import clone from 'just-clone'
 import {fieldFilter, languageObjectFieldFilter} from './fieldFilters'
 import {toHTML} from '@portabletext/to-html'
 
-type SerializerClosure = (schemes: Schema) => Serializer
+type SerializerClosure = (schemas: Schema) => Serializer
 const META_FIELDS = ['_key', '_type', '_id']
 
 export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
   /*
    * Helper function that allows us to get metadata (like `localize: false`) from schema fields.
    */
-  const getSchema = (name: string) => schemas._original.types.find((s) => s.name === name) as any
+  const getSchema = (name: string) => schemas?._original?.types.find((s) => s.name === name) as any
 
   const serializeObject = (
     obj: TypedObject,
