@@ -53,7 +53,7 @@
     "@sanity/mutator": "^3.3.1",
     "@sanity/schema": "3.3.1",
     "just-clone": "^6.2.0",
-    "sanity": "^3"
+    "sanity": "^3.3.1"
   },
   "devDependencies": {
     "@portabletext/types": "^2.0.2",
