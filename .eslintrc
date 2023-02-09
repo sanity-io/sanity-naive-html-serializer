@@ -4,14 +4,6 @@
     "node": true,
     "browser": true
   },
-  "extends": [
-    "sanity",
-    "sanity/typescript",
-    "sanity/react",
-    "plugin:react-hooks/recommended",
-    "plugin:prettier/recommended",
-    "@sanity/no-v2-imports"
-  ],
   "overrides": [
     {
       "files": ["test/**"],
@@ -19,5 +11,13 @@
       "extends": ["plugin:jest/recommended"],
       "rules": {"jest/prefer-expect-assertions": "off", "max-nested-callbacks": "off"}
     }
+  ],
+  "extends": [
+    "sanity",
+    "sanity/typescript",
+    "sanity/react",
+    "plugin:react-hooks/recommended",
+    "plugin:prettier/recommended",
+    "plugin:react/jsx-runtime"
   ]
 }

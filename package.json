@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:sanity-io/sanity-naive-html-serializer.git"
+    "url": "git+ssh://git@github.com/sanity-io/sanity-naive-html-serializer.git"
   },
   "license": "MIT",
   "author": "Sanity.io",
@@ -81,6 +81,7 @@
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
     "rimraf": "^4.1.2",
+    "sanity": "^3.3.1",
     "size-limit": "8.1.2",
     "styled-components": "^5.3.6",
     "ts-jest": "27.0.7",
