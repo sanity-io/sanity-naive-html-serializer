@@ -1,11 +1,10 @@
-import Schema from '@sanity/schema'
-// const Schema = require('@sanity/schema')
+import {Schema} from '@sanity/schema'
 
 const arrayField = {
   name: 'arrayField',
   title: 'Array Field',
   type: 'array',
-  of: [{ type: 'block' }, { type: 'objectField' }],
+  of: [{type: 'block'}, {type: 'objectField'}],
 }
 
 const childObjectField = {
@@ -22,7 +21,7 @@ const childObjectField = {
       name: 'content',
       title: 'Content',
       type: 'array',
-      of: [{ type: 'block' }],
+      of: [{type: 'block'}],
     },
   ],
 }
@@ -46,7 +45,7 @@ const objectField = {
       name: 'nestedArrayField',
       title: 'Nested Array Field',
       type: 'array',
-      of: [{ type: 'block' }, { type: 'childObjectField' }],
+      of: [{type: 'block'}, {type: 'childObjectField'}],
     },
   ],
 }
@@ -76,7 +75,7 @@ const documentLevelArticle = {
       name: 'tags',
       title: 'Tags',
       type: 'array',
-      of: [{ type: 'string' }],
+      of: [{type: 'string'}],
     },
     {
       name: 'hidden',
@@ -97,8 +96,8 @@ const documentLevelArticle = {
 }
 
 function createLocaleFields(locales: string[], fieldType: Record<string, any>) {
-  return locales.map(locale => ({
-    ...{ name: locale },
+  return locales.map((locale) => ({
+    ...{name: locale},
     ...fieldType,
   }))
 }
@@ -123,7 +122,7 @@ const fieldLevelArticle = {
       name: 'snippet',
       title: 'Snippet',
       type: 'object',
-      fields: createLocaleFields(['en', 'fr', 'de'], { type: 'text' }),
+      fields: createLocaleFields(['en', 'fr', 'de'], {type: 'text'}),
     },
     {
       name: 'tags',
@@ -131,7 +130,7 @@ const fieldLevelArticle = {
       type: 'object',
       fields: createLocaleFields(['en', 'fr', 'de'], {
         type: 'array',
-        of: [{ type: 'string' }],
+        of: [{type: 'string'}],
       }),
     },
     {
@@ -143,22 +142,19 @@ const fieldLevelArticle = {
       name: 'config',
       title: 'Config',
       type: 'object',
-      fields: createLocaleFields(['en', 'fr', 'de'], { type: 'objectField' }),
+      fields: createLocaleFields(['en', 'fr', 'de'], {type: 'objectField'}),
     },
     {
       name: 'content',
       title: 'Content',
       type: 'object',
-      fields: createLocaleFields(['en', 'fr', 'de'], { type: 'arrayField' }),
+      fields: createLocaleFields(['en', 'fr', 'de'], {type: 'arrayField'}),
     },
     {
       name: 'slices',
       title: 'Slices',
       type: 'array',
-      of: [
-        { type: 'localeBlock' },
-        { type: 'reference', to: [{ type: 'marketText' }] },
-      ],
+      of: [{type: 'localeBlock'}, {type: 'reference', to: [{type: 'marketText'}]}],
     },
     {
       name: 'pageFields',
@@ -172,14 +168,14 @@ const localeBlock = {
   name: 'localeBlock',
   title: 'Locale Block',
   type: 'object',
-  fields: createLocaleFields(['en', 'fr_FR', 'de_DE'], { type: 'arrayField' }),
+  fields: createLocaleFields(['en', 'fr_FR', 'de_DE'], {type: 'arrayField'}),
 }
 
 const localeString = {
   name: 'localeString',
   title: 'Locale String',
   type: 'object',
-  fields: createLocaleFields(['en', 'fr_FR', 'de_DE'], { type: 'string' }),
+  fields: createLocaleFields(['en', 'fr_FR', 'de_DE'], {type: 'string'}),
 }
 
 const pageFields = {

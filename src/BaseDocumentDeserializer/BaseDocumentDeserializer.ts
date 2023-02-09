@@ -1,37 +1,80 @@
-import blockTools from '@sanity/block-tools'
-import {
-  customDeserializers,
-  customBlockDeserializers,
-} from '../BaseSerializationConfig'
-import { Deserializer } from '../types'
-import { blockContentType, preprocess } from './helpers'
+// import {htmlToBlocks} from '@sanity/block-tools'
+import {htmlToBlocks} from '@sanity/block-tools'
+import {customDeserializers, customBlockDeserializers} from '../BaseSerializationConfig'
+import {Deserializer} from '../types'
+import {blockContentType, preprocess} from './helpers'
 
-const deserializeDocument = (
-  serializedDoc: string,
+const deserializeArray = (
+  arrayHTML: Element,
   deserializers: Record<string, any> = customDeserializers,
   blockDeserializers = customBlockDeserializers
 ) => {
-  const metadata: Record<string, any> = {}
-  const head = new DOMParser().parseFromString(serializedDoc, 'text/html').head
+  const output: any[] = []
+  const children = Array.from(arrayHTML.children)
+  children.forEach((child) => {
+    let deserializedObject: any
+    try {
+      if (child.tagName.toLowerCase() === 'span') {
+        deserializedObject = preprocess(child.innerHTML)
+      }
+      //has specific class name or data type, so it's an obj
+      else if (child.className || child.getAttribute('data-type') === 'object') {
+        //eslint-disable-next-line no-use-before-define -- this is a recursive function
+        deserializedObject = deserializeObject(child, deserializers, blockDeserializers)
+        deserializedObject._key = child.id
+      } else {
+        deserializedObject = htmlToBlocks(child.outerHTML, blockContentType, {
+          rules: blockDeserializers,
+        })[0]
+        deserializedObject._key = child.id
+      }
+    } catch (e) {
+      //eslint-disable-next-line no-console
+      console.debug(
+        `Tried to deserialize block: ${child.outerHTML} in an array but failed to identify it! Error: ${e}`
+      )
+    }
+    output.push(deserializedObject)
+  })
+  return output
+}
 
-  Array.from(head.children).forEach(metaTag => {
-    const validTags = ['_id', '_rev', '_type']
-    const metaName = metaTag.getAttribute('name')
-    if (metaName && validTags.includes(metaName)) {
-      metadata[metaName] = metaTag.getAttribute('content')
+const deserializeObject = (
+  objectHTML: Element,
+  deserializers: Record<string, any> = customDeserializers,
+  blockDeserializers = customBlockDeserializers
+) => {
+  const deserialize = deserializers.types[objectHTML.className]
+  if (deserialize) {
+    return deserialize(objectHTML)
+  }
+
+  const output: Record<string, any> = {}
+  //account for anonymous inline objects
+  if (objectHTML.className) {
+    output._type = objectHTML.className
+  }
+  const children = Array.from(objectHTML.children)
+
+  children.forEach((child) => {
+    if (child.tagName.toLowerCase() === 'span') {
+      output[child.className] = preprocess(child.innerHTML)
+    } else if (child.getAttribute('data-level') === 'field') {
+      //eslint-disable-next-line no-use-before-define -- this is a recursive function
+      const deserialized = deserializeHTML(child.outerHTML, deserializers, blockDeserializers)
+      if (deserialized && Object.keys(deserialized).length) {
+        output[child.className] = deserialized
+      } else {
+        //eslint-disable-next-line no-console
+        console.debug(
+          `Tried to deserialize block: ${child.outerHTML} in an array but failed to identify it!`
+        )
+      }
+    } else if (child.getAttribute('data-type') === 'array') {
+      output[child.className] = deserializeArray(child, deserializers, blockDeserializers)
     }
   })
-
-  const content: Record<string, any> = deserializeHTML(
-    serializedDoc,
-    deserializers,
-    blockDeserializers
-  )
-
-  return {
-    ...content,
-    ...metadata,
-  }
+  return output
 }
 
 const deserializeHTML = (
@@ -40,8 +83,7 @@ const deserializeHTML = (
   blockDeserializers: Array<any>
 ): Record<string, any> | any[] => {
   //parent node is always div with classname of field -- get its child
-  let HTMLnode = new DOMParser().parseFromString(html, 'text/html').body
-    .children[0]
+  let HTMLnode = new DOMParser().parseFromString(html, 'text/html').body.children[0]
 
   //catch embedded object as a field
   if (HTMLnode.getAttribute('data-level') === 'field') {
@@ -64,101 +106,42 @@ const deserializeHTML = (
     output = deserializeArray(HTMLnode, deserializers, blockDeserializers)
   } else {
     output = {}
-    console.debug(
-      `Tried to deserialize block ${HTMLnode.outerHTML} but failed to identify it!`
-    )
+    //eslint-disable-next-line no-console
+    console.debug(`Tried to deserialize block ${HTMLnode.outerHTML} but failed to identify it!`)
   }
 
   return output
 }
 
-const deserializeObject = (
-  objectHTML: Element,
+const deserializeDocument = (
+  serializedDoc: string,
   deserializers: Record<string, any> = customDeserializers,
   blockDeserializers = customBlockDeserializers
-) => {
-  const deserialize = deserializers.types[objectHTML.className]
-  if (deserialize) {
-    return deserialize(objectHTML)
-  }
+): Record<string, any> => {
+  const metadata: Record<string, any> = {}
+  const head = new DOMParser().parseFromString(serializedDoc, 'text/html').head
 
-  const output: Record<string, any> = {}
-  //account for anonymous inline objects
-  if (objectHTML.className) {
-    output._type = objectHTML.className
-  }
-  const children = Array.from(objectHTML.children)
-
-  children.forEach(child => {
-    if (child.tagName.toLowerCase() === 'span') {
-      output[child.className] = preprocess(child.innerHTML)
-    } else if (child.getAttribute('data-level') === 'field') {
-      const deserialized = deserializeHTML(
-        child.outerHTML,
-        deserializers,
-        blockDeserializers
-      )
-      if (deserialized && Object.keys(deserialized).length) {
-        output[child.className] = deserialized
-      } else {
-        console.debug(
-          `Tried to deserialize block: ${child.outerHTML} in an array but failed to identify it!`
-        )
-      }
-    } else if (child.getAttribute('data-type') === 'array') {
-      output[child.className] = deserializeArray(
-        child,
-        deserializers,
-        blockDeserializers
-      )
+  Array.from(head.children).forEach((metaTag) => {
+    const validTags = ['_id', '_rev', '_type']
+    const metaName = metaTag.getAttribute('name')
+    if (metaName && validTags.includes(metaName)) {
+      metadata[metaName] = metaTag.getAttribute('content')
     }
   })
-  return output
+
+  const content: Record<string, any> = deserializeHTML(
+    serializedDoc,
+    deserializers,
+    blockDeserializers
+  )
+
+  return {
+    ...content,
+    ...metadata,
+  }
 }
 
-const deserializeArray = (
-  arrayHTML: Element,
-  deserializers: Record<string, any> = customDeserializers,
-  blockDeserializers = customBlockDeserializers
-) => {
-  const output: any[] = []
-  const children = Array.from(arrayHTML.children)
-  children.forEach(child => {
-    let deserializedObject: any
-    if (child.tagName.toLowerCase() === 'span') {
-      deserializedObject = preprocess(child.innerHTML)
-    }
-    //has specific class name or data type, so it's an obj
-    else if (child.className || child.getAttribute('data-type') === 'object') {
-      deserializedObject = deserializeObject(
-        child,
-        deserializers,
-        blockDeserializers
-      )
-      deserializedObject._key = child.id
-    } else {
-      deserializedObject = blockTools.htmlToBlocks(
-        child.outerHTML,
-        blockContentType,
-        { rules: blockDeserializers }
-      )[0]
-      deserializedObject._key = child.id
-    }
-
-    if (!deserializedObject) {
-      console.debug(
-        `Tried to deserialize block: ${child.outerHTML} in an array but failed to identify it!`
-      )
-    } else {
-      output.push(deserializedObject)
-    }
-  })
-  return output
-}
-
-const BaseDocumentDeserializer: Deserializer = {
+export const BaseDocumentDeserializer: Deserializer = {
   deserializeDocument,
   deserializeHTML,
 }
-
-export default BaseDocumentDeserializer

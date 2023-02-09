@@ -3,5 +3,5 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jest-environment-jsdom',
   verbose: false,
-  silent: false
-};
+  silent: false,
+}

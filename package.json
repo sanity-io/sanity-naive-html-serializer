@@ -1,67 +1,103 @@
 {
-  "version": "2.0.6",
+  "name": "sanity-naive-html-serializer",
+  "version": "3.0.0-beta",
+  "description": "This is the source for tooling for naively turning documents and rich text fields into HTML, deserializing them, combining them with source documents, and patching them back. Ideally, this should take in objects that are in portable text, text arrays, or objects with text fields without knowing their specific names or types, and be able to patch them back without additional work on the part of the developer.",
+  "keywords": [
+    "sanity",
+    "sanity-plugin"
+  ],
+  "homepage": "https://github.com/sanity-io/sanity-naive-html-serializer#readme",
+  "bugs": {
+    "url": "https://github.com/sanity-io/sanity-naive-html-serializer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/sanity-io/sanity-naive-html-serializer.git"
+  },
   "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "author": "Sanity.io",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "source": "./src/index.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.esm.js",
+      "default": "./dist/index.esm.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "src"
+    "sanity.json",
+    "src",
+    "v2-incompatible.js"
   ],
-  "engines": {
-    "node": ">=10"
-  },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "lint": "tsdx lint src test",
+    "build": "run-s clean && plugin-kit verify-package --silent && pkg-utils build --strict && pkg-utils --strict",
+    "lint": "eslint .",
     "test": "jest",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint src test"
-    }
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": false,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
-  "name": "sanity-naive-html-serializer",
-  "author": "Sanity.io",
-  "module": "dist/sanity-naive-html-serializer.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/sanity-naive-html-serializer.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/sanity-naive-html-serializer.esm.js",
-      "limit": "10 KB"
-    }
-  ],
-  "devDependencies": {
-    "@portabletext/types": "^1.0.3",
-    "@size-limit/preset-small-lib": "7.0.8",
-    "@types/jest": "^27.4.1",
-    "husky": "4.3.8",
-    "jest": "27.3.1",
-    "jest-environment-jsdom": "27.3.1",
-    "size-limit": "7.0.8",
-    "ts-jest": "27.0.7",
-    "tsdx": "0.14.1",
-    "tslib": "2.3.1",
-    "typescript": "4.4.4"
+    "clean": "rimraf dist",
+    "format": "prettier --write --cache --ignore-unknown .",
+    "link-watch": "plugin-kit link-watch",
+    "prepublishOnly": "run-s build",
+    "watch": "pkg-utils watch --strict"
   },
   "dependencies": {
-    "@portabletext/to-html": "^1.0.3",
-    "@sanity/block-tools": "^2.11.0",
-    "@sanity/mutator": "^2.29.3",
-    "@sanity/schema": "^2.10.0",
-    "@sanity/types": "^2.11.0",
-    "just-clone": "^3.2.1"
+    "@portabletext/to-html": "^1.0.4",
+    "@sanity/block-tools": "^3.3.1",
+    "@sanity/incompatible-plugin": "^1.0.4",
+    "@sanity/mutator": "^3.3.1",
+    "@sanity/schema": "3.3.1",
+    "just-clone": "^6.2.0",
+    "sanity": "^3.3.1"
+  },
+  "devDependencies": {
+    "@portabletext/types": "^2.0.2",
+    "@sanity/eslint-config-no-v2-imports": "^0.0.1-studio-v3.3",
+    "@sanity/pkg-utils": "^2.2.4",
+    "@sanity/plugin-kit": "^3.1.4",
+    "@types/jest": "27.4.1",
+    "@types/react": "^18.0.27",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "eslint": "^8.33.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-sanity": "^6.0.0",
+    "eslint-plugin-jest": "^27.2.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "8.0.3",
+    "jest": "27.3.1",
+    "jest-environment-jsdom": "27.3.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.4",
+    "prettier-plugin-packagejson": "^2.4.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-is": "^18.2.0",
+    "rimraf": "^4.1.2",
+    "sanity": "^3.3.1",
+    "size-limit": "8.1.2",
+    "styled-components": "^5.3.6",
+    "ts-jest": "27.0.7",
+    "tslib": "2.5.0",
+    "typescript": "^4.9.5"
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "sanity": "^3"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "sanityPlugin": {
+    "verifyPackage": {
+      "packageName": false
+    }
   }
 }

@@ -1,19 +1,15 @@
-import { SanityDocument, TypedObject } from '@sanity/types'
-import { BaseDocumentSerializer, BaseDocumentDeserializer } from '../src'
-import {
-  customSerializers,
-  customDeserializers,
-} from '../src/BaseSerializationConfig'
-import { Block } from '@sanity/types'
+import {BaseDocumentSerializer, BaseDocumentDeserializer} from '../src'
+import {customSerializers, customDeserializers} from '../src/BaseSerializationConfig'
+import {PortableTextBlock, SanityDocument, TypedObject} from 'sanity'
 import clone from 'just-clone'
-import { TranslationLevel } from '../src/types'
+import {SerializedDocument, TranslationLevel} from '../src/types'
 
 const schema = require('./__fixtures__/schema')
 
 export const getSerialized = (
   document: SanityDocument,
   level: TranslationLevel
-) => {
+): SerializedDocument => {
   const serializer = BaseDocumentSerializer(schema)
   return serializer.serializeDocument(document, level)
 }
@@ -21,55 +17,42 @@ export const getSerialized = (
 export const getDeserialized = (
   document: SanityDocument,
   level: TranslationLevel
-) => {
+): Record<string, any> => {
   const serialized = getSerialized(document, level)
   const deserializer = BaseDocumentDeserializer
   return deserializer.deserializeDocument(serialized.content)
 }
 
-export const getValidFields = (field: Record<string, any>) => {
+export const getValidFields = (field: Record<string, any>): Record<string, any> => {
   const invalidFields = ['_type', '_key']
-  return Object.keys(field).filter(key => !invalidFields.includes(key))
+  return Object.keys(field).filter((key) => !invalidFields.includes(key))
 }
 
-export const toPlainText = (blocks: Block[]) => {
+export const toPlainText = (blocks: PortableTextBlock[]): string => {
   return blocks
-    .map(block => {
+    .map((block) => {
       if (block._type !== 'block' || !block.children) {
         return ''
       }
-      return block.children.map(child => child.text).join('')
+      return (block.children as Array<any>).map((child) => child.text).join('')
     })
     .join('\n\n')
 }
 
-type SerializerProps = {
-  node: Record<string, any>
-}
-
-type AnnotationProps = {
-  children: Record<string, any>[]
-  _type: string
-  _key: string
-  mark: Record<string, any>
-}
-
-export const createCustomInnerHTML = (title: string) =>
+export const createCustomInnerHTML = (title: string): string =>
   `Custom serializer works and includes title: '${title}'`
 
 const additionalSerializerTypes = {
   //block and top-level tests
-  objectField: ({ value }: { value: TypedObject }) => {
+  objectField: ({value}: {value: TypedObject}) => {
     const innerText = createCustomInnerHTML(value.title as string)
-    const html = `<div class="${value._type}" id="${value._key ??
-      value._id}">${innerText}</div>`
+    const html = `<div class="${value._type}" id="${value._key ?? value._id}">${innerText}</div>`
     return html
   },
   //inline-level tests
-  childObjectField: ({ value }: { value: TypedObject }) => {
+  childObjectField: ({value}: {value: TypedObject}) => {
     const innerText = createCustomInnerHTML(value.title as string)
-    const html = `<span class="${value._type}" id="${value._key ??
-      value._id}">${innerText}</span>`
+    const html = `<span class="${value._type}" id="${value._key ?? value._id}">${innerText}</span>`
     return html
   },
 }
@@ -96,14 +79,11 @@ tempSerializers.marks = {
 export const addedCustomSerializers = tempSerializers
 
 export const addedDeserializerTypes = {
-  objectField: (html: HTMLElement) => {
-    const title = html.innerHTML
-      .split(':')[1]
-      .replace(/'/g, '')
-      .trim()
+  objectField: (html: HTMLElement): TypedObject => {
+    const title = html.innerHTML.split(':')[1].replace(/'/g, '').trim()
     const _type = html.className
     const _key = html.id
-    return { title, _type, _key }
+    return {title, _type, _key}
   },
 }
 
@@ -117,25 +97,24 @@ export const addedCustomDeserializers = tempDeserializers
 
 export const addedBlockDeserializers = [
   {
-    //@ts-ignore
-    deserialize(el) {
+    deserialize(el: HTMLElement): TypedObject | undefined {
       if (!el.className || el.className.toLowerCase() !== 'childobjectfield') {
         return undefined
       }
 
-      const title = el.innerHTML
-        .split(':')[1]
-        .replace(/'/g, '')
-        .trim()
+      const title = el.innerHTML.split(':')[1].replace(/'/g, '').trim()
       const _type = el.className
       const _key = el.id
 
-      return { title, _type, _key }
+      return {title, _type, _key}
     },
   },
   {
-    //@ts-ignore
-    deserialize(el, next) {
+    deserialize(
+      el: HTMLElement,
+      //eslint-disable-next-line no-undef -- not picking up NodeListOf/ChildNode
+      next: (nodes: NodeListOf<ChildNode>) => any
+    ): TypedObject | undefined {
       if (!el.className || el.className.toLowerCase() !== 'annotation') {
         return undefined
       }

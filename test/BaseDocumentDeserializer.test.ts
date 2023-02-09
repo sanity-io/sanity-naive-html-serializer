@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs'
+import {readFileSync} from 'fs'
 
 import {
   addedCustomDeserializers,
@@ -7,13 +7,9 @@ import {
   addedCustomSerializers,
   addedBlockDeserializers,
 } from './helpers'
-import { Block } from '@sanity/types'
-import {
-  BaseDocumentDeserializer,
-  BaseDocumentSerializer,
-  defaultStopTypes,
-} from '../src'
-import { customBlockDeserializers } from '../src/BaseSerializationConfig'
+import {PortableTextBlock, PortableTextChild} from 'sanity'
+import {BaseDocumentDeserializer, BaseDocumentSerializer, defaultStopTypes} from '../src'
+import {customBlockDeserializers} from '../src/BaseSerializationConfig'
 
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const inlineDocumentLevelArticle = require('./__fixtures__/inlineDocumentLevelArticle')
@@ -27,10 +23,24 @@ const inlineSchema = require('./__fixtures__/inlineSchema')
 let mockTestKey = 0
 
 //needed to make snapshots happy on internal spans (where we don't track keys)
-jest.mock('@sanity/block-tools/lib/util/randomKey.js', () => {
-  return jest.fn().mockImplementation(() => {
-    return `randomKey-${++mockTestKey}`
-  })
+// const originalModule = jest.requireActual('@sanity/block-tools')
+
+jest.mock('@sanity/block-tools', () => {
+  const originalModule = jest.requireActual('@sanity/block-tools')
+  return {
+    ...originalModule,
+    //not ideal but jest.mock('@sanity/block-tools/src/util/randomKey.ts' is not working
+    htmlToBlocks: (html: string, blockContentType: any, options: any) => {
+      const blocks = originalModule.htmlToBlocks(html, blockContentType, options)
+      const newBlocks = blocks.map((block: PortableTextBlock) => {
+        const newChildren = (block.children as PortableTextChild[]).map((child) => {
+          return {...child, _key: `randomKey-${mockTestKey++}`}
+        })
+        return {...block, children: newChildren}
+      })
+      return newBlocks
+    },
+  }
 })
 
 beforeEach(() => {
@@ -91,10 +101,8 @@ test('Nested object contains accurate values -- document level', () => {
   const origBlockText = documentLevelArticle.config.nestedArrayField
   const deserializedBlockText = deserialized.config.nestedArrayField
 
-  const origKeys = origBlockText.map((block: Block) => block._key)
-  const deserializedKeys = deserializedBlockText.map(
-    (block: Block) => block._key
-  )
+  const origKeys = origBlockText.map((block: PortableTextBlock) => block._key)
+  const deserializedKeys = deserializedBlockText.map((block: PortableTextBlock) => block._key)
 
   expect(deserializedKeys.sort()).toEqual(origKeys.sort())
   expect(toPlainText(deserializedBlockText)).toEqual(toPlainText(origBlockText))
@@ -107,9 +115,9 @@ test('Nested object in an object contains accurate values -- document level', ()
 
   expect(origNestedObject.title).toEqual(deserializedNestedObject.title)
 
-  const origKeys = origNestedObject.content.map((block: Block) => block._key)
+  const origKeys = origNestedObject.content.map((block: PortableTextBlock) => block._key)
   const deserializedKeys = deserializedNestedObject.content.map(
-    (block: Block) => block._key
+    (block: PortableTextBlock) => block._key
   )
 
   expect(origKeys.sort()).toEqual(deserializedKeys.sort())
@@ -124,20 +132,14 @@ test('Nested object in an object contains accurate values -- document level', ()
 
 test('Array contains all serializable blocks with keys, in order -- document level', () => {
   const deserialized = getDeserialized(documentLevelArticle, 'document')
-  const origKeys = documentLevelArticle.content.map(
-    (block: Block) => block._key
-  )
-  const deserializedKeys = deserialized.content.map(
-    (block: Block) => block._key
-  )
+  const origKeys = documentLevelArticle.content.map((block: PortableTextBlock) => block._key)
+  const deserializedKeys = deserialized.content.map((block: PortableTextBlock) => block._key)
   expect(deserializedKeys.sort()).toEqual(origKeys.sort())
 })
 
 test('Array contains top-level block text -- document level', () => {
   const deserialized = getDeserialized(documentLevelArticle, 'document')
-  expect(toPlainText(deserialized.content)).toEqual(
-    toPlainText(documentLevelArticle.content)
-  )
+  expect(toPlainText(deserialized.content)).toEqual(toPlainText(documentLevelArticle.content))
 })
 
 test('Object in array contains accurate values in nested object -- document level', () => {
@@ -151,14 +153,12 @@ test('Object in array contains accurate values in nested object -- document leve
   expect(deserializedTitle).toEqual(origTitle)
 
   const origBlockText = toPlainText(
-    documentLevelArticle.content.find(
-      (block: Record<string, any>) => block._type === 'objectField'
-    ).objectAsField.content
+    documentLevelArticle.content.find((block: Record<string, any>) => block._type === 'objectField')
+      .objectAsField.content
   ).trim()
   const deserializedBlockText = toPlainText(
-    documentLevelArticle.content.find(
-      (block: Record<string, any>) => block._type === 'objectField'
-    ).objectAsField.content
+    documentLevelArticle.content.find((block: Record<string, any>) => block._type === 'objectField')
+      .objectAsField.content
   ).trim()
   expect(deserializedBlockText).toEqual(origBlockText)
 })
@@ -189,10 +189,8 @@ test('Nested object contains accurate values -- field level', () => {
   const origBlockText = fieldLevelArticle.config.en.nestedArrayField
   const deserializedBlockText = deserialized.config.en.nestedArrayField
 
-  const origKeys = origBlockText.map((block: Block) => block._key)
-  const deserializedKeys = deserializedBlockText.map(
-    (block: Block) => block._key
-  )
+  const origKeys = origBlockText.map((block: PortableTextBlock) => block._key)
+  const deserializedKeys = deserializedBlockText.map((block: PortableTextBlock) => block._key)
 
   expect(deserializedKeys.sort()).toEqual(origKeys.sort())
   expect(toPlainText(deserializedBlockText)).toEqual(toPlainText(origBlockText))
@@ -205,9 +203,9 @@ test('Nested object in an object contains accurate values -- field level', () =>
 
   expect(origNestedObject.title).toEqual(deserializedNestedObject.title)
 
-  const origKeys = origNestedObject.content.map((block: Block) => block._key)
+  const origKeys = origNestedObject.content.map((block: PortableTextBlock) => block._key)
   const deserializedKeys = deserializedNestedObject.content.map(
-    (block: Block) => block._key
+    (block: PortableTextBlock) => block._key
   )
 
   expect(origKeys.sort()).toEqual(deserializedKeys.sort())
@@ -222,23 +220,17 @@ test('Nested object in an object contains accurate values -- field level', () =>
 
 test('Array contains all serializable blocks with keys, in order -- field level', () => {
   const deserialized = getDeserialized(fieldLevelArticle, 'field')
-  const origKeys = fieldLevelArticle.content.en.map(
-    (block: Block) => block._key
-  )
-  const deserializedKeys = deserialized.content.en.map(
-    (block: Block) => block._key
-  )
+  const origKeys = fieldLevelArticle.content.en.map((block: PortableTextBlock) => block._key)
+  const deserializedKeys = deserialized.content.en.map((block: PortableTextBlock) => block._key)
   expect(deserializedKeys.sort()).toEqual(origKeys.sort())
 })
 
 test('Array contains top-level block text -- field level', () => {
   const deserialized = getDeserialized(fieldLevelArticle, 'field')
-  expect(toPlainText(deserialized.content.en)).toEqual(
-    toPlainText(fieldLevelArticle.content.en)
-  )
+  expect(toPlainText(deserialized.content.en)).toEqual(toPlainText(fieldLevelArticle.content.en))
 })
 
-test('Object in array contains accurate values in nested object -- document level', () => {
+test('Object in array contains accurate values in nested object -- field level', () => {
   const deserialized = getDeserialized(fieldLevelArticle, 'field')
   const origTitle = fieldLevelArticle.content.en.find(
     (block: Record<string, any>) => block._type === 'objectField'
@@ -249,14 +241,12 @@ test('Object in array contains accurate values in nested object -- document leve
   expect(deserializedTitle).toEqual(origTitle)
 
   const origBlockText = toPlainText(
-    fieldLevelArticle.content.en.find(
-      (block: Record<string, any>) => block._type === 'objectField'
-    ).objectAsField.content
+    fieldLevelArticle.content.en.find((block: Record<string, any>) => block._type === 'objectField')
+      .objectAsField.content
   ).trim()
   const deserializedBlockText = toPlainText(
-    fieldLevelArticle.content.en.find(
-      (block: Record<string, any>) => block._type === 'objectField'
-    ).objectAsField.content
+    fieldLevelArticle.content.en.find((block: Record<string, any>) => block._type === 'objectField')
+      .objectAsField.content
   ).trim()
   expect(deserializedBlockText).toEqual(origBlockText)
 })
@@ -364,8 +354,8 @@ test('Handled annotations should be accurately deserialized', () => {
   let origAnnotation: Record<string, any> | null = null
   let deserializedAnnotation: Record<string, any> | null = null
 
-  inlineDocument.content.forEach((block: Block) => {
-    if (block.children) {
+  inlineDocument.content.forEach((block: PortableTextBlock) => {
+    if (block.children && Array.isArray(block.children)) {
       block.children.forEach((span: Record<string, any>) => {
         if (span.marks && span.marks.length) {
           origAnnotation = span
@@ -374,8 +364,8 @@ test('Handled annotations should be accurately deserialized', () => {
     }
   })
 
-  deserialized.content.forEach((block: Block) => {
-    if (block.children) {
+  deserialized.content.forEach((block: PortableTextBlock) => {
+    if (block.children && Array.isArray(block.children)) {
       block.children.forEach((span: Record<string, any>) => {
         if (span.marks && span.marks.length) {
           deserializedAnnotation = span
@@ -393,16 +383,16 @@ test('Handled annotations should be accurately deserialized', () => {
 test('Deserialized content should preserve style tags', () => {
   const deserialized = getDeserialized(documentLevelArticle, 'document')
   const origH1 = documentLevelArticle.content.find(
-    (block: Block) => block.style === 'h1'
+    (block: PortableTextBlock) => block.style === 'h1'
   )
   const deserializedH1 = deserialized.content.find(
-    (block: Block) => block.style === 'h1'
+    (block: PortableTextBlock) => block.style === 'h1'
   )
   const origH2 = documentLevelArticle.content.find(
-    (block: Block) => block.style === 'h2'
+    (block: PortableTextBlock) => block.style === 'h2'
   )
   const deserializedH2 = deserialized.content.find(
-    (block: Block) => block.style === 'h2'
+    (block: PortableTextBlock) => block.style === 'h2'
   )
   expect(deserializedH1).toBeDefined()
   expect(deserializedH2).toBeDefined()
@@ -413,7 +403,7 @@ test('Deserialized content should preserve style tags', () => {
 })
 
 test('Content with custom styles deserializes correctly and maintains style', () => {
-  //unhandled style will throw a warn -- ignore it in this case
+  //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
   jest.spyOn(console, 'warn').mockImplementation(() => {})
 
   const customStyledDocument = {
@@ -426,24 +416,20 @@ test('Content with custom styles deserializes correctly and maintains style', ()
     'document'
   )
 
-  const deserialized = BaseDocumentDeserializer.deserializeDocument(
-    serialized.content
-  )
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(serialized.content)
 
   expect(deserialized.content[0].children[0].text).toEqual(
     customStyledDocument.content[0].children[0].text
   )
 
-  expect(deserialized.content[0].style).toEqual(
-    customStyledDocument.content[0].style
-  )
+  expect(deserialized.content[0].style).toEqual(customStyledDocument.content[0].style)
 })
 
 /*
  * MESSY INPUT
  */
 test('&nbsp; whitespace should not be escaped', () => {
-  //unhandled field will throw a warn -- ignore it in this case
+  //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
   jest.spyOn(console, 'debug').mockImplementation(() => {})
 
   const content = readFileSync('test/__fixtures__/messy-html.html', {
@@ -451,16 +437,14 @@ test('&nbsp; whitespace should not be escaped', () => {
   })
   const result = BaseDocumentDeserializer.deserializeDocument(content)
   expect(result.title).toEqual('Här är artikel titeln')
-  expect(result.content[1].nestedArrayField[0].title).toEqual(
-    'Det här är en dragspels titeln'
-  )
+  expect(result.content[1].nestedArrayField[0].title).toEqual('Det här är en dragspels titeln')
 })
 
 /*
  * V2 functionality -- be able to operate without a strict schema
  */
 test('Content with anonymous inline objects deserializes all fields, at any depth', () => {
-  //unhandled field will throw a warn -- ignore it in this case
+  //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
   jest.spyOn(console, 'debug').mockImplementation(() => {})
 
   const serialized = BaseDocumentSerializer(inlineSchema).serializeDocument(
@@ -468,20 +452,13 @@ test('Content with anonymous inline objects deserializes all fields, at any dept
     'document'
   )
 
-  const deserialized = BaseDocumentDeserializer.deserializeDocument(
-    serialized.content
-  )
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(serialized.content)
   //object in field
-  expect(deserialized.tabs.config.title).toEqual(
-    inlineDocumentLevelArticle.tabs.config.title
-  )
+  expect(deserialized.tabs.config.title).toEqual(inlineDocumentLevelArticle.tabs.config.title)
 
   //array in object in object
-  expect(
-    deserialized.tabs.config.objectAsField.content[0].children[0].text
-  ).toEqual(
-    inlineDocumentLevelArticle.tabs.config.objectAsField.content[0].children[0]
-      .text
+  expect(deserialized.tabs.config.objectAsField.content[0].children[0].text).toEqual(
+    inlineDocumentLevelArticle.tabs.config.objectAsField.content[0].children[0].text
   )
 
   //arrays
