@@ -1,12 +1,12 @@
 import {defaultStopTypes, customSerializers} from '../BaseSerializationConfig'
 import {SanityDocument, TypedObject, Schema} from 'sanity'
 import {Serializer, TranslationLevel} from '../types'
-// import clone from 'just-clone'
+import clone from 'just-clone'
 import {fieldFilter, languageObjectFieldFilter} from './fieldFilters'
 import {toHTML} from '@portabletext/to-html'
 
 type SerializerClosure = (schemas: Schema) => Serializer
-const META_FIELDS = ['_key', '_type', '_id']
+const META_FIELDS = ['_key', '_type', '_id', '_weak']
 
 export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
   /*
@@ -32,8 +32,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
 
     //we modify the serializers to send it to blocksToHTML
     //but we don't want those changes to persist for each block, so we clone
-    // const tempSerializers = clone(serializers)
-    const tempSerializers = {...serializers}
+    const tempSerializers = clone(serializers)
 
     //if it's a custom object, iterate through its keys to find and serialize translatable content
     if (obj._type !== 'span' && obj._type !== 'block') {
@@ -183,7 +182,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         serializedFields[key] = value
       } else if (Array.isArray(value)) {
         serializedFields[key] = serializeArray(value, key, stopTypes, serializers)
-      } else {
+      } else if (value && !stopTypes.find((stopType) => stopType == value?._type)) {
         const serialized = serializeObject(value as TypedObject, stopTypes, serializers)
         serializedFields[key] = `<div class="${key}" data-level='field'>${serialized}</div>`
       }
