@@ -41,37 +41,41 @@ test('Global test of working field-level functionality and snapshot match', () =
 /*
  * metadata presence
  */
-test('Contains metadata field containing document id', () => {
+describe('Metadata presence', () => {
   const serialized = getSerialized(documentLevelArticle, 'document')
   const docTree = getHTMLNode(serialized)
-  const idMetaTag = Array.from(docTree.head.children).find(
-    (metaTag) => metaTag.getAttribute('name') === '_id'
-  )
-  const id = idMetaTag?.getAttribute('content')
-  expect(id).toEqual(documentLevelArticle._id)
-})
+  test('Contains metadata field containing document id', () => {
+    const idMetaTag = Array.from(docTree.head.children).find(
+      (metaTag) => metaTag.getAttribute('name') === '_id'
+    )
+    const id = idMetaTag?.getAttribute('content')
+    expect(id).toEqual(documentLevelArticle._id)
+  })
 
-test('Contains metadata field containing document revision', () => {
-  const serialized = getSerialized(documentLevelArticle, 'document')
-  const docTree = getHTMLNode(serialized)
-  const revMetaTag = Array.from(docTree.head.children).find(
-    (metaTag) => metaTag.getAttribute('name') === '_rev'
-  )
-  const rev = revMetaTag?.getAttribute('content')
-  expect(rev).toEqual(documentLevelArticle._rev)
-})
+  test('Contains metadata field containing document revision', () => {
+    const revMetaTag = Array.from(docTree.head.children).find(
+      (metaTag) => metaTag.getAttribute('name') === '_rev'
+    )
+    const rev = revMetaTag?.getAttribute('content')
+    expect(rev).toEqual(documentLevelArticle._rev)
+  })
 
-test('Contains metadata field containing document type', () => {
-  const serialized = getSerialized(documentLevelArticle, 'document')
-  const docTree = getHTMLNode(serialized)
-  const typeMetaTag = Array.from(docTree.head.children).find(
-    (metaTag) => metaTag.getAttribute('name') === '_type'
-  )
-  const type = typeMetaTag?.getAttribute('content')
-  expect(type).toEqual(documentLevelArticle._type)
-})
+  test('Contains metadata field containing document type', () => {
+    const typeMetaTag = Array.from(docTree.head.children).find(
+      (metaTag) => metaTag.getAttribute('name') === '_type'
+    )
+    const type = typeMetaTag?.getAttribute('content')
+    expect(type).toEqual(documentLevelArticle._type)
+  })
 
-//TODO: version meta
+  test('Contains metadata field containing version', () => {
+    const typeMetaTag = Array.from(docTree.head.children).find(
+      (metaTag) => metaTag.getAttribute('name') === 'version'
+    )
+    const version = typeMetaTag?.getAttribute('content')
+    expect(version).toEqual('3')
+  })
+})
 
 /*
  * DOCUMENT LEVEL
@@ -195,9 +199,6 @@ describe('Field-level serialization', () => {
 
   describe('Presence and accuracy of fields in "vanilla" deserialization -- objects', () => {
     const getFieldLevelObjectField = () => {
-      const serialized = getSerialized(fieldLevelArticle, 'field')
-      //parent node is always div with classname of field -- get its children
-      const docTree = getHTMLNode(serialized).body.children[0]
       const config = findByClass(docTree.children, 'config')?.children[0]
       //return english field
       const englishConfig = findByClass(config!.children, 'en')
@@ -243,8 +244,6 @@ describe('Field-level serialization', () => {
    */
   describe('Presence and accurancy of fields in "vanilla" deserialization -- arrays', () => {
     const getFieldLevelArrayField = () => {
-      const serialized = getSerialized(fieldLevelArticle, 'field')
-      const docTree = getHTMLNode(serialized).body.children[0]
       const content = findByClass(docTree.children, 'content')?.children[0]
       return findByClass(content!.children, 'en')
     }
@@ -290,10 +289,10 @@ describe('Field-level serialization', () => {
 
   test('Nested locale fields make it to serialization, but only base lang', () => {
     const nestedLocales = {...fieldLevelArticle, ...nestedLanguageFields}
-    const serialized = getSerialized(nestedLocales, 'field')
-    const docTree = getHTMLNode(serialized).body.children[0]
-    const slices = findByClass(docTree.children, 'slices')
-    const pageFields = findByClass(docTree.children, 'pageFields')
+    const nestedSerialized = getSerialized(nestedLocales, 'field')
+    const nestedDocTree = getHTMLNode(nestedSerialized).body.children[0]
+    const slices = findByClass(nestedDocTree.children, 'slices')
+    const pageFields = findByClass(nestedDocTree.children, 'pageFields')
     expect(slices?.innerHTML).toContain(nestedLanguageFields.slices[0].en[0].children[0].text)
     expect(pageFields?.innerHTML).toContain(nestedLanguageFields.pageFields.name.en)
     expect(slices?.innerHTML).not.toContain(
@@ -390,7 +389,7 @@ test('Expect custom stop types to be absent at all levels', () => {
  */
 
 test('Unhandled inline objects and annotations should not hinder translation flows', () => {
-  //unhandled will throw a warn -- ignore it in this case
+  //eslint-disable-next-line no-empty-function -- we're just silencing the console.warn
   jest.spyOn(console, 'warn').mockImplementation(() => {})
 
   const inlineDocument = {
@@ -508,7 +507,7 @@ test('Serialized content should preserve style tags from Portable Text', () => {
     (block: PortableTextBlock) => block.style === 'h2'
   )
   const serializedH2 = arrayField?.querySelector('h2')
-  //TODO: test blockquote
+  //include quote style for completeness
   expect(serializedH1).toBeDefined()
   expect(serializedH2).toBeDefined()
   expect(serializedH1?.innerHTML).toEqual(blockH1.children[0].text)

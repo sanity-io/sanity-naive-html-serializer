@@ -230,7 +230,7 @@ test('Array contains top-level block text -- field level', () => {
   expect(toPlainText(deserialized.content.en)).toEqual(toPlainText(fieldLevelArticle.content.en))
 })
 
-test('Object in array contains accurate values in nested object -- document level', () => {
+test('Object in array contains accurate values in nested object -- field level', () => {
   const deserialized = getDeserialized(fieldLevelArticle, 'field')
   const origTitle = fieldLevelArticle.content.en.find(
     (block: Record<string, any>) => block._type === 'objectField'
@@ -403,7 +403,7 @@ test('Deserialized content should preserve style tags', () => {
 })
 
 test('Content with custom styles deserializes correctly and maintains style', () => {
-  //unhandled style will throw a warn -- ignore it in this case
+  //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
   jest.spyOn(console, 'warn').mockImplementation(() => {})
 
   const customStyledDocument = {
@@ -429,7 +429,7 @@ test('Content with custom styles deserializes correctly and maintains style', ()
  * MESSY INPUT
  */
 test('&nbsp; whitespace should not be escaped', () => {
-  //unhandled field will throw a warn -- ignore it in this case
+  //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
   jest.spyOn(console, 'debug').mockImplementation(() => {})
 
   const content = readFileSync('test/__fixtures__/messy-html.html', {
@@ -444,7 +444,7 @@ test('&nbsp; whitespace should not be escaped', () => {
  * V2 functionality -- be able to operate without a strict schema
  */
 test('Content with anonymous inline objects deserializes all fields, at any depth', () => {
-  //unhandled field will throw a warn -- ignore it in this case
+  //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
   jest.spyOn(console, 'debug').mockImplementation(() => {})
 
   const serialized = BaseDocumentSerializer(inlineSchema).serializeDocument(

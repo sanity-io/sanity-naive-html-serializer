@@ -8,6 +8,7 @@ import {
 
 import {htmlToBlocks} from '@sanity/block-tools'
 import {blockContentType} from './BaseDocumentDeserializer/helpers'
+import {PortableTextTextBlock, TypedObject} from 'sanity'
 
 export const defaultStopTypes = [
   'reference',
@@ -64,7 +65,7 @@ export const customDeserializers: Record<string, any> = {types: {}}
 export const customBlockDeserializers: Array<any> = [
   //handle undeclared styles
   {
-    deserialize(el: HTMLParagraphElement) {
+    deserialize(el: HTMLParagraphElement): PortableTextTextBlock | TypedObject | undefined {
       if (!el.hasChildNodes()) {
         return undefined
       }
@@ -73,7 +74,7 @@ export const customBlockDeserializers: Array<any> = [
         return undefined
       }
 
-      const style = el.getAttribute('data-style')
+      const style = el.getAttribute('data-style') ?? ''
       const block = htmlToBlocks(el.outerHTML, blockContentType)[0]
 
       return {

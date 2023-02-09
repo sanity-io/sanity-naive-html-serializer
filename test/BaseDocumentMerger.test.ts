@@ -5,7 +5,6 @@ import {getDeserialized} from './helpers'
 const documentLevelArticle = require('./__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('./__fixtures__/fieldLevelArticle')
 const nestedLanguageFields = require('./__fixtures__/nestedLanguageFields')
-import * as blockTools from '@sanity/block-tools'
 
 let mockTestKey = 0
 
@@ -109,29 +108,34 @@ describe('Document level merging', () => {
   })
 
   test('Arrays will merge objects in the array', () => {
-    const newDocument = getNewDocument()
-    const newObject = getNewObject()
+    const documentWithIncompleteObj = getNewDocument()
+    const incompleteObj = getNewObject()
 
     //add a new block with some new content, but not all new content
-    newDocument.content.push({
+    documentWithIncompleteObj.content.push({
       _key: documentLevelArticle.content[1]._key,
-      objectAsField: newObject.objectAsField,
-      title: newObject.title,
+      objectAsField: incompleteObj.objectAsField,
+      title: incompleteObj.title,
     })
-    const mergedDocument = BaseDocumentMerger.documentLevelMerge(newDocument, documentLevelArticle)
+    const documentWithMergedObj = BaseDocumentMerger.documentLevelMerge(
+      documentWithIncompleteObj,
+      documentLevelArticle
+    )
 
-    expect(mergedDocument.content[1].title).toEqual(newDocument.content[1].title)
-    expect(mergedDocument.content[1].objectAsField.title).toEqual(
-      newDocument.content[1].objectAsField.title
+    expect(documentWithMergedObj.content[1].title).toEqual(
+      documentWithIncompleteObj.content[1].title
+    )
+    expect(documentWithMergedObj.content[1].objectAsField.title).toEqual(
+      documentWithIncompleteObj.content[1].objectAsField.title
     )
     //content existed on old doc but not new, so the two coexist happily
-    expect(newDocument.content[1].objectAsField.content).toBeUndefined()
-    expect(mergedDocument.content[1].objectAsField.content).toBeDefined()
+    expect(documentWithIncompleteObj.content[1].objectAsField.content).toBeUndefined()
+    expect(documentWithMergedObj.content[1].objectAsField.content).toBeDefined()
   })
 })
 
 /*
- * FIELD LEVEL -- todo (field level merge just wraps the other tested functions)
+ * field level tests not prioritized, since field level func merge just wraps other tested functions.
  */
 
 const getNewFieldLevelObject = () => {
@@ -216,50 +220,57 @@ describe('Field level merging', () => {
   })
 
   test('Arrays will merge objects in the array', () => {
-    const newDocument = getNewFieldLevelDocument()
-    const newObject = getNewObject()
+    const documentWithIncompleteObj = getNewFieldLevelDocument()
+    const incompleteObj = getNewObject()
 
     //add a new block with some new content, but not all new content
-    newDocument.content.en.push({
+    documentWithIncompleteObj.content.en.push({
       _key: fieldLevelArticle.content.en[1]._key,
-      objectAsField: newObject.objectAsField,
-      title: newObject.title,
+      objectAsField: incompleteObj.objectAsField,
+      title: incompleteObj.title,
       //does not include "content" field -- we want that to be merged with the old
     })
 
-    const fieldLevelPatches = BaseDocumentMerger.fieldLevelMerge(
-      newDocument,
+    const fieldDocWithMergedObj = BaseDocumentMerger.fieldLevelMerge(
+      documentWithIncompleteObj,
       fieldLevelArticle,
       'es_ES',
       'en'
     )
 
-    expect(fieldLevelPatches['content.es_ES'][1].title).toEqual(newDocument.content.en[1].title)
-    expect(fieldLevelPatches['content.es_ES'][1].objectAsField.title).toEqual(
-      newDocument.content.en[1].objectAsField.title
+    expect(fieldDocWithMergedObj['content.es_ES'][1].title).toEqual(
+      documentWithIncompleteObj.content.en[1].title
+    )
+    expect(fieldDocWithMergedObj['content.es_ES'][1].objectAsField.title).toEqual(
+      documentWithIncompleteObj.content.en[1].objectAsField.title
     )
     //"content" field existed on old doc but not new, so the two coexist happily
-    expect(newDocument.content.en[1].objectAsField.content).toBeUndefined()
-    expect(fieldLevelPatches['content.es_ES'][1].objectAsField.content).toBeDefined()
+    expect(documentWithIncompleteObj.content.en[1].objectAsField.content).toBeUndefined()
+    expect(fieldDocWithMergedObj['content.es_ES'][1].objectAsField.content).toBeDefined()
   })
 
   test('nested locale fields will be merged', () => {
     const newNestedFields = clone(nestedLanguageFields)
     newNestedFields.pageFields.name.en = 'This is a new page field name'
     newNestedFields.slices[0].en[0].children[0].text = 'This is new slice text'
-    const baseDocument = {...fieldLevelArticle, ...nestedLanguageFields}
-    const newDocument = getDeserialized({...fieldLevelArticle, ...newNestedFields}, 'field')
-    const fieldLevelPatches = BaseDocumentMerger.fieldLevelMerge(
-      newDocument,
-      baseDocument,
+    const baseDocumentWithNestedFields = {...fieldLevelArticle, ...nestedLanguageFields}
+    const newDocumentWithNestedFields = getDeserialized(
+      {...fieldLevelArticle, ...newNestedFields},
+      'field'
+    )
+    const nestedFieldLevelPatches = BaseDocumentMerger.fieldLevelMerge(
+      newDocumentWithNestedFields,
+      baseDocumentWithNestedFields,
       'es_ES',
       'en'
     )
 
-    expect(fieldLevelPatches['slices[0].es_ES'][0].children[0].text).toEqual(
-      newDocument.slices[0].en[0].children[0].text
+    expect(nestedFieldLevelPatches['slices[0].es_ES'][0].children[0].text).toEqual(
+      newDocumentWithNestedFields.slices[0].en[0].children[0].text
     )
-    expect(fieldLevelPatches['pageFields.name.es_ES']).toEqual(newDocument.pageFields.name.en)
+    expect(nestedFieldLevelPatches['pageFields.name.es_ES']).toEqual(
+      newDocumentWithNestedFields.pageFields.name.en
+    )
   })
 })
 

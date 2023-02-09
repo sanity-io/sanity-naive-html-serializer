@@ -118,28 +118,16 @@
     "hidden": true,
     "meta": "Do not translate this",
     "snippet": "This is text in my text field.",
-    "tags": [
-      "tag 1",
-      "tag 2",
-      "tag 3"
-    ],
+    "tags": ["tag 1", "tag 2", "tag 3"],
     "title": "My Document-Level Article",
     "arrayWithAnonymousObjects": [
       {
         "_key": "4c146e0ab346",
-        "cells": [
-          "Standard",
-          "Americas",
-          "EMEA"
-        ]
+        "cells": ["Standard", "Americas", "EMEA"]
       },
       {
         "_key": "038f8c197939",
-        "cells": [
-          "Friends",
-          "Family",
-          "Other"
-        ]
+        "cells": ["Friends", "Family", "Other"]
       }
     ]
   }
