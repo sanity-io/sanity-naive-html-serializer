@@ -12,7 +12,7 @@
 
 ## What this package solves
 
-This is not a plugin, and probably does not need to be installed independently. Instead, it is a dependency for our translation tooling. If you're using any of our `TranslationsTab` plugins and need to solve a serialization issue, you can skip to the [custom serialization guide].
+This is not a plugin, and probably does not need to be installed independently. Instead, it is a dependency for our translation tooling. If you're using any of our `TranslationsTab` plugins and need to solve a serialization issue, you can skip to the [custom serialization guide](https://github.com/sanity-io/sanity-naive-html-serializer/blob/main/docs/serialization-guide.md).
 
 ## What this package does
 
