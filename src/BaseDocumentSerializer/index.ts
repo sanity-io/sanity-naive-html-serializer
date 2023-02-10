@@ -1,11 +1,10 @@
 import {defaultStopTypes, customSerializers} from '../BaseSerializationConfig'
 import {SanityDocument, TypedObject, Schema} from 'sanity'
-import {Serializer, TranslationLevel} from '../types'
+import {TranslationLevel, SerializerClosure} from '../types'
 import clone from 'just-clone'
 import {fieldFilter, languageObjectFieldFilter} from './fieldFilters'
 import {toHTML} from '@portabletext/to-html'
 
-type SerializerClosure = (schemas: Schema) => Serializer
 const META_FIELDS = ['_key', '_type', '_id', '_weak']
 
 export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
