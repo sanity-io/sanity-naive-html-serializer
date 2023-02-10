@@ -6,7 +6,7 @@ import {fieldFilter, languageObjectFieldFilter} from './fieldFilters'
 import {toHTML} from '@portabletext/to-html'
 
 type SerializerClosure = (schemas: Schema) => Serializer
-const META_FIELDS = ['_key', '_type', '_id']
+const META_FIELDS = ['_key', '_type', '_id', '_weak']
 
 export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
   /*
@@ -37,12 +37,14 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     //if it's a custom object, iterate through its keys to find and serialize translatable content
     if (obj._type !== 'span' && obj._type !== 'block') {
       let innerHTML = ''
+
       //if schema is available, encode values in the order they're declared in the schema,
       //since this will likely be more intuitive for a translator.
       let fieldNames = Object.keys(obj)
-      if (getSchema(obj._type)) {
-        fieldNames = getSchema(obj._type)
-          .fields.map((field: Record<string, any>) => field.name)
+      const schema = getSchema(obj._type)
+      if (schema && schema.fields) {
+        fieldNames = schema.fields
+          .map((field: Record<string, any>) => field.name)
           .filter((schemaKey: string) => Object.keys(obj).includes(schemaKey))
       }
 
@@ -74,10 +76,10 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
           //this is an object in an object, serialize it first
           else {
             const embeddedObject = value as TypedObject
-            const schema = getSchema(embeddedObject._type)
+            const embeddedObjectSchema = getSchema(embeddedObject._type)
             let toTranslate = embeddedObject
-            if (schema) {
-              toTranslate = fieldFilter(embeddedObject, schema.fields, stopTypes)
+            if (embeddedObjectSchema && embeddedObjectSchema.fields) {
+              toTranslate = fieldFilter(embeddedObject, embeddedObjectSchema.fields, stopTypes)
             }
             const objHTML = serializeObject(toTranslate, stopTypes, serializers)
             htmlField = `<div class="${fieldName}" data-level="field">${objHTML}</div>`
@@ -126,7 +128,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     //not be sent to translation
     const filteredBlocks = validBlocks.map((block) => {
       const schema = getSchema(block._type)
-      if (schema) {
+      if (schema && schema.fields) {
         return fieldFilter(block, schema.fields, stopTypes)
       }
       return block
@@ -156,6 +158,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     stopTypes = defaultStopTypes,
     serializers = customSerializers
   ) => {
+    const schema = getSchema(doc._type)
     let filteredObj: Record<string, any> = {}
 
     //field level translations explicitly send over any fields that
@@ -166,7 +169,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     //otherwise, we can refer to the schema and a list of stop types
     //to determine what should not be sent
     else {
-      filteredObj = fieldFilter(doc, getSchema(doc._type).fields, stopTypes)
+      filteredObj = fieldFilter(doc, schema.fields, stopTypes)
     }
 
     const serializedFields: Record<string, any> = {}
@@ -179,7 +182,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         serializedFields[key] = value
       } else if (Array.isArray(value)) {
         serializedFields[key] = serializeArray(value, key, stopTypes, serializers)
-      } else {
+      } else if (value && !stopTypes.find((stopType) => stopType == value?._type)) {
         const serialized = serializeObject(value as TypedObject, stopTypes, serializers)
         serializedFields[key] = `<div class="${key}" data-level='field'>${serialized}</div>`
       }

@@ -57,18 +57,19 @@ const deserializeObject = (
   const children = Array.from(objectHTML.children)
 
   children.forEach((child) => {
+    //string field
     if (child.tagName.toLowerCase() === 'span') {
       output[child.className] = preprocess(child.innerHTML)
-    } else if (child.getAttribute('data-level') === 'field') {
+    }
+    //richer field, either object or array
+    else if (child.getAttribute('data-level') === 'field') {
       //eslint-disable-next-line no-use-before-define -- this is a recursive function
       const deserialized = deserializeHTML(child.outerHTML, deserializers, blockDeserializers)
       if (deserialized && Object.keys(deserialized).length) {
         output[child.className] = deserialized
       } else {
         //eslint-disable-next-line no-console
-        console.debug(
-          `Tried to deserialize block: ${child.outerHTML} in an array but failed to identify it!`
-        )
+        console.debug(`Deserializer: Skipping empty or unreadable HTML: ${child.outerHTML}`)
       }
     } else if (child.getAttribute('data-type') === 'array') {
       output[child.className] = deserializeArray(child, deserializers, blockDeserializers)
@@ -86,7 +87,7 @@ const deserializeHTML = (
   let HTMLnode = new DOMParser().parseFromString(html, 'text/html').body.children[0]
 
   //catch embedded object as a field
-  if (HTMLnode.getAttribute('data-level') === 'field') {
+  if (HTMLnode?.getAttribute('data-level') === 'field') {
     HTMLnode = HTMLnode.children[0]
   }
 

@@ -107,7 +107,7 @@ export const fieldFilter = (
 
   const validFields = [
     ...META_FIELDS,
-    ...objFields.filter(fieldFilterFunc).map((field) => field.name),
+    ...objFields?.filter(fieldFilterFunc)?.map((field) => field.name),
   ]
   validFields.forEach((field) => {
     if (obj[field]) {
