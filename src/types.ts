@@ -1,6 +1,4 @@
-import {ObjectField, ObjectSchemaType, BlockSchemaType, SanityDocument, TypedObject} from 'sanity'
-
-import {Schema} from '@sanity/schema'
+import {ObjectField, SanityDocument, TypedObject, Schema} from 'sanity'
 
 export type SerializedDocument = {
   name: string
@@ -35,6 +33,8 @@ export interface Serializer {
   ) => string
 }
 
+export type SerializerClosure = (schemas: Schema) => Serializer
+
 export interface Deserializer {
   deserializeDocument: (
     serializedDoc: string,
@@ -47,22 +47,6 @@ export interface Deserializer {
     blockDeserializers: Array<any>
   ) => Record<string, any> | any[]
 }
-
-export interface LegacyDeserializer {
-  deserializeDocument: (
-    serializedDoc: string,
-    deserializers?: Record<string, any>,
-    blockDeserializers?: Array<any>
-  ) => Record<string, any>
-  deserializeHTML: (
-    html: string,
-    target: ObjectSchemaType | BlockSchemaType,
-    deserializers: Record<string, any>,
-    blockDeserializers: Array<any>
-  ) => Record<string, any> | any[]
-}
-
-export type DeserializerClosure = (schema: typeof Schema) => LegacyDeserializer
 
 export interface Merger {
   fieldLevelMerge: (
