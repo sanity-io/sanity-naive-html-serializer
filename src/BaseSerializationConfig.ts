@@ -45,8 +45,10 @@ const defaultLists: Record<'number' | 'bullet', PortableTextListComponent> = {
   bullet: ({value, children}) => `<ul id="${value._key.replace('-parent', '')}">${children}</ul>`,
 }
 
-const defaultListItem: PortableTextListItemComponent = ({value, children}) =>
-  `<li id="${(value._key || '').replace('-parent', '')}">${children}</li>`
+const defaultListItem: PortableTextListItemComponent = ({value, children}) => {
+  const {_key, level} = value
+  return `<li id="${(_key || '').replace('-parent', '')}" data-level="${level}">${children}</li>`
+}
 
 const unknownBlockFunc: PortableTextBlockComponent = ({value, children}) =>
   `<p id="${value._key}" data-type="unknown-block-style" data-style="${value.style}">${children}</p>`
@@ -70,7 +72,7 @@ export const customBlockDeserializers: Array<any> = [
         return undefined
       }
 
-      if (!el.hasAttribute('data-type') || el.getAttribute('data-type') !== 'unknown-block-style') {
+      if (el.getAttribute('data-type') !== 'unknown-block-style') {
         return undefined
       }
 
@@ -80,6 +82,48 @@ export const customBlockDeserializers: Array<any> = [
       return {
         ...block,
         style,
+      }
+    },
+  },
+  //handle list items
+  {
+    deserialize(
+      el: HTMLParagraphElement,
+      next: (elements: Node | Node[] | NodeList) => TypedObject | TypedObject[] | undefined
+    ): PortableTextTextBlock | TypedObject | undefined {
+      if (!el.hasChildNodes()) {
+        return undefined
+      }
+
+      if (el.tagName.toLowerCase() !== 'li') {
+        return undefined
+      }
+
+      const tagsToStyle: Record<string, string> = {
+        ul: 'bullet',
+        ol: 'number',
+      }
+
+      const parent = el.parentNode as HTMLUListElement | HTMLOListElement
+      const parentTag = tagsToStyle[parent?.tagName?.toLowerCase()]
+      if (!parent || !parent.tagName || !parentTag) {
+        return undefined
+      }
+
+      const level =
+        el.getAttribute('data-level') && parseInt(el.getAttribute('data-level') || '0', 10)
+      let block = htmlToBlocks(el.outerHTML, blockContentType)[0]
+
+      //check if the object inside is also serialized -- that means it has a style
+      const regex = new RegExp(/<("[^"]*"|'[^']*'|[^'">])*>/)
+      if (regex.test(el.innerHTML)) {
+        block = htmlToBlocks(el.innerHTML, blockContentType)[0]
+      }
+      return {
+        ...block,
+        level,
+        listItem: parentTag,
+        children: next(el.childNodes),
       }
     },
   },

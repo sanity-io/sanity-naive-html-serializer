@@ -111,11 +111,63 @@
       ],
       "markDefs": [],
       "style": "h2"
+    },
+    {
+      "_key": "76e648fc3845",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "49f466bbc78c",
+          "_type": "span",
+          "marks": [],
+          "text": "Bullet 1"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "d090cd8b27d2",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "599c6991018f",
+          "_type": "span",
+          "marks": [],
+          "text": "nested bullet a"
+        }
+      ],
+      "level": 2,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "1cdffa5d50f5",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "c16eb16f01cb",
+          "_type": "span",
+          "marks": [],
+          "text": "Bullet 2"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "h2"
     }
   ],
   "hidden": true,
   "meta": "Do not translate this",
   "snippet": "This is text in my text field.",
-  "tags": ["tag 1", "tag 2", "tag 3"],
+  "tags": [
+    "tag 1",
+    "tag 2",
+    "tag 3"
+  ],
   "title": "My Document-Level Article"
 }

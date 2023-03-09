@@ -507,9 +507,6 @@ test('Serialized content should preserve style tags from Portable Text', () => {
     (block: PortableTextBlock) => block.style === 'h2'
   )
   const serializedH2 = arrayField?.querySelector('h2')
-  //include quote style for completeness
-  expect(serializedH1).toBeDefined()
-  expect(serializedH2).toBeDefined()
   expect(serializedH1?.innerHTML).toEqual(blockH1.children[0].text)
   expect(serializedH2?.innerHTML).toEqual(blockH2.children[0].text)
 })
@@ -547,4 +544,27 @@ test('Content with anonymous inline objects serializes all fields, at any depth'
     (obj: any) => obj._type === 'objectField'
   )
   expect(objectInArrayHTMLFieldNames.sort()).toEqual(getValidFields(objectInArray).sort())
+})
+
+/*
+ * LIST ITEMS
+ */
+test('Serialized content should preserve list style and depth from Portable text', () => {
+  const serialized = getSerialized(documentLevelArticle, 'document')
+  const docTree = getHTMLNode(serialized).body.children[0]
+  const arrayField = findByClass(docTree.children, 'content')
+  const listItem = documentLevelArticle.content.find(
+    (block: PortableTextBlock) => block.listItem === 'bullet' && block.style === 'h2'
+  )
+
+  const serializedListItem = arrayField?.querySelectorAll('li')[2]
+  const nestedListItem = documentLevelArticle.content.find(
+    (block: PortableTextBlock) => block.listItem === 'bullet' && block.level === 2
+  )
+  const serializedNestedListItem = arrayField?.querySelectorAll('li')[1]
+  //include quote style for completeness
+  expect(serializedListItem?.innerHTML).toContain(listItem.children[0].text)
+  expect(serializedListItem?.innerHTML).toContain('h2')
+
+  expect(serializedNestedListItem?.innerHTML).toEqual(nestedListItem.children[0].text)
 })

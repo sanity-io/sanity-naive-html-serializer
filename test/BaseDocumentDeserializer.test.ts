@@ -402,6 +402,31 @@ test('Deserialized content should preserve style tags', () => {
   expect(deserializedH2.children[0].text).toEqual(origH2.children[0].text)
 })
 
+/*
+ * LIST ITEMS
+ */
+test('Deserialized list items should prefer level and tag', () => {
+  const deserialized = getDeserialized(documentLevelArticle, 'document')
+  const origListItem = documentLevelArticle.content.find(
+    (block: PortableTextBlock) => block.listItem === 'bullet' && block.style === 'h2'
+  )
+  const deserializedListItem = deserialized.content.find(
+    (block: PortableTextBlock) => block.listItem === 'bullet' && block.style === 'h2'
+  )
+  const origNestedListItem = documentLevelArticle.content.find(
+    (block: PortableTextBlock) => block.listItem === 'bullet' && block.level === 2
+  )
+  const deserializedNestedListItem = deserialized.content.find(
+    (block: PortableTextBlock) => block.listItem === 'bullet' && block.level === 2
+  )
+  expect(deserializedListItem).toBeDefined()
+  expect(deserializedNestedListItem).toBeDefined()
+  expect(deserializedListItem._key).toEqual(origListItem._key)
+  expect(deserializedNestedListItem._key).toEqual(origNestedListItem._key)
+  expect(deserializedListItem.children[0].text).toEqual(origListItem.children[0].text)
+  expect(deserializedNestedListItem.children[0].text).toEqual(origNestedListItem.children[0].text)
+})
+
 test('Content with custom styles deserializes correctly and maintains style', () => {
   //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
   jest.spyOn(console, 'warn').mockImplementation(() => {})
