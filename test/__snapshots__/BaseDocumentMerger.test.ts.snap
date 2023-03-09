@@ -115,6 +115,54 @@ Object {
       "markDefs": Array [],
       "style": "h2",
     },
+    Object {
+      "_key": "76e648fc3845",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "49f466bbc78c",
+          "_type": "span",
+          "marks": Array [],
+          "text": "Bullet 1",
+        },
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": Array [],
+      "style": "normal",
+    },
+    Object {
+      "_key": "d090cd8b27d2",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "599c6991018f",
+          "_type": "span",
+          "marks": Array [],
+          "text": "nested bullet a",
+        },
+      ],
+      "level": 2,
+      "listItem": "bullet",
+      "markDefs": Array [],
+      "style": "normal",
+    },
+    Object {
+      "_key": "1cdffa5d50f5",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "c16eb16f01cb",
+          "_type": "span",
+          "marks": Array [],
+          "text": "Bullet 2",
+        },
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": Array [],
+      "style": "h2",
+    },
   ],
   "hidden": true,
   "meta": "Do not translate this",
@@ -179,7 +227,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-48",
+          "_key": "randomKey-62",
           "_type": "span",
           "marks": Array [],
           "text": "New block text",

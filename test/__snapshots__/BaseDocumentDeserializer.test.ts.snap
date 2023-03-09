@@ -113,6 +113,54 @@ Object {
       "markDefs": Array [],
       "style": "h2",
     },
+    Object {
+      "_key": "76e648fc3845",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "randomKey-16",
+          "_type": "span",
+          "marks": Array [],
+          "text": "Bullet 1",
+        },
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": Array [],
+      "style": "normal",
+    },
+    Object {
+      "_key": "d090cd8b27d2",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "randomKey-18",
+          "_type": "span",
+          "marks": Array [],
+          "text": "nested bullet a",
+        },
+      ],
+      "level": 2,
+      "listItem": "bullet",
+      "markDefs": Array [],
+      "style": "normal",
+    },
+    Object {
+      "_key": "1cdffa5d50f5",
+      "_type": "block",
+      "children": Array [
+        Object {
+          "_key": "randomKey-21",
+          "_type": "span",
+          "marks": Array [],
+          "text": "Bullet 2",
+        },
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": Array [],
+      "style": "h2",
+    },
   ],
   "snippet": "This is text in my text field.",
   "tags": Array [

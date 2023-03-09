@@ -60,10 +60,12 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
           //strings are either string fields or have recursively been turned
           //into HTML because they were a nested object or array
           if (typeof value === 'string') {
-            const htmlRegex = /^</
-            htmlField = value.match(htmlRegex)
-              ? value
-              : `<span class="${fieldName}">${value}</span>`
+            const htmlRegex = new RegExp(/<("[^"]*"|'[^']*'|[^'">])*>/)
+            if (htmlRegex.test(value)) {
+              htmlField = value
+            } else {
+              htmlField = `<span class="${fieldName}">${value}</span>`
+            }
           }
 
           //array fields get filtered and its children serialized
