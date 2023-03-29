@@ -91,7 +91,7 @@ export const fieldFilter = (
   obj: Record<string, any>,
   objFields: ObjectField[],
   stopTypes: string[]
-) => {
+): TypedObject => {
   const filteredObj: TypedObject = { _type: obj._type }
 
   const fieldFilter = (field: Record<string, any>) => {
@@ -106,15 +106,33 @@ export const fieldFilter = (
     }
     return false
   }
+  if (hasPossibleNameCollision(obj, objFields)) {
+    return obj as TypedObject
+  }
 
   const validFields = [
     ...META_FIELDS,
     ...objFields.filter(fieldFilter).map(field => field.name),
   ]
+
   validFields.forEach(field => {
     if (obj[field]) {
       filteredObj[field] = obj[field]
     }
   })
   return filteredObj
+}
+
+//if the object has fields that are not in the schema,
+//we should return the object as is -- it might be a name collision
+//(e.g., an inline object with the same name as a top-level one)
+export const hasPossibleNameCollision = (
+  obj: Record<string, any>,
+  objFields: ObjectField[]
+) => {
+  const objFieldNames = [...objFields.map(field => field.name)]
+  return Object.keys(obj).filter(
+    fieldName => fieldName.charAt(0) !== '_').some(
+    key => objFieldNames.indexOf(key) === -1
+  )
 }

@@ -3,7 +3,7 @@ import { SanityDocument, TypedObject } from '@sanity/types'
 import { Serializer, TranslationLevel } from '../types'
 import Schema from '@sanity/schema'
 import clone from 'just-clone'
-import { fieldFilter, languageObjectFieldFilter } from './fieldFilters'
+import { fieldFilter, hasPossibleNameCollision, languageObjectFieldFilter } from './fieldFilters'
 import { toHTML } from '@portabletext/to-html'
 
 type SerializerClosure = (schemes: Schema) => Serializer
@@ -146,7 +146,6 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     if (stopTypes.includes(obj._type)) {
       return ''
     }
-
     //if user has declared a custom serializer, use that
     //instead of this method
     const hasSerializer =
@@ -165,7 +164,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       //if schema is available, encode values in the order they're declared in the schema,
       //since this will likely be more intuitive for a translator.
       let fieldNames = Object.keys(obj)
-      if (getSchema(obj._type)) {
+      if (getSchema(obj._type) && !hasPossibleNameCollision(obj, getSchema(obj._type).fields)) {
         fieldNames = getSchema(obj._type)
           .fields.map((field: Record<string, any>) => field.name)
           .filter((schemaKey: string) => Object.keys(obj).includes(schemaKey))
@@ -226,7 +225,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       }) => {
         let div = `<div class="${value._type}"`
         if (value._key || value._id) {
-          div += `id="${value._key ?? value._id}"`
+          div += ` id="${value._key ?? value._id}" `
         }
 
         return [div, `data-type="object">${innerHTML}</div>`].join('')
@@ -241,6 +240,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         `Had issues serializing block of type "${obj._type}". Please specify a serialization method for this block in your serialization config. Received error: ${err}`
       )
     }
+
     return serializedBlock
   }
 
