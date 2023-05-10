@@ -30,6 +30,12 @@ export const noSchemaWarning = (obj: Element) =>
 //helper to handle messy input -- take advantage
 //of blockTools' sanitizing behavior for single strings
 export const preprocess = (html: string) => {
+  //sometimes users send over raw HTML strings.
+  //Preserve if that's the case -- we can't safely preprocess.
+  const htmlRegex = new RegExp(/<("[^"]*"|'[^']*'|[^'">])*>/)
+  if (html.match(htmlRegex)) {
+    return html
+  }
   const intermediateBlocks = blockTools.htmlToBlocks(
     `<p>${html}</p>`,
     blockContentType

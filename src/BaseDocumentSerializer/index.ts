@@ -182,8 +182,10 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         if (!META_FIELDS.includes(fieldName)) {
           //strings are either string fields or have recursively been turned
           //into HTML because they were a nested object or array
+          //TODO -- possibly add fieldName to regex to make precise.
           if (typeof value === 'string') {
-            const htmlRegex = /^</
+            const htmlRegex = new RegExp(/<*class=("[^"]*"|'[^']*'|[^'">])*>/)
+
             htmlField = value.match(htmlRegex)
               ? value
               : `<span class="${fieldName}">${value}</span>`
