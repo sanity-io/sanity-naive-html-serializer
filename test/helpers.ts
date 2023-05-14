@@ -1,8 +1,13 @@
 import {BaseDocumentSerializer, BaseDocumentDeserializer} from '../src'
-import {customSerializers, customDeserializers} from '../src/BaseSerializationConfig'
+import {
+  customSerializers,
+  customDeserializers,
+  customBlockDeserializers,
+} from '../src/BaseSerializationConfig'
 import {PortableTextBlock, SanityDocument, TypedObject} from 'sanity'
 import clone from 'just-clone'
 import {SerializedDocument, TranslationLevel} from '../src/types'
+const h = require('hyperscript')
 
 const schema = require('./__fixtures__/schema')
 
@@ -55,6 +60,24 @@ const additionalSerializerTypes = {
     const html = `<span class="${value._type}" id="${value._key ?? value._id}">${innerText}</span>`
     return html
   },
+  inlineImageRef: (props: any) =>
+    h(
+      'span',
+      {
+        id: props.value._ref,
+        className: 'inlineImageRef',
+      },
+      props.children
+    ).outerHTML,
+  inlineSnippet: (props: any) =>
+    h(
+      'span',
+      {
+        id: props.value._ref,
+        className: 'inlineSnippet',
+      },
+      props.children
+    ).outerHTML,
 }
 
 const tempSerializers = clone(customSerializers)
@@ -96,6 +119,7 @@ tempDeserializers.types = {
 export const addedCustomDeserializers = tempDeserializers
 
 export const addedBlockDeserializers = [
+  ...customBlockDeserializers,
   {
     deserialize(el: HTMLElement): TypedObject | undefined {
       if (!el.className || el.className.toLowerCase() !== 'childobjectfield') {
@@ -115,7 +139,7 @@ export const addedBlockDeserializers = [
       //eslint-disable-next-line no-undef -- not picking up NodeListOf/ChildNode
       next: (nodes: NodeListOf<ChildNode>) => any
     ): TypedObject | undefined {
-      if (!el.className || el.className.toLowerCase() !== 'annotation') {
+      if (!el.className || el.className?.toLowerCase() !== 'annotation') {
         return undefined
       }
 

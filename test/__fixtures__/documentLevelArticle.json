@@ -152,13 +152,29 @@
           "_key": "c16eb16f01cb",
           "_type": "span",
           "marks": [],
-          "text": "Bullet 2"
+          "text": "Styled bullet 2"
         }
       ],
       "level": 1,
       "listItem": "bullet",
       "markDefs": [],
       "style": "h2"
+    },
+    {
+      "_key": "da29f5063059",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "e3d7e3eaad54",
+          "_type": "span",
+          "marks": [],
+          "text": "Number 1"
+        }
+      ],
+      "level": 1,
+      "listItem": "number",
+      "markDefs": [],
+      "style": "h3"
     }
   ],
   "hidden": true,
