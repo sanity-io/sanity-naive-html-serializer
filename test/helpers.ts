@@ -1,5 +1,9 @@
 import {BaseDocumentSerializer, BaseDocumentDeserializer} from '../src'
-import {customSerializers, customDeserializers} from '../src/BaseSerializationConfig'
+import {
+  customSerializers,
+  customDeserializers,
+  customBlockDeserializers,
+} from '../src/BaseSerializationConfig'
 import {PortableTextBlock, SanityDocument, TypedObject} from 'sanity'
 import clone from 'just-clone'
 import {SerializedDocument, TranslationLevel} from '../src/types'
@@ -96,6 +100,7 @@ tempDeserializers.types = {
 export const addedCustomDeserializers = tempDeserializers
 
 export const addedBlockDeserializers = [
+  ...customBlockDeserializers,
   {
     deserialize(el: HTMLElement): TypedObject | undefined {
       if (!el.className || el.className.toLowerCase() !== 'childobjectfield') {
@@ -115,7 +120,7 @@ export const addedBlockDeserializers = [
       //eslint-disable-next-line no-undef -- not picking up NodeListOf/ChildNode
       next: (nodes: NodeListOf<ChildNode>) => any
     ): TypedObject | undefined {
-      if (!el.className || el.className.toLowerCase() !== 'annotation') {
+      if (!el.className || el.className?.toLowerCase() !== 'annotation') {
         return undefined
       }
 

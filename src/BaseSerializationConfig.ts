@@ -67,7 +67,10 @@ export const customDeserializers: Record<string, any> = {types: {}}
 export const customBlockDeserializers: Array<any> = [
   //handle undeclared styles
   {
-    deserialize(el: HTMLParagraphElement): PortableTextTextBlock | TypedObject | undefined {
+    deserialize(
+      el: HTMLParagraphElement,
+      next: (elements: Node | Node[] | NodeList) => TypedObject | TypedObject[] | undefined
+    ): PortableTextTextBlock | TypedObject | undefined {
       if (!el.hasChildNodes()) {
         return undefined
       }
@@ -82,6 +85,7 @@ export const customBlockDeserializers: Array<any> = [
       return {
         ...block,
         style,
+        children: next(el.childNodes),
       }
     },
   },
@@ -105,24 +109,43 @@ export const customBlockDeserializers: Array<any> = [
       }
 
       const parent = el.parentNode as HTMLUListElement | HTMLOListElement
-      const parentTag = tagsToStyle[parent?.tagName?.toLowerCase()]
-      if (!parent || !parent.tagName || !parentTag) {
+      if (!parent || !parent.tagName) {
+        return undefined
+      }
+
+      const listItem = tagsToStyle[parent.tagName.toLowerCase()]
+      if (!listItem) {
         return undefined
       }
 
       const level =
         el.getAttribute('data-level') && parseInt(el.getAttribute('data-level') || '0', 10)
-      let block = htmlToBlocks(el.outerHTML, blockContentType)[0]
+      const _key = el.id
+      let block = htmlToBlocks(parent.outerHTML, blockContentType)[0]
+      const customStyle = el.children?.[0]?.getAttribute('data-style')
 
       //check if the object inside is also serialized -- that means it has a style
+      //or custom annotation and we should use childNode serialization
       const regex = new RegExp(/<("[^"]*"|'[^']*'|[^'">])*>/)
       if (regex.test(el.innerHTML)) {
-        block = htmlToBlocks(el.innerHTML, blockContentType)[0]
+        const newBlock = htmlToBlocks(el.innerHTML, blockContentType)[0]
+        block = {
+          ...block,
+          ...newBlock,
+          style: customStyle ?? (newBlock as PortableTextTextBlock).style,
+        }
+
+        //next(childNodes) plays poorly with custom styles, issue to be filed.
+        if (customStyle) {
+          return block as PortableTextTextBlock
+        }
       }
+
       return {
         ...block,
         level,
-        listItem: parentTag,
+        _key,
+        listItem,
         children: next(el.childNodes),
       }
     },

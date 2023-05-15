@@ -283,6 +283,45 @@ test('Custom deserialization should manifest at all levels', () => {
   expect(deserializedArrayObj._key).toEqual(origArrayObj._key)
 })
 
+test('Content with custom styles deserializes correctly and maintains style', () => {
+  //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
+  jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+  const customStyledDocument = {
+    ...documentLevelArticle,
+    ...customStyles,
+  }
+
+  const serialized = BaseDocumentSerializer(schema).serializeDocument(
+    customStyledDocument,
+    'document'
+  )
+
+  const deserialized = BaseDocumentDeserializer.deserializeDocument(serialized.content)
+  const origCustomStyleBlock = customStyledDocument.content.find(
+    (b: Record<string, any>) => b._type === 'block' && b.style === 'custom1'
+  )
+  const origCustomStyleListItem = customStyledDocument.content.find(
+    (b: Record<string, any>) =>
+      b._type === 'block' && b.listItem === 'number' && b.style === 'custom1'
+  )
+  const deserializedCustomStyleBlock = deserialized.content.find(
+    (b: Record<string, any>) => b._type === 'block' && b.style === 'custom1'
+  )
+  const deserializedCustomStyleListItem = deserialized.content.find(
+    (b: Record<string, any>) =>
+      b._type === 'block' && b.listItem === 'number' && b.style === 'custom1'
+  )
+
+  expect(deserializedCustomStyleBlock.children[0].text).toEqual(
+    origCustomStyleBlock.children[0].text
+  )
+
+  expect(deserializedCustomStyleListItem.children[0].text).toEqual(
+    origCustomStyleListItem.children[0].text
+  )
+})
+
 //test -- unhandled annotations and inlines don't break when they get deserialized back
 test('Handled inline objects should be accurately deserialized', () => {
   const inlineDocument = {
@@ -304,31 +343,39 @@ test('Handled inline objects should be accurately deserialized', () => {
     addedBlockDeserializers
   )
 
-  let origInlineObj: Record<string, any> | null = null
-  let deserializedInlineObj: Record<string, any> | null = null
+  const getInlineObj = (content: PortableTextBlock[], level: number | undefined = undefined) => {
+    let child: Record<string, any> = {}
+    const blocks = content.filter((block: PortableTextBlock) => {
+      if (level) {
+        return block.level === level
+      }
+      return !block.level
+    })
 
-  inlineDocument.content.forEach((block: Record<string, any>) => {
-    if (block.children) {
-      block.children.forEach((span: Record<string, any>) => {
-        if (span._type === 'childObjectField') {
-          origInlineObj = span
-        }
-      })
-    }
-  })
+    blocks.forEach((block: PortableTextBlock) => {
+      if (block.children && Array.isArray(block.children)) {
+        child = block.children.find((span: Record<string, any>) => {
+          if (level) {
+            return span._type === 'childObjectField' && block.level === level
+          }
+          return span._type === 'childObjectField' && !block.level
+        })
+      }
+    })
 
-  deserialized.content.forEach((block: Record<string, any>) => {
-    if (block.children) {
-      block.children.forEach((span: Record<string, any>) => {
-        if (span._type === 'childObjectField') {
-          deserializedInlineObj = span
-        }
-      })
-    }
-  })
+    return child
+  }
+  const origInlineObject = getInlineObj(inlineDocument.content)
+  const origInlineListObject = getInlineObj(inlineDocument.content, 1)
 
-  expect(deserializedInlineObj!.title).toEqual(origInlineObj!.title)
-  expect(deserializedInlineObj!._type).toEqual(origInlineObj!._type)
+  const deserializedInlineObject = getInlineObj(deserialized.content)
+  const deserializedInlineListObject = getInlineObj(deserialized.content, 1)
+
+  expect(deserializedInlineObject.title).toEqual(origInlineObject.title)
+  expect(deserializedInlineObject._type).toEqual(origInlineObject._type)
+
+  expect(deserializedInlineListObject.title).toEqual(origInlineListObject.title)
+  expect(deserializedInlineListObject._type).toEqual(origInlineListObject._type)
 })
 
 test('Handled annotations should be accurately deserialized', () => {
@@ -405,7 +452,7 @@ test('Deserialized content should preserve style tags', () => {
 /*
  * LIST ITEMS
  */
-test('Deserialized list items should prefer level and tag', () => {
+test('Deserialized list items should preserve level, style and tag', () => {
   const deserialized = getDeserialized(documentLevelArticle, 'document')
   const origListItem = documentLevelArticle.content.find(
     (block: PortableTextBlock) => block.listItem === 'bullet' && block.style === 'h2'
@@ -425,29 +472,6 @@ test('Deserialized list items should prefer level and tag', () => {
   expect(deserializedNestedListItem._key).toEqual(origNestedListItem._key)
   expect(deserializedListItem.children[0].text).toEqual(origListItem.children[0].text)
   expect(deserializedNestedListItem.children[0].text).toEqual(origNestedListItem.children[0].text)
-})
-
-test('Content with custom styles deserializes correctly and maintains style', () => {
-  //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
-  jest.spyOn(console, 'warn').mockImplementation(() => {})
-
-  const customStyledDocument = {
-    ...documentLevelArticle,
-    ...customStyles,
-  }
-
-  const serialized = BaseDocumentSerializer(schema).serializeDocument(
-    customStyledDocument,
-    'document'
-  )
-
-  const deserialized = BaseDocumentDeserializer.deserializeDocument(serialized.content)
-
-  expect(deserialized.content[0].children[0].text).toEqual(
-    customStyledDocument.content[0].children[0].text
-  )
-
-  expect(deserialized.content[0].style).toEqual(customStyledDocument.content[0].style)
 })
 
 /*

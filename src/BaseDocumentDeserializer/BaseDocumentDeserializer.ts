@@ -14,7 +14,7 @@ const deserializeArray = (
   children.forEach((child) => {
     let deserializedObject: any
     try {
-      if (child.tagName.toLowerCase() === 'span') {
+      if (child.tagName?.toLowerCase() === 'span') {
         deserializedObject = preprocess(child.innerHTML)
       }
       //has specific class name or data type, so it's an obj
@@ -58,7 +58,7 @@ const deserializeObject = (
 
   children.forEach((child) => {
     //string field
-    if (child.tagName.toLowerCase() === 'span') {
+    if (child.tagName?.toLowerCase() === 'span') {
       output[child.className] = preprocess(child.innerHTML)
     }
     //richer field, either object or array

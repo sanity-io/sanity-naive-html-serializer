@@ -1,6 +1,42 @@
 {
   "content": [
     {
+      "_key": "6fe9a3ecaf0f",
+      "style": "normal",
+      "markDefs": [],
+      "_type": "block",
+      "listItem": "number",
+      "level": 1,
+      "children": [
+        {
+          "_type": "span",
+          "marks": [],
+          "text": "",
+          "_key": "47eb0224d6b5"
+        },
+        {
+          "_key": "d3dcb15f4bfe",
+          "_type": "childObjectField",
+          "title": "This is an inline object in a top-level block list"
+        }
+      ]
+    },
+    {
+      "_key": "a1b026261117",
+      "_type": "block",
+      "markDefs": [],
+      "style": "normal",
+      "level": 2,
+      "listItem": "number",
+      "children": [
+        {
+          "_key": "d3dcb15f4bfe",
+          "_type": "childObjectField",
+          "title": "This is an inline object in a nested list item"
+        }
+      ]
+    },
+    {
       "_key": "0e55995095df",
       "_type": "block",
       "children": [
@@ -13,7 +49,9 @@
         {
           "_key": "3d31216296ab",
           "_type": "span",
-          "marks": ["2f5ec56ab061"],
+          "marks": [
+            "2f5ec56ab061"
+          ],
           "text": "text"
         },
         {
