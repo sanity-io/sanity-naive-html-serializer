@@ -129,15 +129,17 @@ export const customBlockDeserializers: Array<any> = [
       const regex = new RegExp(/<("[^"]*"|'[^']*'|[^'">])*>/)
       if (regex.test(el.innerHTML)) {
         const newBlock = htmlToBlocks(el.innerHTML, blockContentType)[0]
-        block = {
-          ...block,
-          ...newBlock,
-          style: customStyle ?? (newBlock as PortableTextTextBlock).style,
-        }
+        if (newBlock) {
+          block = {
+            ...block,
+            ...newBlock,
+            style: customStyle ?? (newBlock as PortableTextTextBlock).style,
+          }
 
-        //next(childNodes) plays poorly with custom styles, issue to be filed.
-        if (customStyle) {
-          return block as PortableTextTextBlock
+          //next(childNodes) plays poorly with custom styles, issue to be filed.
+          if (customStyle) {
+            return block as PortableTextTextBlock
+          }
         }
       }
 
