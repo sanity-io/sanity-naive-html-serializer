@@ -61,7 +61,7 @@ import {
   defaultDocumentLevelConfig,
   BaseDocumentSerializer,
   BaseDocumentDeserializer,
-  BaseDocumentPatcher,
+  documentLevelPatch,
   defaultStopTypes
 } from 'whichever-sanity-plugin-translation-service-you-use'
 
@@ -81,7 +81,7 @@ const myCustomConfig = {
       document,
       myCustomDeserializer,
       myBlockDeserializationRules
-    ).then((deserialized) => BaseDocumentPatcher.documentLevelPatch(deserialized, id, localeId))
+    ).then((deserialized) => documentLevelPatch(deserialized, id, localeId))
   }
 }
 ```
