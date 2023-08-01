@@ -52,7 +52,7 @@
     "@sanity/block-tools": "^3.3.1",
     "@sanity/incompatible-plugin": "^1.0.4",
     "@sanity/mutator": "^3.3.1",
-    "@sanity/schema": "3.3.1",
+    "@sanity/schema": "3.4.0",
     "just-clone": "^6.2.0",
     "sanity": "^3"
   },
