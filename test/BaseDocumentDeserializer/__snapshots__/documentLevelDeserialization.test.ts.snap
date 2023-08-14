@@ -13,7 +13,7 @@ Object {
         "_type": "block",
         "children": Array [
           Object {
-            "_key": "randomKey-8",
+            "_key": "randomKey-16",
             "_type": "span",
             "marks": Array [],
             "text": "This is block text 1 level deep",
@@ -31,7 +31,7 @@ Object {
           "_type": "block",
           "children": Array [
             Object {
-              "_key": "randomKey-7",
+              "_key": "randomKey-14",
               "_type": "span",
               "marks": Array [],
               "text": "This is a block text 2 levels deep",
@@ -51,7 +51,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-9",
+          "_key": "randomKey-18",
           "_type": "span",
           "marks": Array [],
           "text": "This is block text at the top level.",
@@ -71,7 +71,7 @@ Object {
             "_type": "block",
             "children": Array [
               Object {
-                "_key": "randomKey-12",
+                "_key": "randomKey-24",
                 "_type": "span",
                 "marks": Array [],
                 "text": "This is block text in a nested object in an object in top-level block text.",
@@ -90,7 +90,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-13",
+          "_key": "randomKey-26",
           "_type": "span",
           "marks": Array [],
           "text": "This is h1 text",
@@ -104,7 +104,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-14",
+          "_key": "randomKey-28",
           "_type": "span",
           "marks": Array [],
           "text": "This is h2 text",
@@ -118,7 +118,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-16",
+          "_key": "randomKey-32",
           "_type": "span",
           "marks": Array [],
           "text": "Bullet 1",
@@ -134,7 +134,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-18",
+          "_key": "randomKey-36",
           "_type": "span",
           "marks": Array [],
           "text": "nested bullet a",
@@ -150,7 +150,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-21",
+          "_key": "randomKey-42",
           "_type": "span",
           "marks": Array [],
           "text": "Styled bullet 2",
@@ -166,7 +166,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-24",
+          "_key": "randomKey-48",
           "_type": "span",
           "marks": Array [],
           "text": "Number 1",
@@ -185,111 +185,5 @@ Object {
     "tag 3",
   ],
   "title": "My Document-Level Article",
-}
-`;
-
-exports[`Global test of working field-level functionality and snapshot match 1`] = `
-Object {
-  "_id": "drafts.2947533e-1ea5-4116-955b-339608d3445d",
-  "_rev": "l58oha-n06-1s4-f6i-74g6cuakl",
-  "_type": "fieldLevelArticle",
-  "config": Object {
-    "en": Object {
-      "_type": "objectField",
-      "nestedArrayField": Array [
-        Object {
-          "_key": "f49b4d7e3e51",
-          "_type": "block",
-          "children": Array [
-            Object {
-              "_key": "randomKey-8",
-              "_type": "span",
-              "marks": Array [],
-              "text": "This is block text 1 level deep",
-            },
-          ],
-          "markDefs": Array [],
-          "style": "normal",
-        },
-      ],
-      "objectAsField": Object {
-        "_type": "childObjectField",
-        "content": Array [
-          Object {
-            "_key": "869168fe3a2a",
-            "_type": "block",
-            "children": Array [
-              Object {
-                "_key": "randomKey-7",
-                "_type": "span",
-                "marks": Array [],
-                "text": "This is block text 2 levels deep",
-              },
-            ],
-            "markDefs": Array [],
-            "style": "normal",
-          },
-        ],
-        "title": "This is one level deeper",
-      },
-      "title": "This is an object nested in a document",
-    },
-  },
-  "content": Object {
-    "en": Array [
-      Object {
-        "_key": "e2a39d768ff8",
-        "_type": "block",
-        "children": Array [
-          Object {
-            "_key": "randomKey-9",
-            "_type": "span",
-            "marks": Array [],
-            "text": "This is block text at the top level.",
-          },
-        ],
-        "markDefs": Array [],
-        "style": "normal",
-      },
-      Object {
-        "_key": "271b0c6ee984",
-        "_type": "objectField",
-        "objectAsField": Object {
-          "_type": "childObjectField",
-          "content": Array [
-            Object {
-              "_key": "4f24f6fbfae7",
-              "_type": "block",
-              "children": Array [
-                Object {
-                  "_key": "randomKey-12",
-                  "_type": "span",
-                  "marks": Array [],
-                  "text": "This is block text in a nested object in an object in top-level block text.",
-                },
-              ],
-              "markDefs": Array [],
-              "style": "normal",
-            },
-          ],
-          "title": "This is a nested object in an object in top-level block text.",
-        },
-        "title": "This is an object in top-level block text.",
-      },
-    ],
-  },
-  "snippet": Object {
-    "en": "This is text in my text field",
-  },
-  "tags": Object {
-    "en": Array [
-      "tag 1",
-      "tag 2",
-      "tag 3",
-    ],
-  },
-  "title": Object {
-    "en": "My Field-Level Article",
-  },
 }
 `;
