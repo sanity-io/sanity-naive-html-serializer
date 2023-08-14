@@ -1,12 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Document level merging Global document level snapshot test 1`] = `
+exports[`Global test of working doc-level functionality and snapshot match 1`] = `
 Object {
-  "_createdAt": "2021-09-01T23:00:13Z",
   "_id": "drafts.d8ffc675-ce86-4f60-9ac8-da164cde3b0a",
   "_rev": "fxcnqj-uew-gr7-v6r-z965tfm69",
   "_type": "documentLevelArticle",
-  "_updatedAt": "2021-09-01T23:02:05Z",
   "config": Object {
     "_type": "objectField",
     "nestedArrayField": Array [
@@ -15,10 +13,10 @@ Object {
         "_type": "block",
         "children": Array [
           Object {
-            "_key": "4f6bc15ae261",
+            "_key": "bd9349720b050",
             "_type": "span",
             "marks": Array [],
-            "text": "New text",
+            "text": "This is block text 1 level deep",
           },
         ],
         "markDefs": Array [],
@@ -33,7 +31,7 @@ Object {
           "_type": "block",
           "children": Array [
             Object {
-              "_key": "e2cf67af8e62",
+              "_key": "b52e9a14c8770",
               "_type": "span",
               "marks": Array [],
               "text": "This is a block text 2 levels deep",
@@ -43,9 +41,9 @@ Object {
           "style": "normal",
         },
       ],
-      "title": "A new nested title",
+      "title": "This is one level deeper",
     },
-    "title": "A new title",
+    "title": "This is an object nested in a document",
   },
   "content": Array [
     Object {
@@ -53,10 +51,10 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "randomKey-18",
+          "_key": "fb6e52aa29020",
           "_type": "span",
           "marks": Array [],
-          "text": "New block text",
+          "text": "This is block text at the top level.",
         },
       ],
       "markDefs": Array [],
@@ -73,7 +71,7 @@ Object {
             "_type": "block",
             "children": Array [
               Object {
-                "_key": "d68f4288f5b7",
+                "_key": "f64f6c2103ea0",
                 "_type": "span",
                 "marks": Array [],
                 "text": "This is block text in a nested object in an object in top-level block text.",
@@ -92,7 +90,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "17e856dc4766",
+          "_key": "08b4c1ddefdb0",
           "_type": "span",
           "marks": Array [],
           "text": "This is h1 text",
@@ -106,7 +104,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "0b2f9e94a161",
+          "_key": "95bb4dad71d20",
           "_type": "span",
           "marks": Array [],
           "text": "This is h2 text",
@@ -120,7 +118,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "49f466bbc78c",
+          "_key": "76e648fc38450",
           "_type": "span",
           "marks": Array [],
           "text": "Bullet 1",
@@ -136,7 +134,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "599c6991018f",
+          "_key": "d090cd8b27d20",
           "_type": "span",
           "marks": Array [],
           "text": "nested bullet a",
@@ -152,7 +150,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "c16eb16f01cb",
+          "_key": "1cdffa5d50f50",
           "_type": "span",
           "marks": Array [],
           "text": "Styled bullet 2",
@@ -168,7 +166,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "e3d7e3eaad54",
+          "_key": "da29f50630590",
           "_type": "span",
           "marks": Array [],
           "text": "Number 1",
@@ -180,110 +178,12 @@ Object {
       "style": "h3",
     },
   ],
-  "hidden": true,
-  "meta": "Do not translate this",
-  "snippet": "A new document snippet",
+  "snippet": "This is text in my text field.",
   "tags": Array [
     "tag 1",
     "tag 2",
     "tag 3",
   ],
-  "title": "A new document title",
-}
-`;
-
-exports[`Field level merging Global field level snapshot test 1`] = `
-Object {
-  "_id": "drafts.2947533e-1ea5-4116-955b-339608d3445d",
-  "_rev": "l58oha-n06-1s4-f6i-74g6cuakl",
-  "_type": "fieldLevelArticle",
-  "config.es_ES": Object {
-    "_type": "objectField",
-    "nestedArrayField": Array [
-      Object {
-        "_key": "f49b4d7e3e51",
-        "_type": "block",
-        "children": Array [
-          Object {
-            "_key": "a6170f21181c",
-            "_type": "span",
-            "marks": Array [],
-            "text": "New text",
-          },
-        ],
-        "markDefs": Array [],
-        "style": "normal",
-      },
-    ],
-    "objectAsField": Object {
-      "_type": "childObjectField",
-      "content": Array [
-        Object {
-          "_key": "869168fe3a2a",
-          "_type": "block",
-          "children": Array [
-            Object {
-              "_key": "10d423df228a",
-              "_type": "span",
-              "marks": Array [],
-              "text": "This is block text 2 levels deep",
-            },
-          ],
-          "markDefs": Array [],
-          "style": "normal",
-        },
-      ],
-      "title": "A new nested title",
-    },
-    "title": "A new title",
-  },
-  "content.es_ES": Array [
-    Object {
-      "_key": "e2a39d768ff8",
-      "_type": "block",
-      "children": Array [
-        Object {
-          "_key": "randomKey-68",
-          "_type": "span",
-          "marks": Array [],
-          "text": "New block text",
-        },
-      ],
-      "markDefs": Array [],
-      "style": "normal",
-    },
-    Object {
-      "_key": "271b0c6ee984",
-      "_type": "objectField",
-      "objectAsField": Object {
-        "_type": "childObjectField",
-        "content": Array [
-          Object {
-            "_key": "4f24f6fbfae7",
-            "_type": "block",
-            "children": Array [
-              Object {
-                "_key": "d68f4288f5b7",
-                "_type": "span",
-                "marks": Array [],
-                "text": "This is block text in a nested object in an object in top-level block text.",
-              },
-            ],
-            "markDefs": Array [],
-            "style": "normal",
-          },
-        ],
-        "title": "This is a nested object in an object in top-level block text.",
-      },
-      "title": "This is an object in top-level block text.",
-    },
-  ],
-  "snippet.es_ES": "A new document snippet",
-  "tags.es_ES": Array [
-    "tag 1",
-    "tag 2",
-    "tag 3",
-  ],
-  "title.es_ES": "A new document title",
+  "title": "My Document-Level Article",
 }
 `;

@@ -4,4 +4,5 @@ module.exports = {
   testEnvironment: 'jest-environment-jsdom',
   verbose: false,
   silent: false,
+  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.ts'],
 }
