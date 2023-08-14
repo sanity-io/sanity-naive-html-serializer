@@ -14,7 +14,7 @@ Object {
           "_type": "block",
           "children": Array [
             Object {
-              "_key": "3b632da8226f0",
+              "_key": "randomKey-16",
               "_type": "span",
               "marks": Array [],
               "text": "This is block text 1 level deep",
@@ -32,7 +32,7 @@ Object {
             "_type": "block",
             "children": Array [
               Object {
-                "_key": "0943dd4620e70",
+                "_key": "randomKey-14",
                 "_type": "span",
                 "marks": Array [],
                 "text": "This is block text 2 levels deep",
@@ -54,7 +54,7 @@ Object {
         "_type": "block",
         "children": Array [
           Object {
-            "_key": "e63cb8c185a00",
+            "_key": "randomKey-18",
             "_type": "span",
             "marks": Array [],
             "text": "This is block text at the top level.",
@@ -74,7 +74,7 @@ Object {
               "_type": "block",
               "children": Array [
                 Object {
-                  "_key": "0bbf650d57490",
+                  "_key": "randomKey-24",
                   "_type": "span",
                   "marks": Array [],
                   "text": "This is block text in a nested object in an object in top-level block text.",

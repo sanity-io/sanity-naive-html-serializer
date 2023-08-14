@@ -53,7 +53,7 @@ Object {
       "_type": "block",
       "children": Array [
         Object {
-          "_key": "d0b15ddf8eb30",
+          "_key": "randomKey-18",
           "_type": "span",
           "marks": Array [],
           "text": "New block text",
