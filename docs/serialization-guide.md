@@ -62,7 +62,7 @@ import {
   BaseDocumentSerializer,
   BaseDocumentDeserializer,
   documentLevelPatch,
-  defaultStopTypes
+  defaultStopTypes,
 } from 'whichever-sanity-plugin-translation-service-you-use'
 
 const myCustomConfig = {
@@ -82,7 +82,7 @@ const myCustomConfig = {
       myCustomDeserializer,
       myBlockDeserializationRules
     ).then((deserialized) => documentLevelPatch(deserialized, id, localeId))
-  }
+  },
 }
 ```
 
@@ -141,7 +141,7 @@ import {
   TranslationsTab,
   defaultDocumentLevelConfig,
   defaultStopTypes,
-  BaseDocumentSerializer
+  BaseDocumentSerializer,
 } from 'sanity-plugin-transifex'
 
 const myCustomStopTypes = [...defaultStopTypes, 'listItem']
@@ -149,7 +149,7 @@ const myCustomStopTypes = [...defaultStopTypes, 'listItem']
 const myCustomConfig = {
   ...defaultDocumentLevelConfig,
   exportForTranslation: (id) =>
-    BaseDocumentSerializer.serializeDocument(id, 'document', 'en', myCustomStopTypes)
+    BaseDocumentSerializer.serializeDocument(id, 'document', 'en', myCustomStopTypes),
 }
 ```
 

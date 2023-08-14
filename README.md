@@ -42,7 +42,7 @@ Now, you can import something from the serializer and use it in your code:
 import {
   BaseDocumentSerializer,
   BaseDocumentDeserializer,
-  BaseDocumentMerger
+  BaseDocumentMerger,
 } from 'sanity-naive-html-serializer'
 ```
 
@@ -84,18 +84,16 @@ const defaultDocumentNode: DefaultDocumentNodeResolver = (S, {schema}) => {
       .options({
         serializeFunc: (doc: SanityDocument) => {
           BaseDocumentSerializer(schema).serializeDocument(doc, 'document')
-        }
+        },
       })
-      .title('Serialize')
+      .title('Serialize'),
   ])
 }
 ```
 
-
 ## License
 
 [MIT](LICENSE) © Sanity.io
-
 
 ## Develop & test
 

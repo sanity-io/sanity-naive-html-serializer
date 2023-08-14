@@ -49,9 +49,7 @@
         {
           "_key": "3d31216296ab",
           "_type": "span",
-          "marks": [
-            "2f5ec56ab061"
-          ],
+          "marks": ["2f5ec56ab061"],
           "text": "text"
         },
         {

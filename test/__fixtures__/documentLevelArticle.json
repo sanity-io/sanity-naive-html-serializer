@@ -180,10 +180,6 @@
   "hidden": true,
   "meta": "Do not translate this",
   "snippet": "This is text in my text field.",
-  "tags": [
-    "tag 1",
-    "tag 2",
-    "tag 3"
-  ],
+  "tags": ["tag 1", "tag 2", "tag 3"],
   "title": "My Document-Level Article"
 }
