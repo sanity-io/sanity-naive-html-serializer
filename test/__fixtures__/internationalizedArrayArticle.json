@@ -2,7 +2,7 @@
   "_createdAt": "2021-10-10T23:00:13Z",
   "_id": "drafts.2947533e-1ea5-4116-955b-339608d3445d",
   "_rev": "l58oha-n06-1s4-f6i-74g6cuakl",
-  "_type": "fieldLevelArticle",
+  "_type": "internationalizedArrayArticle",
   "_updatedAt": "2021-10-10T23:02:05Z",
   "slug": {
     "_type": "slug",
@@ -120,7 +120,54 @@
     {
       "_key": "en",
       "_type": "internationalizedArrayStringFieldValue",
-      "value": "My Field-Level Article"
+      "value": "My Internationalized Array Article"
+    }
+  ],
+  "slices": [
+    {
+      "_key": "6b9d0b28810f",
+      "_type": "localeBlock",
+      "content": [
+        {
+          "_type": "internationalizedArrayBlockValue",
+          "_key": "en",
+          "value": {
+            "_type": "block",
+            "children": [
+              {
+                "_key": "a6170f21181c",
+                "_type": "span",
+                "marks": [],
+                "text": "This is block text 1 level deep"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        },
+        {
+          "_type": "internationalizedArrayBlockValue",
+          "_key": "fr_FR",
+          "value": {
+            "_type": "block",
+            "children": [
+              {
+                "_key": "44954c1912e1",
+                "_type": "span",
+                "marks": [],
+                "text": "Ceci est une texte du bloque en mon slice"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        }
+      ]
+    },
+    {
+      "_type": "reference",
+      "_key": "13ed4b8013e4",
+      "_ref": "66dd1434-23c3-4d94-9e5a-d117775be828"
     }
   ]
 }

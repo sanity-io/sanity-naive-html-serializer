@@ -11,6 +11,7 @@ export const inlineDocumentLevelArticle = require('../__fixtures__/inlineDocumen
 export const fieldLevelArticle = require('../__fixtures__/fieldLevelArticle.json')
 export const annotationAndInlineBlocks = require('../__fixtures__/annotationAndInlineBlocks.json')
 export const nestedLanguageFields = require('../__fixtures__/nestedLanguageFields.json')
+export const internationalizedArrayArticle = require('../__fixtures__/internationalizedArrayArticle.json')
 
 export const getHTMLNode = (serialized: SerializedDocument): Document => {
   const htmlString = serialized.content
