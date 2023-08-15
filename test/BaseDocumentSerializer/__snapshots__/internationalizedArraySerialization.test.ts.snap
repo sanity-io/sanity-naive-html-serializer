@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Global test of working internationalizedArray-level functionality and snapshot match 1`] = `
+Object {
+  "content": "<html><head><meta name=\\"_id\\" content=\\"drafts.2947533e-1ea5-4116-955b-339608d3445d\\"><meta name=\\"_type\\" content=\\"internationalizedArrayArticle\\"><meta name=\\"_rev\\" content=\\"l58oha-n06-1s4-f6i-74g6cuakl\\"><meta name=\\"version\\" content=\\"3\\"></head><body></body></html>",
+  "name": "drafts.2947533e-1ea5-4116-955b-339608d3445d",
+}
+`;

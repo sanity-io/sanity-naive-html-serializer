@@ -8,7 +8,7 @@ const isValidInternationalizedArray = (arr: any[], baseLang: string): boolean =>
     arr.length > 0 &&
     typeof arr[0] === 'object' &&
     internationalizedRegex.test(arr[0]._type) &&
-    arr.filter((obj) => obj._key === 'baseLang').length > 0
+    arr.filter((obj) => obj._key === baseLang).length > 0
   )
 }
 

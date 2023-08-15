@@ -20,6 +20,7 @@ export interface Serializer {
     stopTypes: string[]
   ) => TypedObject
   languageObjectFieldFilter: (document: SanityDocument, baseLang: string) => Record<string, any>
+  internationalizedArrayFilter: (document: SanityDocument, baseLang: string) => Record<string, any>
   serializeArray: (
     fieldContent: Record<string, any>[],
     fieldName: string,
