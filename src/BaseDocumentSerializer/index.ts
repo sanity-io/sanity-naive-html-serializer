@@ -193,6 +193,11 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     if (translationLevel === 'field') {
       filteredObj = languageObjectFieldFilter(doc, baseLang)
     }
+    //internationalizedArray level translations send over fields
+    //that follow the _type naming pattern and have a _key of the base language
+    else if (translationLevel === 'internationalizedArray') {
+      filteredObj = languageObjectFieldFilter(doc, baseLang)
+    }
     //otherwise, we can refer to the schema and a list of stop types
     //to determine what should not be sent
     else {
