@@ -1,11 +1,7 @@
 import {PortableTextBlock} from 'sanity'
-import {getSerialized, getValidFields, toPlainText} from '../helpers'
+import {getI18nArrayItem, getSerialized, getValidFields, toPlainText} from '../helpers'
 import {findByClass, getHTMLNode, internationalizedArrayArticle} from './utils'
 
-interface InternationalizedArrayValue {
-  _key: string
-  value: string | Record<string, any> | any[]
-}
 const serialized = getSerialized(internationalizedArrayArticle, 'internationalizedArray')
 const docTree = getHTMLNode(serialized).body.children[0]
 
@@ -29,15 +25,11 @@ test('String and text types get serialized correctly at top-level -- internation
   const englishSnippetValueHTML = findByClass(englishSnippetHTML?.children!, 'value')
 
   expect(englishTitleValueHTML?.innerHTML).toEqual(
-    internationalizedArrayArticle.title.find(
-      (title: InternationalizedArrayValue) => title._key === 'en'
-    )?.value
+    getI18nArrayItem(internationalizedArrayArticle.title, 'en')?.value
   )
 
   expect(englishSnippetValueHTML?.innerHTML).toEqual(
-    internationalizedArrayArticle.snippet.find(
-      (snippet: InternationalizedArrayValue) => snippet._key === 'en'
-    )?.value
+    getI18nArrayItem(internationalizedArrayArticle.snippet, 'en')?.value
   )
 })
 
@@ -49,9 +41,8 @@ describe('Presence and accuracy of fields in "vanilla" deserialization -- object
   }
 
   const objectField = getInternationalizedArrayObjectField()
-  const origObjectField = internationalizedArrayArticle.config.find(
-    (val: InternationalizedArrayValue) => val._key === 'en'
-  ).value
+  const origObjectField = getI18nArrayItem(internationalizedArrayArticle.config, 'en')
+    ?.value as Record<string, any>
 
   test('Top-level nested objects contain all serializable fields -- internationalized array', () => {
     const fieldNames = getValidFields(origObjectField)
@@ -95,9 +86,8 @@ describe('Presence and accurancy of fields in "vanilla" deserialization -- array
     return findByClass(englishContent!.children, 'value')
   }
   const arrayField = getInternationalizedArrayArrayField()
-  const origArrayField = internationalizedArrayArticle.content.find(
-    (node: InternationalizedArrayValue) => node._key === 'en'
-  ).value
+  const origArrayField = getI18nArrayItem(internationalizedArrayArticle.content, 'en')
+    ?.value as any[]
 
   test('Array contains all serializable blocks with keys, in order -- internationalized array', () => {
     const origKeys = origArrayField.map((block: PortableTextBlock) => block._key)
@@ -135,17 +125,13 @@ describe('Presence and accurancy of fields in "vanilla" deserialization -- array
 
 //works, but requires another schema declaration. resolve later.
 //eslint-disable-next-line jest/no-commented-out-tests
-// test('Nested locale fields make it to serialization, but only base lang', () => {
-//   const slices = findByClass(docTree.children, 'slices')
-//   const sliceContent = findByClass(slices!.children, 'content')
-//   console.log(slices?.outerHTML)
-//   const origSlices = internationalizedArrayArticle.slices[0].content
-//   const engSlice = origSlices.find(
-//     (slice: InternationalizedArrayValue) => slice._key === 'en'
-//   ).value
-//   const frenchSlice = origSlices.find(
-//     (slice: InternationalizedArrayValue) => slice._key === 'fr_FR'
-//   ).value
-//   expect(slices?.innerHTML).toContain(engSlice!.children[0].text)
-//   expect(slices?.innerHTML).not.toContain(frenchSlice!.children[0].text)
-// })
+test('Nested locale fields make it to serialization, but only base lang', () => {
+  const slices = findByClass(docTree.children, 'slices')?.children[0]
+  const origSlices = internationalizedArrayArticle.slices[0].content
+  const engSlice = getI18nArrayItem(origSlices, 'en').value
+  const frenchSlice = getI18nArrayItem(origSlices, 'fr_FR').value
+  //@ts-ignore
+  expect(slices?.innerHTML).toContain(engSlice[0]!.children![0].text)
+  //@ts-ignore
+  expect(slices?.innerHTML).not.toContain(frenchSlice[0]!.children![0].text)
+})

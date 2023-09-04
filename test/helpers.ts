@@ -42,6 +42,10 @@ export const toPlainText = (blocks: PortableTextBlock[]): string => {
     .join('\n\n')
 }
 
+export const getI18nArrayItem = (array: TypedObject[], key: string): TypedObject => {
+  return array.find((item) => item._key === key)!
+}
+
 export const createCustomInnerHTML = (title: string): string =>
   `Custom serializer works and includes title: '${title}'`
 
