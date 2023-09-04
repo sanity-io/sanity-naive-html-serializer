@@ -113,7 +113,11 @@
     {
       "_key": "en",
       "_type": "internationalizedArrayTagsValue",
-      "value": ["tag 1", "tag 2", "tag 3"]
+      "value": [
+        "tag 1",
+        "tag 2",
+        "tag 3"
+      ]
     }
   ],
   "title": [
@@ -126,41 +130,45 @@
   "slices": [
     {
       "_key": "6b9d0b28810f",
-      "_type": "localeBlock",
+      "_type": "nestedlocaleBlock",
       "content": [
         {
           "_type": "internationalizedArrayBlockValue",
           "_key": "en",
-          "value": {
-            "_type": "block",
-            "children": [
-              {
-                "_key": "a6170f21181c",
-                "_type": "span",
-                "marks": [],
-                "text": "This is block text 1 level deep"
-              }
-            ],
-            "markDefs": [],
-            "style": "normal"
-          }
+          "value": [
+            {
+              "_type": "block",
+              "children": [
+                {
+                  "_key": "a6170f21181c",
+                  "_type": "span",
+                  "marks": [],
+                  "text": "This is block text 1 level deep"
+                }
+              ],
+              "markDefs": [],
+              "style": "normal"
+            }
+          ]
         },
         {
           "_type": "internationalizedArrayBlockValue",
           "_key": "fr_FR",
-          "value": {
-            "_type": "block",
-            "children": [
-              {
-                "_key": "44954c1912e1",
-                "_type": "span",
-                "marks": [],
-                "text": "Ceci est une texte du bloque en mon slice"
-              }
-            ],
-            "markDefs": [],
-            "style": "normal"
-          }
+          "value": [
+            {
+              "_type": "block",
+              "children": [
+                {
+                  "_key": "44954c1912e1",
+                  "_type": "span",
+                  "marks": [],
+                  "text": "Ceci est une texte du bloque en mon slice"
+                }
+              ],
+              "markDefs": [],
+              "style": "normal"
+            }
+          ]
         }
       ]
     },
