@@ -1,4 +1,3 @@
-// import {htmlToBlocks} from '@sanity/block-tools'
 import {htmlToBlocks} from '@sanity/block-tools'
 import {customDeserializers, customBlockDeserializers} from '../BaseSerializationConfig'
 import {Deserializer} from '../types'
