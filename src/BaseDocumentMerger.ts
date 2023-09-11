@@ -106,6 +106,51 @@ const fieldLevelMerge = (
   return merged
 }
 
+//eslint-disable-next-line
+const internationalizedArrayMerge = (
+  translatedFields: Record<string, any>,
+  //should be fetched according to the revision and id of the translated obj above
+  baseDoc: SanityDocument,
+  localeId: string,
+  baseLang: string = 'en'
+): Record<string, any> => {
+  const merged: Record<string, any> = {}
+  const metaKeys = ['_rev', '_id', '_type']
+  metaKeys.forEach((metaKey) => {
+    if (translatedFields[metaKey]) {
+      merged[metaKey] = translatedFields[metaKey]
+    }
+  })
+
+  //get all keys that match the base language, because it's been translated
+  // const originPaths = extractWithPath(`..[_key == '${baseLang}']`, translatedFields)
+  // console.log('originPaths', originPaths)
+  // originPaths.forEach((match) => {
+  //   const origVal = extractWithPath(arrayToJSONMatchPath(match.path), baseDoc)[0].value
+  //   const translatedVal = extractWithPath(arrayToJSONMatchPath(match.path), translatedFields)[0]
+  //     .value
+  //   let valToPatch
+  //   if (typeof translatedVal === 'string') {
+  //     valToPatch = translatedVal
+  //   } else if (Array.isArray(translatedVal) && translatedVal.length) {
+  //     valToPatch = reconcileArray((origVal as Array<any>) ?? [], translatedVal)
+  //   } else if (
+  //     typeof translatedVal === 'object' &&
+  //     Object.keys(translatedVal as Record<string, any>).length
+  //   ) {
+  //     valToPatch = reconcileObject(origVal ?? {}, translatedVal as Record<string, any>)
+  //   }
+  //   const destinationPath = [
+  //     ...match.path.slice(0, match.path.length - 1), //cut off the "en"
+  //     localeId.replace('-', '_'), // replace it with our locale
+  //   ]
+
+  //   merged[arrayToJSONMatchPath(destinationPath)] = valToPatch
+  // })
+
+  return merged
+}
+
 const documentLevelMerge = (
   translatedFields: Record<string, any>,
   //should be fetched according to the revision and id of the translated obj above
