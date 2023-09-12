@@ -1,9 +1,12 @@
 import {defaultStopTypes, customSerializers} from '../BaseSerializationConfig'
-import {SanityDocument, TypedObject, Schema} from 'sanity'
+import {SanityDocument, Schema} from 'sanity'
 import {TranslationLevel, SerializerClosure} from '../types'
 import clone from 'just-clone'
-import {fieldFilter, languageObjectFieldFilter} from './fieldFilters'
+import {fieldFilter, languageObjectFieldFilter} from './utils/fieldFilters'
 import {toHTML} from '@portabletext/to-html'
+import {createInlineSerializerTypes, createMarkSerializerTypes} from './utils/inlineSerializers'
+import {isPortableTextBlock} from './utils/isPortableTextBlock'
+import {ArbitraryTypedObject} from '@portabletext/types'
 
 const META_FIELDS = ['_key', '_type', '_id', '_weak']
 
@@ -14,9 +17,10 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
   const getSchema = (name: string) => schemas?._original?.types.find((s) => s.name === name) as any
 
   const serializeObject = (
-    obj: TypedObject,
+    obj: ArbitraryTypedObject,
     stopTypes: string[],
-    serializers: Record<string, any>
+    serializers: Record<string, any>,
+    serializeInlineContent = false
   ) => {
     if (stopTypes.includes(obj._type)) {
       return ''
@@ -71,18 +75,29 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
           //array fields get filtered and its children serialized
           else if (Array.isArray(value)) {
             //eslint-disable-next-line no-use-before-define -- this is a recursive function
-            htmlField = serializeArray(value, fieldName, stopTypes, serializers)
+            htmlField = serializeArray(
+              value,
+              fieldName,
+              stopTypes,
+              serializers,
+              serializeInlineContent
+            )
           }
 
           //this is an object in an object, serialize it first
           else {
-            const embeddedObject = value as TypedObject
+            const embeddedObject = value as ArbitraryTypedObject
             const embeddedObjectSchema = getSchema(embeddedObject._type)
             let toTranslate = embeddedObject
             if (embeddedObjectSchema && embeddedObjectSchema.fields) {
               toTranslate = fieldFilter(embeddedObject, embeddedObjectSchema.fields, stopTypes)
             }
-            const objHTML = serializeObject(toTranslate, stopTypes, serializers)
+            const objHTML = serializeObject(
+              toTranslate,
+              stopTypes,
+              serializers,
+              serializeInlineContent
+            )
             htmlField = `<div class="${fieldName}" data-level="field">${objHTML}</div>`
           }
 
@@ -94,13 +109,26 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         return ''
       }
 
-      tempSerializers.types[obj._type] = ({value}: {value: TypedObject}) => {
+      tempSerializers.types[obj._type] = ({value}: {value: ArbitraryTypedObject}) => {
         let div = `<div class="${value._type}"`
         if (value._key || value._id) {
           div += `id="${value._key ?? value._id}"`
         }
 
         return [div, `data-type="object">${innerHTML}</div>`].join('')
+      }
+    }
+
+    if (isPortableTextBlock(obj) && serializeInlineContent) {
+      const inlineTypes = createInlineSerializerTypes(obj, stopTypes, serializers, schemas)
+      tempSerializers.types = {
+        ...tempSerializers.types,
+        ...inlineTypes,
+      }
+      const markTypes = createMarkSerializerTypes(obj, stopTypes, serializers, schemas)
+      tempSerializers.marks = {
+        ...tempSerializers.marks,
+        ...markTypes,
       }
     }
 
@@ -119,7 +147,8 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     fieldContent: Record<string, any>[],
     fieldName: string,
     stopTypes: string[],
-    serializers: Record<string, any>
+    serializers: Record<string, any>,
+    serializeInlineContent = false
   ) => {
     //filter for any blocks that user has indicated
     //should not be sent for translation
@@ -141,7 +170,12 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         return `<span>${obj}</span>`
       }
       //send to serialization method
-      return serializeObject(obj as TypedObject, stopTypes, serializers)
+      return serializeObject(
+        obj as ArbitraryTypedObject,
+        stopTypes,
+        serializers,
+        serializeInlineContent
+      )
     })
 
     //encode this with data-level field
@@ -157,7 +191,9 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     translationLevel: TranslationLevel = 'document',
     baseLang = 'en',
     stopTypes = defaultStopTypes,
-    serializers = customSerializers
+    serializers = customSerializers,
+    serializeInlineContent = false
+    //eslint-disable-next-line max-params -- in a new version, we can move stop types and serializers to the closure
   ) => {
     const schema = getSchema(doc._type)
     let filteredObj: Record<string, any> = {}
@@ -182,16 +218,32 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       if (typeof value === 'string') {
         serializedFields[key] = value
       } else if (Array.isArray(value)) {
-        serializedFields[key] = serializeArray(value, key, stopTypes, serializers)
+        serializedFields[key] = serializeArray(
+          value,
+          key,
+          stopTypes,
+          serializers,
+          serializeInlineContent
+        )
       } else if (value && !stopTypes.find((stopType) => stopType == value?._type)) {
-        const serialized = serializeObject(value as TypedObject, stopTypes, serializers)
+        const serialized = serializeObject(
+          value as ArbitraryTypedObject,
+          stopTypes,
+          serializers,
+          serializeInlineContent
+        )
         serializedFields[key] = `<div class="${key}" data-level='field'>${serialized}</div>`
       }
     }
 
     //create a valid HTML file
     const rawHTMLBody = document.createElement('body')
-    rawHTMLBody.innerHTML = serializeObject(serializedFields as TypedObject, stopTypes, serializers)
+    rawHTMLBody.innerHTML = serializeObject(
+      serializedFields as ArbitraryTypedObject,
+      stopTypes,
+      serializers,
+      serializeInlineContent
+    )
 
     const rawHTMLHead = document.createElement('head')
     const metaFields = ['_id', '_type', '_rev']

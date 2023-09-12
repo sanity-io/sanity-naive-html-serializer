@@ -1,3 +1,4 @@
+import {ArbitraryTypedObject} from '@portabletext/types'
 import {ObjectField, SanityDocument, TypedObject, Schema} from 'sanity'
 
 export type SerializedDocument = {
@@ -12,7 +13,8 @@ export interface Serializer {
     translationLevel: TranslationLevel,
     baseLang?: string,
     stopTypes?: string[],
-    serializers?: Record<string, any>
+    serializers?: Record<string, any>,
+    serializeInlineContent?: boolean
   ) => SerializedDocument
   fieldFilter: (
     obj: Record<string, any>,
@@ -24,12 +26,14 @@ export interface Serializer {
     fieldContent: Record<string, any>[],
     fieldName: string,
     stopTypes: string[],
-    serializers: Record<string, any>
+    serializers: Record<string, any>,
+    serializeInlineContent?: boolean
   ) => string
   serializeObject: (
-    obj: TypedObject,
+    obj: ArbitraryTypedObject,
     stopTypes: string[],
-    serializers: Record<string, any>
+    serializers: Record<string, any>,
+    serializeInlineContent?: boolean
   ) => string
 }
 

@@ -130,109 +130,115 @@ test('Expect custom stop types to be absent at all levels', () => {
 /*
  * ANNOTATION AND INLINE BLOCK CONTENT
  */
-
-test('Unhandled inline objects and annotations should not hinder translation flows', () => {
-  //eslint-disable-next-line no-empty-function -- we're just silencing the console.warn
-  jest.spyOn(console, 'warn').mockImplementation(() => {})
-
+describe('Annotation and inline block content', () => {
   const inlineDocument = {
     ...documentLevelArticle,
     ...annotationAndInlineBlocks,
   }
-  const serialized = getSerialized(inlineDocument, 'document')
-  const docTree = getHTMLNode(serialized).body.children[0]
-  const arrayField = findByClass(docTree.children, 'content')
-
-  //expect annotated object to have underlying text
-  const blockWithAnnotation = Array.from(arrayField!.children).find(
-    (node) => node.id === '0e55995095df'
-  )
-  const unhandledAnnotation = findByClass(
-    blockWithAnnotation!.children,
-    'unknown__pt__mark__annotation'
-  )
-  expect(unhandledAnnotation?.innerHTML).toContain('text')
-
-  //expect unknown inline object to be present but empty
-  //(this allows it to be merged back safely, but not sent to translation)
-  const inlineObject = findByClass(arrayField!.children, 'childObjectField')
-  expect(inlineObject?.innerHTML.length).toEqual(0)
-})
-
-test('Handled inline objects should be accurately represented per serializer', () => {
-  const inlineDocument = {
-    ...documentLevelArticle,
-    ...annotationAndInlineBlocks,
-  }
-
   const serializer = BaseDocumentSerializer(schema)
-  const serialized = serializer.serializeDocument(
-    inlineDocument,
-    'document',
-    'en',
-    defaultStopTypes,
-    addedCustomSerializers
-  )
-  const docTree = getHTMLNode(serialized).body.children[0]
-  const arrayField = findByClass(docTree.children, 'content')
-  let inlineObject: Element | null = null
-  let inlineObjectBlock: Record<string, any> | null = null
 
-  Array.from(arrayField!.children).forEach((block: any) => {
-    if (!inlineObject) {
-      inlineObject = findByClass(block.children, 'childObjectField') ?? inlineObject
-    }
+  test('Unhandled inline objects and annotations should not hinder translation flows', () => {
+    //eslint-disable-next-line no-empty-function -- we're just silencing the console.warn
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const serialized = serializer.serializeDocument(inlineDocument, 'document')
+    const docTree = getHTMLNode(serialized).body.children[0]
+    const arrayField = findByClass(docTree.children, 'content')
+
+    //expect annotated object to have underlying text
+    const blockWithAnnotation = Array.from(arrayField!.children).find(
+      (node) => node.id === '0e55995095df'
+    )
+    const unhandledAnnotation = findByClass(
+      blockWithAnnotation!.children,
+      'unknown__pt__mark__annotation'
+    )
+    expect(unhandledAnnotation?.innerHTML).toContain('text')
+
+    //expect unknown inline object to be present but empty
+    //(this allows it to be merged back safely, but not sent to translation)
+    const inlineObject = findByClass(arrayField!.children, 'childObjectField')
+    expect(inlineObject?.innerHTML.length).toEqual(0)
   })
 
-  inlineDocument.content.forEach((block: Record<string, any>) => {
-    if (block.children) {
-      block.children.forEach((span: Record<string, any>) => {
-        if (span._type === 'childObjectField') {
-          inlineObjectBlock = span
-        }
-      })
-    }
+  test('If option is selected, annotation and inline block content should be serialized', () => {
+    const serialized = serializer.serializeDocument(
+      inlineDocument,
+      'document',
+      'en',
+      defaultStopTypes,
+      customSerializers,
+      true
+    )
+
+    const docTree = getHTMLNode(serialized).body.children[0]
+    const arrayField = findByClass(docTree.children, 'content')
+    expect(arrayField?.innerHTML).toContain('text')
   })
 
-  expect(inlineObject!.innerHTML).toContain(createCustomInnerHTML(inlineObjectBlock!.title))
-})
+  test('Handled inline objects should be accurately represented per custom serializer', () => {
+    const serialized = serializer.serializeDocument(
+      inlineDocument,
+      'document',
+      'en',
+      defaultStopTypes,
+      addedCustomSerializers
+    )
+    const docTree = getHTMLNode(serialized).body.children[0]
+    const arrayField = findByClass(docTree.children, 'content')
+    let inlineObject: Element | null = null
+    let inlineObjectBlock: Record<string, any> | null = null
 
-test('Handled annotations should be accurately represented per serializer', () => {
-  const inlineDocument = {
-    ...documentLevelArticle,
-    ...annotationAndInlineBlocks,
-  }
+    Array.from(arrayField!.children).forEach((block: any) => {
+      if (!inlineObject) {
+        inlineObject = findByClass(block.children, 'childObjectField') ?? inlineObject
+      }
+    })
 
-  const serializer = BaseDocumentSerializer(schema)
-  const serialized = serializer.serializeDocument(
-    inlineDocument,
-    'document',
-    'en',
-    defaultStopTypes,
-    addedCustomSerializers
-  )
-  const docTree = getHTMLNode(serialized).body.children[0]
-  const arrayField = findByClass(docTree.children, 'content')
-  let annotation: Element | null = null
-  let annotationBlock: Record<string, any> | null = null
+    inlineDocument.content.forEach((block: Record<string, any>) => {
+      if (block.children) {
+        block.children.forEach((span: Record<string, any>) => {
+          if (span._type === 'childObjectField') {
+            inlineObjectBlock = span
+          }
+        })
+      }
+    })
 
-  Array.from(arrayField!.children).forEach((block: any) => {
-    if (!annotation) {
-      annotation = findByClass(block.children, 'annotation') ?? annotation
-    }
+    expect(inlineObject!.innerHTML).toContain(createCustomInnerHTML(inlineObjectBlock!.title))
   })
 
-  inlineDocument.content.forEach((block: PortableTextBlock) => {
-    if (block.children && Array.isArray(block.children)) {
-      block.children.forEach((span: Record<string, any>) => {
-        if (span.marks && span.marks.length) {
-          annotationBlock = span
-        }
-      })
-    }
-  })
+  test('Handled annotations should be accurately represented per serializer', () => {
+    const serialized = serializer.serializeDocument(
+      inlineDocument,
+      'document',
+      'en',
+      defaultStopTypes,
+      addedCustomSerializers
+    )
+    const docTree = getHTMLNode(serialized).body.children[0]
+    const arrayField = findByClass(docTree.children, 'content')
+    let annotation: Element | null = null
+    let annotationBlock: Record<string, any> | null = null
 
-  expect(annotation!.innerHTML).toEqual(annotationBlock!.text)
+    Array.from(arrayField!.children).forEach((block: any) => {
+      if (!annotation) {
+        annotation = findByClass(block.children, 'annotation') ?? annotation
+      }
+    })
+
+    inlineDocument.content.forEach((block: PortableTextBlock) => {
+      if (block.children && Array.isArray(block.children)) {
+        block.children.forEach((span: Record<string, any>) => {
+          if (span.marks && span.marks.length) {
+            annotationBlock = span
+          }
+        })
+      }
+    })
+
+    expect(annotation!.innerHTML).toEqual(annotationBlock!.text)
+  })
 })
 
 /*
