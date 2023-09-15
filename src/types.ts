@@ -56,6 +56,12 @@ export interface Merger {
     localeId: string,
     baseLang: string
   ) => Record<string, any>
+  internationalizedArrayMerge: (
+    translatedFields: Record<string, any>,
+    baseDoc: SanityDocument,
+    localeId: string,
+    baseLang: string
+  ) => Record<string, any>
   documentLevelMerge: (
     translatedFields: Record<string, any>,
     baseDoc: SanityDocument

@@ -4,7 +4,7 @@ import {getDeserialized, getI18nArrayItem, toPlainText} from '../helpers'
 
 const deserialized = getDeserialized(internationalizedArrayArticle, 'internationalizedArray')
 
-test('Global test of working field-level functionality and snapshot match', () => {
+test('Global test of working internationalized array functionality and snapshot match', () => {
   expect(deserialized).toMatchSnapshot()
 })
 
@@ -68,17 +68,17 @@ describe('Presence and accuracy of fields in "vanilla" deserialization -- arrays
   const origContent = getI18nArrayItem(internationalizedArrayArticle.content, 'en')?.value as any[]
   const deserializedContent = getI18nArrayItem(deserialized.content, 'en')?.value as any[]
 
-  test('Array contains all serializable blocks with keys, in order -- field level', () => {
+  test('Array contains all serializable blocks with keys, in order', () => {
     const origKeys = origContent.map((block: PortableTextBlock) => block._key)
     const deserializedKeys = deserializedContent.map((block: PortableTextBlock) => block._key)
     expect(deserializedKeys.sort()).toEqual(origKeys.sort())
   })
 
-  test('Array contains top-level block text -- field level', () => {
+  test('Array contains top-level block text', () => {
     expect(toPlainText(deserializedContent)).toEqual(toPlainText(origContent))
   })
 
-  test('Object in array contains accurate values in nested object -- field level', () => {
+  test('Object in array contains accurate values in nested object', () => {
     const origTitle = origContent.find(
       (block: Record<string, any>) => block._type === 'objectField'
     ).objectAsField.title
