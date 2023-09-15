@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Global test of working field-level functionality and snapshot match 1`] = `
+exports[`Global test of working internationalized array functionality and snapshot match 1`] = `
 Object {
   "_id": "drafts.2947533e-1ea5-4116-955b-339608d3445d",
   "_rev": "l58oha-n06-1s4-f6i-74g6cuakl",
@@ -10,13 +10,14 @@ Object {
       "_key": "en",
       "_type": "internationalizedArrayObjectFieldValue",
       "value": Object {
+        "_type": "objectField",
         "nestedArrayField": Array [
           Object {
-            "_key": "f49b4d7e3e51",
+            "_key": "4a58adc7c507",
             "_type": "block",
             "children": Array [
               Object {
-                "_key": "randomKey-0",
+                "_key": "randomKey-6",
                 "_type": "span",
                 "marks": Array [],
                 "text": "This is block text 1 level deep",
@@ -107,7 +108,7 @@ Object {
           "_type": "internationalizedArrayBlockValue",
           "value": Array [
             Object {
-              "_key": "undefined",
+              "_key": "e2a39d768ff8",
               "_type": "block",
               "children": Array [
                 Object {
