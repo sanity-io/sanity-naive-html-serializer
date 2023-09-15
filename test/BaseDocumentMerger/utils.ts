@@ -1,5 +1,6 @@
 import clone from 'just-clone'
 import {getDeserialized} from '../helpers'
+import {internationalizedArrayArticle} from '../BaseDocumentSerializer/utils'
 
 const documentLevelArticle = require('../__fixtures__/documentLevelArticle')
 const fieldLevelArticle = require('../__fixtures__/fieldLevelArticle')
@@ -45,5 +46,16 @@ export const getNewFieldLevelDocument = (): Record<string, any> => {
   const newBlockText = newDocument.content.en[0]
   newBlockText.children[0].text = 'New block text'
   newDocument.content.en = [newBlockText]
+  return newDocument
+}
+
+export const getInternationalizedArrayDocument = (): Record<string, any> => {
+  const newDocument = getDeserialized(internationalizedArrayArticle, 'internationalizedArray')
+  newDocument.title[0].value = 'A new document title'
+  newDocument.snippet[0].value = 'A new document snippet'
+  newDocument.config[0].value = getNewObject()
+  const newBlockText = newDocument.content[0].value[0]
+  newBlockText.children[0].text = 'New block text'
+  newDocument.content[0].value[0] = [newBlockText]
   return newDocument
 }

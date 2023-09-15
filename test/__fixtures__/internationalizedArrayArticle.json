@@ -13,13 +13,14 @@
       "_key": "en",
       "_type": "internationalizedArrayObjectFieldValue",
       "value": {
+        "_type": "objectField",
         "nestedArrayField": [
           {
-            "_key": "f49b4d7e3e51",
+            "_key": "4a58adc7c507",
             "_type": "block",
             "children": [
               {
-                "_key": "a6170f21181c",
+                "_key": "4f6bc15ae261",
                 "_type": "span",
                 "marks": [],
                 "text": "This is block text 1 level deep"
@@ -138,6 +139,7 @@
           "value": [
             {
               "_type": "block",
+              "_key": "e2a39d768ff8",
               "children": [
                 {
                   "_key": "a6170f21181c",
@@ -157,6 +159,7 @@
           "value": [
             {
               "_type": "block",
+              "_key": "e2a39d768ff8",
               "children": [
                 {
                   "_key": "44954c1912e1",

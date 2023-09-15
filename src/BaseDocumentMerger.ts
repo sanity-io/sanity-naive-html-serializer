@@ -1,6 +1,12 @@
 import {Merger} from './types'
-import {SanityDocument} from 'sanity'
-import {extractWithPath, arrayToJSONMatchPath} from '@sanity/mutator'
+import {InsertPatch, SanityDocument} from 'sanity'
+import {extractWithPath, arrayToJSONMatchPath, extract} from '@sanity/mutator'
+
+interface I18nArrayItem {
+  _key: string
+  _type: string
+  value: Record<string, any> | string | Array<any>
+}
 
 const reconcileArray = (origArray: any[], translatedArray: any[]): any[] => {
   //arrays of strings don't have keys, so just replace the array and return
@@ -106,49 +112,69 @@ const fieldLevelMerge = (
   return merged
 }
 
-//eslint-disable-next-line
 const internationalizedArrayMerge = (
-  translatedFields: Record<string, any>,
+  translatedItems: Record<string, any>,
   //should be fetched according to the revision and id of the translated obj above
   baseDoc: SanityDocument,
   localeId: string,
   baseLang: string = 'en'
 ): Record<string, any> => {
-  const merged: Record<string, any> = {}
-  const metaKeys = ['_rev', '_id', '_type']
-  metaKeys.forEach((metaKey) => {
-    if (translatedFields[metaKey]) {
-      merged[metaKey] = translatedFields[metaKey]
+  const patches: InsertPatch[] = []
+
+  //get all keys that match the base language from the translated doc,
+  //since those are the strings that have been translated
+  const extractionKey = `..[_key == "${baseLang}"]`
+  const originPaths = extractWithPath(extractionKey, translatedItems)
+
+  //slice off the index to get the arrays at which all the translated fields live
+  //then transform to string so we can extract
+  const i18nArrayPaths = originPaths
+    .map((match) => match.path.slice(0, match.path.length - 1))
+    .map((path) => arrayToJSONMatchPath(path))
+
+  //extract produces duplicates. Likely we need to replace
+  //the function we're using. For now, just dedupe
+  Array.from(new Set(i18nArrayPaths)).forEach((path) => {
+    //we need to merge the translated values with those things
+    //that were not set off for translation. Get the original first
+    const origArray = extract(path, baseDoc)[0] as Array<I18nArrayItem>
+    const origVal = origArray.find((item: I18nArrayItem) => item._key === baseLang)?.value
+
+    const translatedVal = (extract(path, translatedItems)[0] as Array<I18nArrayItem>).find(
+      (item: I18nArrayItem) => item._key === baseLang
+    )?.value
+
+    //then, combine the translated values with the original recursively
+    let valToPatch
+    if (typeof translatedVal === 'string') {
+      valToPatch = translatedVal
+    } else if (Array.isArray(translatedVal) && translatedVal.length) {
+      valToPatch = reconcileArray((origVal as Array<any>) ?? [], translatedVal)
+    } else if (
+      typeof translatedVal === 'object' &&
+      Object.keys(translatedVal as Record<string, any>).length
+    ) {
+      valToPatch = reconcileObject(
+        (origVal as Record<string, any>) ?? {},
+        translatedVal as Record<string, any>
+      )
     }
+    const items = [{_key: localeId, _type: origArray[0]._type, value: valToPatch}]
+
+    //check the original array to see what operation we should run
+    //(we don't want duplicates of locale keys)
+    const existingLocaleKey = origArray.find((item) => item._key === localeId)
+    const patch: InsertPatch = existingLocaleKey
+      ? {
+          replace: `${path}[_key == "${localeId}"]`,
+          items,
+        }
+      : {after: `${path}[-1]`, items}
+
+    patches.push(patch)
   })
 
-  //get all keys that match the base language, because it's been translated
-  // const originPaths = extractWithPath(`..[_key == '${baseLang}']`, translatedFields)
-  // console.log('originPaths', originPaths)
-  // originPaths.forEach((match) => {
-  //   const origVal = extractWithPath(arrayToJSONMatchPath(match.path), baseDoc)[0].value
-  //   const translatedVal = extractWithPath(arrayToJSONMatchPath(match.path), translatedFields)[0]
-  //     .value
-  //   let valToPatch
-  //   if (typeof translatedVal === 'string') {
-  //     valToPatch = translatedVal
-  //   } else if (Array.isArray(translatedVal) && translatedVal.length) {
-  //     valToPatch = reconcileArray((origVal as Array<any>) ?? [], translatedVal)
-  //   } else if (
-  //     typeof translatedVal === 'object' &&
-  //     Object.keys(translatedVal as Record<string, any>).length
-  //   ) {
-  //     valToPatch = reconcileObject(origVal ?? {}, translatedVal as Record<string, any>)
-  //   }
-  //   const destinationPath = [
-  //     ...match.path.slice(0, match.path.length - 1), //cut off the "en"
-  //     localeId.replace('-', '_'), // replace it with our locale
-  //   ]
-
-  //   merged[arrayToJSONMatchPath(destinationPath)] = valToPatch
-  // })
-
-  return merged
+  return patches
 }
 
 const documentLevelMerge = (
@@ -162,6 +188,7 @@ const documentLevelMerge = (
 export const BaseDocumentMerger: Merger = {
   fieldLevelMerge,
   documentLevelMerge,
+  internationalizedArrayMerge,
   reconcileArray,
   reconcileObject,
 }
