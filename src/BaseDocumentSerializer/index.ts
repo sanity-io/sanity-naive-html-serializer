@@ -1,9 +1,8 @@
 import {defaultStopTypes, customSerializers} from '../BaseSerializationConfig'
 import {SanityDocument, TypedObject, Schema} from 'sanity'
 import {TranslationLevel, SerializerClosure} from '../types'
-import clone from 'just-clone'
 import {fieldFilter, languageObjectFieldFilter} from './fieldFilters'
-import {toHTML} from '@portabletext/to-html'
+import {PortableTextTypeComponent, toHTML} from '@portabletext/to-html'
 
 const META_FIELDS = ['_key', '_type', '_id', '_weak']
 
@@ -29,84 +28,107 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       return toHTML([obj], {components: serializers})
     }
 
-    //we modify the serializers to send it to blocksToHTML
-    //but we don't want those changes to persist for each block, so we clone
-    const tempSerializers = clone(serializers)
+    //we don't need to worry about PT types
+    if (obj._type === 'span' || obj._type === 'block') {
+      return toHTML(obj, {components: serializers})
+    }
+
+    //if schema is available, encode values in the order they're declared in the schema,
+    //since this will likely be more intuitive for a translator.
+    let fieldNames = Object.keys(obj).filter((key) => key !== '_type')
+    const schema = getSchema(obj._type)
+    if (schema && schema.fields) {
+      fieldNames = schema.fields
+        .map((field: Record<string, any>) => field.name)
+        .filter((schemaKey: string) => Object.keys(obj).includes(schemaKey))
+    }
+
+    //account for anonymous inline objects
+    if (typeof obj === 'object' && !obj._type) {
+      obj._type = ''
+    }
+
+    //in some cases, we might recurse through many objects of the same type
+    //we should take all methods necessary to ensure state does not persist
+    //otherwise we risk using old serialization methods on new items
+    const newSerializationMethods: Record<string, PortableTextTypeComponent> = {}
+    const tempType = `${obj._type}__temp_type__${Math.random().toString(36).substring(7)}`
+    const objToSerialize: TypedObject = META_FIELDS.reduce(
+      (acc: TypedObject, field: string) => {
+        if (obj[field] && field !== '_type') {
+          acc[field] = obj[field]
+        }
+        return acc
+      },
+      {_type: tempType}
+    )
+
+    let innerHTML = ''
 
     //if it's a custom object, iterate through its keys to find and serialize translatable content
-    if (obj._type !== 'span' && obj._type !== 'block') {
-      let innerHTML = ''
+    fieldNames.forEach((fieldName) => {
+      let htmlField = ''
+      const value = obj[fieldName]
+      objToSerialize[fieldName] = value
 
-      //if schema is available, encode values in the order they're declared in the schema,
-      //since this will likely be more intuitive for a translator.
-      let fieldNames = Object.keys(obj)
-      const schema = getSchema(obj._type)
-      if (schema && schema.fields) {
-        fieldNames = schema.fields
-          .map((field: Record<string, any>) => field.name)
-          .filter((schemaKey: string) => Object.keys(obj).includes(schemaKey))
-      }
-
-      //account for anonymous inline objects
-      if (typeof obj === 'object' && !obj._type) {
-        obj._type = ''
-      }
-
-      fieldNames.forEach((fieldName) => {
-        let htmlField = ''
-        const value = obj[fieldName]
-
-        if (!META_FIELDS.includes(fieldName)) {
-          //strings are either string fields or have recursively been turned
-          //into HTML because they were a nested object or array
-          if (typeof value === 'string') {
-            const htmlRegex = new RegExp(/<("[^"]*"|'[^']*'|[^'">])*>/)
-            if (htmlRegex.test(value)) {
-              htmlField = value
-            } else {
-              htmlField = `<span class="${fieldName}">${value}</span>`
-            }
+      if (!META_FIELDS.includes(fieldName)) {
+        //strings are either string fields or have recursively been turned
+        //into HTML because they were a nested object or array
+        if (typeof value === 'string') {
+          const htmlRegex = new RegExp(/<("[^"]*"|'[^']*'|[^'">])*>/)
+          if (htmlRegex.test(value)) {
+            htmlField = value
+          } else {
+            htmlField = `<span class="${fieldName}">${value}</span>`
           }
-
-          //array fields get filtered and its children serialized
-          else if (Array.isArray(value)) {
-            //eslint-disable-next-line no-use-before-define -- this is a recursive function
-            htmlField = serializeArray(value, fieldName, stopTypes, serializers)
-          }
-
-          //this is an object in an object, serialize it first
-          else {
-            const embeddedObject = value as TypedObject
-            const embeddedObjectSchema = getSchema(embeddedObject._type)
-            let toTranslate = embeddedObject
-            if (embeddedObjectSchema && embeddedObjectSchema.fields) {
-              toTranslate = fieldFilter(embeddedObject, embeddedObjectSchema.fields, stopTypes)
-            }
-            const objHTML = serializeObject(toTranslate, stopTypes, serializers)
-            htmlField = `<div class="${fieldName}" data-level="field">${objHTML}</div>`
-          }
-
-          innerHTML += htmlField
-        }
-      })
-
-      if (!innerHTML) {
-        return ''
-      }
-
-      tempSerializers.types[obj._type] = ({value}: {value: TypedObject}) => {
-        let div = `<div class="${value._type}"`
-        if (value._key || value._id) {
-          div += `id="${value._key ?? value._id}"`
         }
 
-        return [div, `data-type="object">${innerHTML}</div>`].join('')
+        //array fields get filtered and its children serialized
+        else if (Array.isArray(value)) {
+          //eslint-disable-next-line no-use-before-define -- this is a recursive function
+          htmlField = serializeArray(value, fieldName, stopTypes, serializers)
+        }
+
+        //this is an object in an object, serialize it first
+        else {
+          const embeddedObject = value as TypedObject
+          const embeddedObjectSchema = getSchema(embeddedObject._type)
+          let toTranslate = embeddedObject
+          if (embeddedObjectSchema && embeddedObjectSchema.fields) {
+            toTranslate = fieldFilter(embeddedObject, embeddedObjectSchema.fields, stopTypes)
+          }
+          const objHTML = serializeObject(toTranslate, stopTypes, serializers)
+          htmlField = `<div class="${fieldName}" data-level="field">${objHTML}</div>`
+        }
+
+        innerHTML += htmlField
       }
+    })
+
+    if (!innerHTML) {
+      return ''
+    }
+
+    newSerializationMethods[tempType] = ({value}: {value: TypedObject}) => {
+      let div = `<div class="${value._type.split('__temp_type__')[0]}"`
+      if (value._key || value._id) {
+        div += `id="${value._key ?? value._id}"`
+      }
+
+      return [div, `data-type="object">${innerHTML}</div>`].join('')
     }
 
     let serializedBlock = ''
     try {
-      serializedBlock = toHTML([obj], {components: tempSerializers})
+      serializedBlock = toHTML(objToSerialize, {
+        components: {
+          ...serializers,
+          types: {
+            ...serializers.types,
+            ...newSerializationMethods,
+          },
+        },
+      })
     } catch (err) {
       //eslint-disable-next-line no-console -- this is a warning
       console.warn(
@@ -115,6 +137,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     }
     return serializedBlock
   }
+
   const serializeArray = (
     fieldContent: Record<string, any>[],
     fieldName: string,
