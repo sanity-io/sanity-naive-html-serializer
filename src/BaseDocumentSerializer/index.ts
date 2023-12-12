@@ -53,25 +53,21 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     //otherwise we risk using old serialization methods on new items
     const newSerializationMethods: Record<string, PortableTextTypeComponent> = {}
     const tempType = `${obj._type}__temp_type__${Math.random().toString(36).substring(7)}`
-    const objToSerialize: TypedObject = META_FIELDS.reduce(
-      (acc: TypedObject, field: string) => {
-        if (obj[field] && field !== '_type') {
-          acc[field] = obj[field]
-        }
-        return acc
-      },
-      {_type: tempType}
-    )
+    const objToSerialize: TypedObject = {_type: tempType}
+    //for our default serialization method, we only need to
+    //capture metadata. the rest will be recursively turned into strings.
+    META_FIELDS.filter((f) => f !== '_type').forEach((field) => {
+      objToSerialize[field] = obj[field]
+    })
 
     let innerHTML = ''
 
     //if it's a custom object, iterate through its keys to find and serialize translatable content
     fieldNames.forEach((fieldName) => {
       let htmlField = ''
-      const value = obj[fieldName]
-      objToSerialize[fieldName] = value
 
       if (!META_FIELDS.includes(fieldName)) {
+        const value = obj[fieldName]
         //strings are either string fields or have recursively been turned
         //into HTML because they were a nested object or array
         if (typeof value === 'string') {
@@ -86,7 +82,10 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         //array fields get filtered and its children serialized
         else if (Array.isArray(value)) {
           //eslint-disable-next-line no-use-before-define -- this is a recursive function
-          htmlField = serializeArray(value, fieldName, stopTypes, serializers)
+          htmlField = serializeArray(value, fieldName, stopTypes, {
+            ...serializers,
+            types: {...serializers.types},
+          })
         }
 
         //this is an object in an object, serialize it first
@@ -95,9 +94,12 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
           const embeddedObjectSchema = getSchema(embeddedObject._type)
           let toTranslate = embeddedObject
           if (embeddedObjectSchema && embeddedObjectSchema.fields) {
-            toTranslate = fieldFilter(embeddedObject, embeddedObjectSchema.fields, stopTypes)
+            toTranslate = fieldFilter(toTranslate, embeddedObjectSchema.fields, stopTypes)
           }
-          const objHTML = serializeObject(toTranslate, stopTypes, serializers)
+          const objHTML = serializeObject(toTranslate, stopTypes, {
+            ...serializers,
+            types: {...serializers.types},
+          })
           htmlField = `<div class="${fieldName}" data-level="field">${objHTML}</div>`
         }
 
@@ -115,7 +117,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         div += `id="${value._key ?? value._id}"`
       }
 
-      return [div, `data-type="object">${innerHTML}</div>`].join('')
+      return [div, ` data-type="object">${innerHTML}</div>`].join('')
     }
 
     let serializedBlock = ''
@@ -135,6 +137,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
         `Had issues serializing block of type "${obj._type}". Please specify a serialization method for this block in your serialization config. Received error: ${err}`
       )
     }
+
     return serializedBlock
   }
 
@@ -158,7 +161,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
       return block
     })
 
-    const output = filteredBlocks.map((obj, i) => {
+    const output = filteredBlocks.map((obj) => {
       //if object in array is just a string, just return it
       if (typeof obj === 'string') {
         return `<span>${obj}</span>`
