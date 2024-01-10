@@ -1,7 +1,7 @@
 import {defaultStopTypes, customSerializers} from '../BaseSerializationConfig'
 import {SanityDocument, TypedObject, Schema} from 'sanity'
 import {TranslationLevel, SerializerClosure} from '../types'
-import {fieldFilter, languageObjectFieldFilter} from './fieldFilters'
+import {fieldFilter, languageObjectFieldFilter, internationalizedArrayFilter} from './fieldFilters'
 import {PortableTextTypeComponent, toHTML} from '@portabletext/to-html'
 
 const META_FIELDS = ['_key', '_type', '_id', '_weak']
@@ -193,6 +193,11 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     if (translationLevel === 'field') {
       filteredObj = languageObjectFieldFilter(doc, baseLang)
     }
+    //internationalizedArray level translations send over fields
+    //that follow the _type naming pattern and have a _key of the base language
+    else if (translationLevel === 'internationalizedArray') {
+      filteredObj = internationalizedArrayFilter(doc, baseLang)
+    }
     //otherwise, we can refer to the schema and a list of stop types
     //to determine what should not be sent
     else {
@@ -248,6 +253,7 @@ export const BaseDocumentSerializer: SerializerClosure = (schemas: Schema) => {
     serializeDocument,
     fieldFilter,
     languageObjectFieldFilter,
+    internationalizedArrayFilter,
     serializeArray,
     serializeObject,
   }

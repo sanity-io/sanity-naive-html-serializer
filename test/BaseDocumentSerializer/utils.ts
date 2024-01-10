@@ -3,6 +3,7 @@ import {SerializedDocument} from '../../src'
 export const documentLevelArticle = require('../__fixtures__/documentLevelArticle')
 export const inlineDocumentLevelArticle = require('../__fixtures__/inlineDocumentLevelArticle')
 export const fieldLevelArticle = require('../__fixtures__/fieldLevelArticle')
+export const internationalizedArrayArticle = require('../__fixtures__/internationalizedArrayArticle')
 export const annotationAndInlineBlocks = require('../__fixtures__/annotationAndInlineBlocks')
 export const nestedLanguageFields = require('../__fixtures__/nestedLanguageFields')
 
