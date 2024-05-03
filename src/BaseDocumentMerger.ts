@@ -1,11 +1,19 @@
 import {Merger} from './types'
-import {InsertPatch, SanityDocument} from 'sanity'
+import {SanityDocument} from 'sanity'
 import {extractWithPath, arrayToJSONMatchPath, extract} from '@sanity/mutator'
+
+//based on args required for a sanityClient.insert operation
+//https://github.com/sanity-io/client/blob/d061e116cea10096c262fe3a8b0926d4fecdb6f3/src/data/patch.ts#L102
 
 interface I18nArrayItem {
   _key: string
   _type: string
   value: Record<string, any> | string | Array<any>
+}
+interface I18nArrayInsert {
+  at: 'before' | 'after' | 'replace'
+  selector: string
+  items: Array<I18nArrayItem>
 }
 
 const reconcileArray = (origArray: any[], translatedArray: any[]): any[] => {
@@ -117,9 +125,10 @@ const internationalizedArrayMerge = (
   //should be fetched according to the revision and id of the translated obj above
   baseDoc: SanityDocument,
   localeId: string,
-  baseLang: string = 'en'
+  baseLang: string = 'en',
+  localeArrayPosition: number = 0
 ): Record<string, any> => {
-  const patches: InsertPatch[] = []
+  const patches: I18nArrayInsert[] = []
 
   //get all keys that match the base language from the translated doc,
   //since those are the strings that have been translated
@@ -159,19 +168,26 @@ const internationalizedArrayMerge = (
         translatedVal as Record<string, any>
       )
     }
-    const items = [{_key: localeId, _type: origArray[0]._type, value: valToPatch}]
+
+    let finalArrayPosition = localeArrayPosition
+    //check if the array is long enough for it 
+    //see wtf is causing duplicates
 
     //check the original array to see what operation we should run
     //(we don't want duplicates of locale keys)
     const existingLocaleKey = origArray.find((item) => item._key === localeId)
-    const patch: InsertPatch = existingLocaleKey
-      ? {
-          replace: `${path}[_key == "${localeId}"]`,
-          items,
-        }
-      : {after: `${path}[-1]`, items}
+    const at = existingLocaleKey ? 'replace' : 'after'
+    const selector: string = existingLocaleKey
+      ? `${path}[_key == "${localeId}"]`
+      : `${path}[${localeArrayPosition - 1}]`
 
-    patches.push(patch)
+    if (valToPatch) {
+      patches.push({
+        at,
+        selector,
+        items: [{_key: localeId, _type: origArray[0]._type, value: valToPatch}],
+      })
+    }
   })
 
   return patches

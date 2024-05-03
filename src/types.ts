@@ -60,7 +60,8 @@ export interface Merger {
     translatedFields: Record<string, any>,
     baseDoc: SanityDocument,
     localeId: string,
-    baseLang: string
+    baseLang: string,
+    localeArrayPosition: number
   ) => Record<string, any>
   documentLevelMerge: (
     translatedFields: Record<string, any>,
