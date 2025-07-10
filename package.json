@@ -47,11 +47,11 @@
     "watch": "pkg-utils watch --strict"
   },
   "dependencies": {
-    "@portabletext/to-html": "^2.0.5",
-    "@sanity/block-tools": "^3.40.0",
+    "@portabletext/to-html": "^2.0.14",
+    "@sanity/block-tools": "^3.70.0",
     "@sanity/incompatible-plugin": "^1.0.5",
-    "@sanity/mutator": "^3.40.0",
-    "@sanity/schema": "^3.40.0"
+    "@sanity/mutator": "^3.98.1",
+    "@sanity/schema": "^3.98.1"
   },
   "devDependencies": {
     "@portabletext/types": "^2.0.2",
