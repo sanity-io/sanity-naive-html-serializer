@@ -1,4 +1,5 @@
 import {PortableTextBlock} from 'sanity'
+import {expect, test} from 'vitest'
 import {documentLevelArticle} from '../BaseDocumentSerializer/utils'
 import {getDeserialized, toPlainText} from '../helpers'
 

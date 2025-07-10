@@ -1,8 +1,11 @@
 import clone from 'just-clone'
 import {getDeserialized} from '../helpers'
+import {createRequire} from 'module'
 
-const documentLevelArticle = require('../__fixtures__/documentLevelArticle')
-const fieldLevelArticle = require('../__fixtures__/fieldLevelArticle')
+const require = createRequire(import.meta.url)
+
+const documentLevelArticle = require('../__fixtures__/documentLevelArticle.json')
+const fieldLevelArticle = require('../__fixtures__/fieldLevelArticle.json')
 
 export const getNewObject = (): Record<string, any> => {
   const newObject = {

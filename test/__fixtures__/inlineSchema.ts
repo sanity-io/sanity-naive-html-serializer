@@ -261,7 +261,7 @@ const types = [
   localeString,
 ]
 
-module.exports = new Schema({
+export default new Schema({
   name: 'test',
   types,
 })

@@ -1,12 +1,17 @@
 import {readFileSync} from 'fs'
-
-import {PortableTextBlock, PortableTextChild} from 'sanity'
 import {
-  addedBlockDeserializers,
-  addedCustomDeserializers,
-  addedCustomSerializers,
-  getDeserialized,
-} from '../helpers'
+  PortableTextBlock,
+  PortableTextObject,
+  PortableTextSpan,
+  PortableTextTextBlock,
+} from 'sanity'
+import {beforeEach, expect, test, vi} from 'vitest'
+import {
+  BaseDocumentDeserializer,
+  BaseDocumentSerializer,
+  customBlockDeserializers,
+  defaultStopTypes,
+} from '../../src'
 import {
   annotationAndInlineBlocks,
   documentLevelArticle,
@@ -15,27 +20,32 @@ import {
   schema,
 } from '../BaseDocumentSerializer/utils'
 import {
-  BaseDocumentDeserializer,
-  BaseDocumentSerializer,
-  customBlockDeserializers,
-  defaultStopTypes,
-} from '../../src'
+  addedBlockDeserializers,
+  addedCustomDeserializers,
+  addedCustomSerializers,
+  getDeserialized,
+} from '../helpers'
+
 const customStyles = require('../__fixtures__/customStyles')
 
 let mockTestKey = 0
 
-jest.mock('@sanity/block-tools', () => {
-  const originalModule = jest.requireActual('@sanity/block-tools')
+vi.mock('@sanity/block-tools', async () => {
+  const originalModule = await vi.importActual<typeof import('@sanity/block-tools')>(
+    '@sanity/block-tools'
+  )
   return {
     ...originalModule,
-    //not ideal but jest.mock('@sanity/block-tools/src/util/randomKey.ts' is not working
+    //not ideal but vi.mock('@sanity/block-tools/src/util/randomKey.ts' is not working
     htmlToBlocks: (html: string, blockContentType: any, options: any) => {
       const blocks = originalModule.htmlToBlocks(html, blockContentType, options)
-      const newBlocks = blocks.map((block: PortableTextBlock) => {
-        const newChildren = (block.children as PortableTextChild[]).map((child) => {
+      const newBlocks = blocks.map((block) => {
+        const newChildren = (
+          block as unknown as PortableTextTextBlock<PortableTextSpan | PortableTextObject>
+        ).children.map((child) => {
           return {...child, _key: `randomKey-${mockTestKey++}`}
         })
-        return {...block, children: newChildren}
+        return {...block, children: newChildren, _key: `randomKey-${mockTestKey++}`}
       })
       return newBlocks
     },
@@ -98,7 +108,7 @@ test('Custom deserialization should manifest at all levels', () => {
 
 test('Content with custom styles deserializes correctly and maintains style', () => {
   //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
-  jest.spyOn(console, 'warn').mockImplementation(() => {})
+  vi.spyOn(console, 'warn').mockImplementation(() => {})
 
   const customStyledDocument = {
     ...documentLevelArticle,
@@ -292,7 +302,7 @@ test('Deserialized list items should preserve level, style and tag', () => {
  */
 test('&nbsp; whitespace should not be escaped', () => {
   //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
-  jest.spyOn(console, 'debug').mockImplementation(() => {})
+  vi.spyOn(console, 'debug').mockImplementation(() => {})
 
   const content = readFileSync('test/__fixtures__/messy-html.html', {
     encoding: 'utf-8',
@@ -307,7 +317,7 @@ test('&nbsp; whitespace should not be escaped', () => {
  */
 test('Content with anonymous inline objects deserializes all fields, at any depth', () => {
   //eslint-disable-next-line no-empty-function -- unhandled style throws a warn -- ignore it in this case
-  jest.spyOn(console, 'debug').mockImplementation(() => {})
+  vi.spyOn(console, 'debug').mockImplementation(() => {})
 
   const serialized = BaseDocumentSerializer(inlineSchema).serializeDocument(
     inlineDocumentLevelArticle,

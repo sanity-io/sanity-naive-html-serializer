@@ -1,4 +1,5 @@
 import {PortableTextBlock} from 'sanity'
+import {describe, expect, test} from 'vitest'
 import {getSerialized, getValidFields, toPlainText} from '../helpers'
 import {documentLevelArticle, findByClass, getHTMLNode} from './utils'
 

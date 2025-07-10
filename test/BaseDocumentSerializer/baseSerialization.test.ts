@@ -1,4 +1,5 @@
 import {PortableTextBlock} from 'sanity'
+import {describe, expect, test, vi} from 'vitest'
 import {BaseDocumentSerializer, customSerializers, defaultStopTypes} from '../../src'
 import {
   addedCustomSerializers,
@@ -133,7 +134,7 @@ test('Expect custom stop types to be absent at all levels', () => {
 
 test('Unhandled inline objects and annotations should not hinder translation flows', () => {
   //eslint-disable-next-line no-empty-function -- we're just silencing the console.warn
-  jest.spyOn(console, 'warn').mockImplementation(() => {})
+  vi.spyOn(console, 'warn').mockImplementation(() => {})
 
   const inlineDocument = {
     ...documentLevelArticle,

@@ -7,8 +7,7 @@ import {
 import {PortableTextBlock, SanityDocument, TypedObject} from 'sanity'
 import clone from 'just-clone'
 import {SerializedDocument, TranslationLevel} from '../src/types'
-
-const schema = require('./__fixtures__/schema')
+import schema from './__fixtures__/schema'
 
 export const getSerialized = (
   document: SanityDocument,

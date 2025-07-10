@@ -39,7 +39,7 @@
   "scripts": {
     "build": "run-s clean && plugin-kit verify-package --silent && pkg-utils build --strict && pkg-utils --strict",
     "lint": "eslint .",
-    "test": "jest",
+    "test": "vitest",
     "clean": "rimraf dist",
     "format": "prettier --write --cache --ignore-unknown .",
     "link-watch": "plugin-kit link-watch",
@@ -59,7 +59,6 @@
     "@sanity/pkg-utils": "^2.2.4",
     "@sanity/plugin-kit": "^3.1.4",
     "@sanity/semantic-release-preset": "^5.0.0",
-    "@types/jest": "27.4.1",
     "@types/react": "^18.0.27",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
@@ -67,12 +66,10 @@
     "eslint": "^8.33.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-config-sanity": "^6.0.0",
-    "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "jest": "27.3.1",
-    "jest-environment-jsdom": "27.3.1",
+    "jsdom": "^26.1.0",
     "just-clone": "^6.2.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.4",
@@ -85,9 +82,9 @@
     "semantic-release": "^24.2.6",
     "size-limit": "8.1.2",
     "styled-components": "^6.1.9",
-    "ts-jest": "27.0.7",
     "tslib": "2.5.0",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "react": "^18.3 || ^19",

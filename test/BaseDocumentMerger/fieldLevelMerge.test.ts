@@ -1,9 +1,14 @@
 import clone from 'just-clone'
+import {createRequire} from 'module'
+import {expect, test} from 'vitest'
 import {BaseDocumentMerger} from '../../src'
-import {getNewFieldLevelDocument, getNewObject} from './utils'
 import {getDeserialized} from '../helpers'
-const fieldLevelArticle = require('../__fixtures__/fieldLevelArticle')
-const nestedLanguageFields = require('../__fixtures__/nestedLanguageFields')
+import {getNewFieldLevelDocument, getNewObject} from './utils'
+
+const require = createRequire(import.meta.url)
+
+const fieldLevelArticle = require('../__fixtures__/fieldLevelArticle.json')
+const nestedLanguageFields = require('../__fixtures__/nestedLanguageFields.json')
 
 const newDocument = getNewFieldLevelDocument()
 const fieldLevelPatches = BaseDocumentMerger.fieldLevelMerge(

@@ -4,14 +4,6 @@
     "node": true,
     "browser": true
   },
-  "overrides": [
-    {
-      "files": ["test/**"],
-      "plugins": ["jest"],
-      "extends": ["plugin:jest/recommended"],
-      "rules": {"jest/prefer-expect-assertions": "off", "max-nested-callbacks": "off"}
-    }
-  ],
   "extends": [
     "sanity",
     "sanity/typescript",

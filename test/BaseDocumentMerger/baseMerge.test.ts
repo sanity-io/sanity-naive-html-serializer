@@ -1,7 +1,12 @@
+import {createRequire} from 'module'
 import {PortableTextBlock} from 'sanity'
+import {expect, test} from 'vitest'
 import {BaseDocumentMerger} from '../../src'
 import {getNewDocument} from './utils'
-const documentLevelArticle = require('../__fixtures__/documentLevelArticle')
+
+const require = createRequire(import.meta.url)
+
+const documentLevelArticle = require('../__fixtures__/documentLevelArticle.json')
 
 /*
  * STYLE TAGS
