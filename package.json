@@ -99,5 +99,8 @@
     "verifyPackage": {
       "packageName": false
     }
+  },
+  "overrides": {
+    "conventional-changelog-conventionalcommits": ">= 8.0.0"
   }
 }
