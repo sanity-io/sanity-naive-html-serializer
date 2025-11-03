@@ -16,20 +16,19 @@
   },
   "license": "MIT",
   "author": "Sanity.io",
+  "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "source": "./src/index.ts",
-      "require": "./dist/index.js",
       "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs",
       "default": "./dist/index.esm.js"
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.esm.js",
-  "source": "./src/index.ts",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.esm.d.ts",
   "files": [
     "dist",
     "sanity.json",
@@ -37,18 +36,18 @@
     "v2-incompatible.js"
   ],
   "scripts": {
-    "build": "run-s clean && plugin-kit verify-package --silent && pkg-utils build --strict && pkg-utils --strict",
+    "build": "plugin-kit verify-package --silent && pkg-utils build --strict --check --clean",
     "lint": "eslint .",
     "test": "vitest",
     "clean": "rimraf dist",
     "format": "prettier --write --cache --ignore-unknown .",
     "link-watch": "plugin-kit link-watch",
-    "prepublishOnly": "run-s build",
+    "prepublishOnly": "npm run build",
     "watch": "pkg-utils watch --strict"
   },
   "dependencies": {
     "@portabletext/to-html": "^2.0.14",
-    "@sanity/block-tools": "^3.70.0",
+    "@portabletext/block-tools": "^3.5.13",
     "@sanity/incompatible-plugin": "^1.0.5",
     "@sanity/mutator": "^3.98.1",
     "@sanity/schema": "^3.98.1"
@@ -56,8 +55,8 @@
   "devDependencies": {
     "@portabletext/types": "^2.0.2",
     "@sanity/eslint-config-no-v2-imports": "^0.0.1-studio-v3.3",
-    "@sanity/pkg-utils": "^2.2.4",
-    "@sanity/plugin-kit": "^3.1.4",
+    "@sanity/pkg-utils": "^8.1.29",
+    "@sanity/plugin-kit": "^4.0.20",
     "@sanity/semantic-release-preset": "^5.0.0",
     "@types/react": "^18.0.27",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
@@ -91,7 +90,7 @@
     "sanity": "^3 || ^4.0.0-0"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "sanityPlugin": {
     "verifyPackage": {

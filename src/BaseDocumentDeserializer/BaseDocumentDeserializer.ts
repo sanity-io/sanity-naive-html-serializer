@@ -1,5 +1,4 @@
-// import {htmlToBlocks} from '@sanity/block-tools'
-import {htmlToBlocks} from '@sanity/block-tools'
+import {htmlToBlocks} from '@portabletext/block-tools'
 import {customDeserializers, customBlockDeserializers} from '../BaseSerializationConfig'
 import {Deserializer} from '../types'
 import {blockContentType, preprocess} from './helpers'

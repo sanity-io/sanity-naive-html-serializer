@@ -30,9 +30,9 @@ const customStyles = require('../__fixtures__/customStyles')
 
 let mockTestKey = 0
 
-vi.mock('@sanity/block-tools', async () => {
-  const originalModule = await vi.importActual<typeof import('@sanity/block-tools')>(
-    '@sanity/block-tools'
+vi.mock('@portabletext/block-tools', async () => {
+  const originalModule = await vi.importActual<typeof import('@portabletext/block-tools')>(
+    '@portabletext/block-tools'
   )
   return {
     ...originalModule,
