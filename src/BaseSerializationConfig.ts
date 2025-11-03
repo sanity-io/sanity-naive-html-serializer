@@ -6,7 +6,7 @@ import {
   PortableTextListItemComponent,
 } from '@portabletext/to-html'
 
-import {htmlToBlocks} from '@sanity/block-tools'
+import {htmlToBlocks} from '@portabletext/block-tools'
 import {blockContentType} from './BaseDocumentDeserializer/helpers'
 import {PortableTextTextBlock, TypedObject} from 'sanity'
 
@@ -134,7 +134,7 @@ export const customBlockDeserializers: Array<any> = [
             ...block,
             ...newBlock,
             style: customStyle ?? (newBlock as PortableTextTextBlock).style,
-          }
+          } as PortableTextTextBlock
 
           //next(childNodes) plays poorly with custom styles, issue to be filed.
           if (customStyle) {

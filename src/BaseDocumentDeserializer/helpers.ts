@@ -1,4 +1,4 @@
-import {htmlToBlocks} from '@sanity/block-tools'
+import {htmlToBlocks} from '@portabletext/block-tools'
 import {Schema} from '@sanity/schema'
 import {ObjectField, PortableTextSpan, PortableTextTextBlock} from 'sanity'
 
