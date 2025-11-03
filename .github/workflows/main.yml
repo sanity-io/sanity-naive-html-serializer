@@ -53,6 +53,8 @@ jobs:
     name: Semantic release
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     # only run if opt-in during workflow_dispatch
     if: inputs.release == true
     steps:
@@ -74,9 +76,10 @@ jobs:
         with:
           node-version: lts/*
           cache: npm
+          registry-url: https://registry.npmjs.org
       - run: npm ci
         # Branches that will release new versions are defined in .releaserc.json
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
