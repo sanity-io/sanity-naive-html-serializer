@@ -78,7 +78,7 @@
     "react-is": "^18.2.0",
     "rimraf": "^4.1.2",
     "sanity": "^3.3.1",
-    "semantic-release": "^24.2.6",
+    "semantic-release": "^25.0.1",
     "size-limit": "8.1.2",
     "styled-components": "^6.1.9",
     "tslib": "2.5.0",
