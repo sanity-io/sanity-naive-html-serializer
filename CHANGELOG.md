@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/sanity-io/sanity-naive-html-serializer/compare/v4.0.0...v4.0.1) (2025-11-12)
+
+### Bug Fixes
+
+- **deps:** update sanity monorepo to v4 ([#88](https://github.com/sanity-io/sanity-naive-html-serializer/issues/88)) ([e756db1](https://github.com/sanity-io/sanity-naive-html-serializer/commit/e756db1cb3483a1facada76f84434ef280495b25))
+
 ## [4.0.0](https://github.com/sanity-io/sanity-naive-html-serializer/compare/v3.2.0...v4.0.0) (2025-11-03)
 
 ### ⚠ BREAKING CHANGES
