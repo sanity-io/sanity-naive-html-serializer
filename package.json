@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@portabletext/to-html": "^2.0.14",
-    "@portabletext/block-tools": "^3.5.13",
+    "@portabletext/block-tools": "^4.0.2",
     "@sanity/incompatible-plugin": "^1.0.5",
     "@sanity/mutator": "^4.15.0",
     "@sanity/schema": "^4.15.0"
