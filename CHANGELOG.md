@@ -5,6 +5,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.2](https://github.com/sanity-io/sanity-naive-html-serializer/compare/v4.0.1...v4.0.2) (2025-12-29)
+
+### Bug Fixes
+
+- **deps:** allow studio v5 in peer deps ranges ([#92](https://github.com/sanity-io/sanity-naive-html-serializer/issues/92)) ([7e4b4c0](https://github.com/sanity-io/sanity-naive-html-serializer/commit/7e4b4c03565cc33d0ed8d8241b33ad07de97daab))
+- **deps:** Update dependency @portabletext/block-tools to v4 ([#89](https://github.com/sanity-io/sanity-naive-html-serializer/issues/89)) ([a277cdd](https://github.com/sanity-io/sanity-naive-html-serializer/commit/a277cddbb6a7b6c1c8d3adb9b91b6990af72d8d3))
+
 ## [4.0.1](https://github.com/sanity-io/sanity-naive-html-serializer/compare/v4.0.0...v4.0.1) (2025-11-12)
 
 ### Bug Fixes
