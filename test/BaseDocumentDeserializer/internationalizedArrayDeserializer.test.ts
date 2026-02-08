@@ -1,6 +1,7 @@
 import {PortableTextBlock} from 'sanity'
 import {internationalizedArrayArticle} from '../BaseDocumentSerializer/utils'
 import {getDeserialized, getI18nArrayItem, toPlainText} from '../helpers'
+import {expect, test, describe} from 'vitest'
 
 const deserialized = getDeserialized(internationalizedArrayArticle, 'internationalizedArray')
 

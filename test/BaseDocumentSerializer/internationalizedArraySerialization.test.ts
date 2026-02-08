@@ -1,4 +1,5 @@
 import {PortableTextBlock} from 'sanity'
+import {expect, test, describe} from 'vitest'
 import {getI18nArrayItem, getSerialized, getValidFields, toPlainText} from '../helpers'
 import {findByClass, getHTMLNode, internationalizedArrayArticle} from './utils'
 
@@ -124,7 +125,6 @@ describe('Presence and accurancy of fields in "vanilla" deserialization -- array
 })
 
 //works, but requires another schema declaration. resolve later.
-//eslint-disable-next-line jest/no-commented-out-tests
 test('Nested locale fields make it to serialization, but only base lang', () => {
   const slices = findByClass(docTree.children, 'slices')?.children[0]
   const origSlices = internationalizedArrayArticle.slices[0].content

@@ -169,9 +169,7 @@ const internationalizedArrayMerge = (
       )
     }
 
-    let finalArrayPosition = localeArrayPosition
-    //check if the array is long enough for it 
-    //see wtf is causing duplicates
+    //check if the array is long enough for it to have a position
 
     //check the original array to see what operation we should run
     //(we don't want duplicates of locale keys)

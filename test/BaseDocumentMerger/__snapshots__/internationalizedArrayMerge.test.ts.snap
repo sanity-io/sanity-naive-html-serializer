@@ -1,46 +1,46 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Global internationalized array snapshot test 1`] = `
-Array [
-  Object {
-    "after": "config[-1]",
-    "items": Array [
-      Object {
+[
+  {
+    "at": "after",
+    "items": [
+      {
         "_key": "es_ES",
         "_type": "internationalizedArrayObjectFieldValue",
-        "value": Object {
+        "value": {
           "_type": "objectField",
-          "nestedArrayField": Array [
-            Object {
+          "nestedArrayField": [
+            {
               "_key": "4a58adc7c507",
               "_type": "block",
-              "children": Array [
-                Object {
+              "children": [
+                {
                   "_key": "4f6bc15ae261",
                   "_type": "span",
-                  "marks": Array [],
+                  "marks": [],
                   "text": "New text",
                 },
               ],
-              "markDefs": Array [],
+              "markDefs": [],
               "style": "normal",
             },
           ],
-          "objectAsField": Object {
+          "objectAsField": {
             "_type": "childObjectField",
-            "content": Array [
-              Object {
+            "content": [
+              {
                 "_key": "869168fe3a2a",
                 "_type": "block",
-                "children": Array [
-                  Object {
+                "children": [
+                  {
                     "_key": "10d423df228a",
                     "_type": "span",
-                    "marks": Array [],
+                    "marks": [],
                     "text": "This is block text 2 levels deep",
                   },
                 ],
-                "markDefs": Array [],
+                "markDefs": [],
                 "style": "normal",
               },
             ],
@@ -50,46 +50,47 @@ Array [
         },
       },
     ],
+    "selector": "config[-1]",
   },
-  Object {
-    "after": "content[-1]",
-    "items": Array [
-      Object {
+  {
+    "at": "after",
+    "items": [
+      {
         "_key": "es_ES",
         "_type": "internationalizedArrayPortableTextValue",
-        "value": Array [
-          Object {
+        "value": [
+          {
             "_key": "e2a39d768ff8",
             "_type": "block",
-            "children": Array [
-              Object {
+            "children": [
+              {
                 "_key": "216e97c5a5cc",
                 "_type": "span",
-                "marks": Array [],
+                "marks": [],
                 "text": "This is block text at the top level.",
               },
             ],
-            "markDefs": Array [],
+            "markDefs": [],
             "style": "normal",
           },
-          Object {
+          {
             "_key": "271b0c6ee984",
             "_type": "objectField",
-            "objectAsField": Object {
+            "objectAsField": {
               "_type": "childObjectField",
-              "content": Array [
-                Object {
+              "content": [
+                {
                   "_key": "4f24f6fbfae7",
                   "_type": "block",
-                  "children": Array [
-                    Object {
+                  "children": [
+                    {
                       "_key": "randomKey-14",
                       "_type": "span",
-                      "marks": Array [],
+                      "marks": [],
                       "text": "This is block text in a nested object in an object in top-level block text.",
                     },
                   ],
-                  "markDefs": Array [],
+                  "markDefs": [],
                   "style": "normal",
                 },
               ],
@@ -100,65 +101,70 @@ Array [
         ],
       },
     ],
+    "selector": "content[-1]",
   },
-  Object {
-    "after": "snippet[-1]",
-    "items": Array [
-      Object {
+  {
+    "at": "after",
+    "items": [
+      {
         "_key": "es_ES",
         "_type": "internationalizedArrayStringFieldValue",
         "value": "A new document snippet",
       },
     ],
+    "selector": "snippet[-1]",
   },
-  Object {
-    "after": "tags[-1]",
-    "items": Array [
-      Object {
+  {
+    "at": "after",
+    "items": [
+      {
         "_key": "es_ES",
         "_type": "internationalizedArrayTagsValue",
-        "value": Array [
+        "value": [
           "tag 1",
           "tag 2",
           "tag 3",
         ],
       },
     ],
+    "selector": "tags[-1]",
   },
-  Object {
-    "after": "title[-1]",
-    "items": Array [
-      Object {
+  {
+    "at": "after",
+    "items": [
+      {
         "_key": "es_ES",
         "_type": "internationalizedArrayStringFieldValue",
         "value": "A new document title",
       },
     ],
+    "selector": "title[-1]",
   },
-  Object {
-    "after": "slices[0].content[-1]",
-    "items": Array [
-      Object {
+  {
+    "at": "after",
+    "items": [
+      {
         "_key": "es_ES",
         "_type": "internationalizedArrayBlockValue",
-        "value": Array [
-          Object {
+        "value": [
+          {
             "_key": "e2a39d768ff8",
             "_type": "block",
-            "children": Array [
-              Object {
+            "children": [
+              {
                 "_key": "randomKey-26",
                 "_type": "span",
-                "marks": Array [],
+                "marks": [],
                 "text": "This is block text 1 level deep",
               },
             ],
-            "markDefs": Array [],
+            "markDefs": [],
             "style": "normal",
           },
         ],
       },
     ],
+    "selector": "slices[0].content[-1]",
   },
 ]
 `;

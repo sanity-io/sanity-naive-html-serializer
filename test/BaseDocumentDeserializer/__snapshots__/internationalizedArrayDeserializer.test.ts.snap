@@ -1,47 +1,47 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Global test of working internationalized array functionality and snapshot match 1`] = `
-Object {
+{
   "_id": "drafts.2947533e-1ea5-4116-955b-339608d3445d",
   "_rev": "l58oha-n06-1s4-f6i-74g6cuakl",
   "_type": "internationalizedArrayArticle",
-  "config": Array [
-    Object {
+  "config": [
+    {
       "_key": "en",
       "_type": "internationalizedArrayObjectFieldValue",
-      "value": Object {
+      "value": {
         "_type": "objectField",
-        "nestedArrayField": Array [
-          Object {
+        "nestedArrayField": [
+          {
             "_key": "4a58adc7c507",
             "_type": "block",
-            "children": Array [
-              Object {
+            "children": [
+              {
                 "_key": "randomKey-6",
                 "_type": "span",
-                "marks": Array [],
+                "marks": [],
                 "text": "This is block text 1 level deep",
               },
             ],
-            "markDefs": Array [],
+            "markDefs": [],
             "style": "normal",
           },
         ],
-        "objectAsField": Object {
+        "objectAsField": {
           "_type": "childObjectField",
-          "content": Array [
-            Object {
+          "content": [
+            {
               "_key": "869168fe3a2a",
               "_type": "block",
-              "children": Array [
-                Object {
+              "children": [
+                {
                   "_key": "randomKey-4",
                   "_type": "span",
-                  "marks": Array [],
+                  "marks": [],
                   "text": "This is block text 2 levels deep",
                 },
               ],
-              "markDefs": Array [],
+              "markDefs": [],
               "style": "normal",
             },
           ],
@@ -51,43 +51,43 @@ Object {
       },
     },
   ],
-  "content": Array [
-    Object {
+  "content": [
+    {
       "_key": "en",
       "_type": "internationalizedArrayPortableTextValue",
-      "value": Array [
-        Object {
+      "value": [
+        {
           "_key": "e2a39d768ff8",
           "_type": "block",
-          "children": Array [
-            Object {
+          "children": [
+            {
               "_key": "randomKey-8",
               "_type": "span",
-              "marks": Array [],
+              "marks": [],
               "text": "This is block text at the top level.",
             },
           ],
-          "markDefs": Array [],
+          "markDefs": [],
           "style": "normal",
         },
-        Object {
+        {
           "_key": "271b0c6ee984",
           "_type": "objectField",
-          "objectAsField": Object {
+          "objectAsField": {
             "_type": "childObjectField",
-            "content": Array [
-              Object {
+            "content": [
+              {
                 "_key": "4f24f6fbfae7",
                 "_type": "block",
-                "children": Array [
-                  Object {
+                "children": [
+                  {
                     "_key": "randomKey-14",
                     "_type": "span",
-                    "marks": Array [],
+                    "marks": [],
                     "text": "This is block text in a nested object in an object in top-level block text.",
                   },
                 ],
-                "markDefs": Array [],
+                "markDefs": [],
                 "style": "normal",
               },
             ],
@@ -98,27 +98,27 @@ Object {
       ],
     },
   ],
-  "slices": Array [
-    Object {
+  "slices": [
+    {
       "_key": "6b9d0b28810f",
       "_type": "nestedlocaleBlock",
-      "content": Array [
-        Object {
+      "content": [
+        {
           "_key": "en",
           "_type": "internationalizedArrayBlockValue",
-          "value": Array [
-            Object {
+          "value": [
+            {
               "_key": "e2a39d768ff8",
               "_type": "block",
-              "children": Array [
-                Object {
+              "children": [
+                {
                   "_key": "randomKey-26",
                   "_type": "span",
-                  "marks": Array [],
+                  "marks": [],
                   "text": "This is block text 1 level deep",
                 },
               ],
-              "markDefs": Array [],
+              "markDefs": [],
               "style": "normal",
             },
           ],
@@ -126,26 +126,26 @@ Object {
       ],
     },
   ],
-  "snippet": Array [
-    Object {
+  "snippet": [
+    {
       "_key": "en",
       "_type": "internationalizedArrayStringFieldValue",
       "value": "This is text in my text field",
     },
   ],
-  "tags": Array [
-    Object {
+  "tags": [
+    {
       "_key": "en",
       "_type": "internationalizedArrayTagsValue",
-      "value": Array [
+      "value": [
         "tag 1",
         "tag 2",
         "tag 3",
       ],
     },
   ],
-  "title": Array [
-    Object {
+  "title": [
+    {
       "_key": "en",
       "_type": "internationalizedArrayStringFieldValue",
       "value": "My Internationalized Array Article",

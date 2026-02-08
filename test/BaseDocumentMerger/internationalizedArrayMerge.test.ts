@@ -1,15 +1,15 @@
-// import {PortableTextBlock} from 'sanity'
 import {internationalizedArrayArticle} from '../BaseDocumentSerializer/utils'
-// import {getDeserialized, getI18nArrayItem, toPlainText} from '../helpers'
 import {BaseDocumentMerger} from '../../src'
 import {getInternationalizedArrayDocument} from './utils'
+import {expect, test} from 'vitest'
 
 const newDocument = getInternationalizedArrayDocument()
 const internationalizedArrayPatches = BaseDocumentMerger.internationalizedArrayMerge(
   newDocument,
   internationalizedArrayArticle,
   'es_ES',
-  'en'
+  'en',
+  0
 )
 
 test('Global internationalized array snapshot test', () => {
