@@ -5,7 +5,7 @@ export type SerializedDocument = {
   content: string
 }
 
-export type TranslationLevel = 'document' | 'field'
+export type TranslationLevel = 'document' | 'field' | 'internationalizedArray'
 export interface Serializer {
   serializeDocument: (
     doc: SanityDocument,
@@ -19,7 +19,8 @@ export interface Serializer {
     objFields: ObjectField[],
     stopTypes: string[]
   ) => TypedObject
-  languageObjectFieldFilter: (obj: Record<string, any>, baseLang: string) => Record<string, any>
+  languageObjectFieldFilter: (document: SanityDocument, baseLang: string) => Record<string, any>
+  internationalizedArrayFilter: (document: SanityDocument, baseLang: string) => Record<string, any>
   serializeArray: (
     fieldContent: Record<string, any>[],
     fieldName: string,
@@ -54,6 +55,13 @@ export interface Merger {
     baseDoc: SanityDocument,
     localeId: string,
     baseLang: string
+  ) => Record<string, any>
+  internationalizedArrayMerge: (
+    translatedFields: Record<string, any>,
+    baseDoc: SanityDocument,
+    localeId: string,
+    baseLang: string,
+    localeArrayPosition: number
   ) => Record<string, any>
   documentLevelMerge: (
     translatedFields: Record<string, any>,
