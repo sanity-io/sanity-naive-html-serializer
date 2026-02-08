@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.0](https://github.com/sanity-io/sanity-naive-html-serializer/compare/v4.0.2...v4.1.0) (2026-02-08)
+
+### Features
+
+- i18n array serialization ([#62](https://github.com/sanity-io/sanity-naive-html-serializer/issues/62)) ([174ded7](https://github.com/sanity-io/sanity-naive-html-serializer/commit/174ded7a31948758aaa1897014941c1373970388))
+
 ## [4.0.2](https://github.com/sanity-io/sanity-naive-html-serializer/compare/v4.0.1...v4.0.2) (2025-12-29)
 
 ### Bug Fixes
