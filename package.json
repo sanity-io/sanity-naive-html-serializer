@@ -53,7 +53,7 @@
     "@sanity/schema": "^4.15.0"
   },
   "devDependencies": {
-    "@portabletext/types": "^2.0.2",
+    "@portabletext/types": "^3.0.1",
     "@sanity/eslint-config-no-v2-imports": "^0.0.1-studio-v3.3",
     "@sanity/pkg-utils": "^8.1.29",
     "@sanity/plugin-kit": "^4.0.20",
